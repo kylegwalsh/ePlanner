@@ -1,83 +1,93 @@
-      body {
-        font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
-        font-size: 100%;
-        background-color: white;
-        width: 350px;
-        height: 400px;
-      }
-      #title{
-        text-align: center;
-        padding-top: 1%;
-        padding-bottom: 1%;
-        border-style: solid;
-        height: 10%;
-        width: 100%;
-        background-color: teal;
-      }
-      .tabs{
-        text-align: center;
-        padding:0px;
-        margin:0px;
-        width: 100%;
-        background-color: pink;
-      }
-      #To-do{
-        width: 33%;
-        float: left;
-        padding-top: 1%;
-        padding-bottom: 1%;
-        border-style: solid;
-      }
-      #To-do:hover{
-        background-color: teal;
-      }
-      #Calendar{
-        width: 32%;
-        float: left;
-        padding-top: 1%;
-        padding-bottom: 1%;
-        border-style: solid;
-      }
-      #Calendar:hover{
-        background-color: teal;
-      }
-      #Completed{
-        width:32%;
-        float: left;
-        padding-top: 1%;
-        padding-bottom: 1%;
-        border-style: solid;
-      }
-      #Completed:hover{
-        background-color: teal;
-      }
-      #Main{
-        width: 100%;
-        height: 85%;
-        border-style: solid;
+@import 'https://fonts.googleapis.com/css?family=Lato';
 
-      }
-      #first{
-        margin-top: 5px;
-        margin-right: 60px;
-        margin-bottom: 5px;
-      }
-      #second{
-        margin-top: 5px;
-        margin-left: 60px;
-        margin-bottom: 5px;
-      }
-      button{
-        border-radius: 3px;
-        height: 30px;
-      }
-      button:hover{
-        background-color: teal;
-      }
+body {
+  font-family: 'Lato', sans-serif;
+  font-size: 100%;
+  background-color: white;
+  width: 520px;
+  height: 600px;
+  padding: 0;
+  margin: 0;
+}
 
-      footer{
-        border-style: solid;
-        background-color: teal;
-        height: 5%;
-        width: 100%;
-      }
+#top-bar{
+  text-align: center;
+  font-size: 30px;
+  height: 8%;
+  width: 100%;
+  background-color: #3498db;
+  color: white;
+  padding: 0;
+  margin: 0;
+}
+
+#header{
+  padding-top: 7px;
+}
+
+#filter{
+  width: 35px;
+  height: 35px;
+  float: left;
+  margin-left: 25px;
+}
+
+#filter:hover{
+  cursor: pointer;
+}
+
+#settings{
+  width: 35px;
+  height: 35px;
+  float: right;
+  margin-right: 25px;
+}
+
+#settings:hover{
+  cursor: pointer;
+}
+
+.container{
+  width: 100%;
+  padding: 20px;
+}
+
+.col-3{
+  width: 32%;
+}
+
+.tabs{
+  height: 6%;
+  text-align: center;
+  width: 100%;
+}
+
+.tab{
+  width: 32.7%;
+  float: left;
+  padding-top: 1%;
+  padding-bottom: 1%;
+  border-style: solid;
+  border-color: lightgray;
+}
+
+.tab:hover{
+  cursor: pointer;
+}
+
+.tab:active, .active{
+  background-color: #93c8ec;
+}
+
+#Main{
+  width: 100%;
+  height: 82%;
+}
+
+footer{
+  background-color: #3498db;
+  height: 4%;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
