@@ -10,6 +10,12 @@
     "default_popup": "popup.htm",
     "default_title": "Click here!"
   },
+  "content_scripts": [
+    {
+      "matches": ["http://www.google.com/*"],
+      "js": ["lib/js/jquery-3.1.1.min.js", "lib/js/angular.min.js", "lib/js/bootstrap.min.js"]
+    }
+  ],
   "permissions": [
     "activeTab",
     "https://ajax.googleapis.com/"

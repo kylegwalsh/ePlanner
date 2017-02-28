@@ -3,30 +3,33 @@
   <head>
     <title>ePlanner Extension</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="lib/js/angular.min.js"></script>
+    <script src="lib/js/jquery-3.1.1.min.js"></script>
+    <script src="lib/js/bootstrap.min.js"></script>
     <script src="source.js"></script>
   </head>
 
   <body>
       <div id="top-bar">
-        <div id="header">
-          <div class="col-3" style="float:left">
-            <img id="filter" src="/images/filter-icon.png"/>
+        <div class="row" id="header">
+          <div style="float:left">
+            <i id="filter" class="fa fa-lg fa-filter"></i>
           </div>
-          <div class="col-3" style="display: inline-block">
-            <strong>Eplanner</strong>
+          <div style="display: inline-block">
+            <strong>ePlanner</strong>
           </div>
-          <div class="col-3" style="float:right">
-            <img id="settings" src="/images/settings-icon.png"/> 
+          <div style="float:right">
+            <i id="settings" class="fa fa-lg fa-cog"></i> 
           </div>
         </div>
       </div>
-      <div class ="tabs">
-        <div class="tab" id="To-do">To-do</div>
-        <div class="tab" id="Completed">Completed</div>
-        <div class="tab" id="Calendar">Calendar</div>
+      <div class="row tabs">
+        <div class="col-xs-4 tab active" id="To-do">To-do</div>
+        <div class="col-xs-4 tab" id="Completed">Completed</div>
+        <div class="col-xs-4 tab" id="Calendar">Calendar</div>
       </div>
       <div id="Main">
-          Main area with all the stuff, we start in the Todo
+        To do will be default
       </div>
   </body>
 
