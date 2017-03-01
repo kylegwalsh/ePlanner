@@ -1,28 +1,21 @@
 <!doctype html>
-<html>
+<html ng-app="app">
   <head>
     <title>ePlanner Extension</title>
+    <link rel="stylesheet" type="text/css" href="lib/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <script src="lib/js/angular.min.js"></script>
-    <script src="lib/js/jquery-3.1.1.min.js"></script>
-    <script src="lib/js/bootstrap.min.js"></script>
-    <script src="source.js"></script>
   </head>
 
-  <body>
-      <div id="top-bar">
+  <body ng-controller="todoCtrl">
+    <div class="container" id="top-bar">
         <div class="row" id="header">
-          <div style="float:left">
-            <i id="filter" class="fa fa-lg fa-filter"></i>
-          </div>
-          <div style="display: inline-block">
+          <a class='filter pull-left'><i id="filter" class='glyphicon glyphicon-filter'></i> </a>
+          <div id="appName">
             <strong>ePlanner</strong>
           </div>
-          <div style="float:right">
-            <i id="settings" class="fa fa-lg fa-cog"></i> 
-          </div>
+          <a class='filter pull-right'><i id="settings" class='glyphicon glyphicon-cog'></i> </a>
         </div>
-      </div>
+    </div>
       <div class="row tabs">
         <div class="col-xs-4 tab active" id="To-do">To-do</div>
         <div class="col-xs-4 tab" id="Completed">Completed</div>
@@ -31,6 +24,13 @@
       <div id="Main">
         To do will be default
       </div>
+    <script type="text/javascript" src="lib/jquery/jquery-2.1.3.min.js"></script>
+    <script type="text/javascript" src="lib/angular/angular.js"></script>
+    <script type="text/javascript" src="lib/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="app/app.js"></script>
+    <script type="text/javascript" src="app/todoCtrl.js"></script>
+    <script type="text/javascript" src="app/todoStorage.js"></script>
+    <script type="text/javascript" src="app/source.js"></script>
   </body>
 
   <footer>

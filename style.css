@@ -27,10 +27,14 @@ body {
   padding-top: 7px;
 }
 
+#appName{
+  display: inline-block;
+}
+
 #filter{
   float: left;
   margin-left: 25px;
-  color: black;
+  color: white;
 }
 
 #filter:hover{
@@ -40,7 +44,7 @@ body {
 #settings{
   float: right;
   margin-right: 25px;
-  color: black;
+  color: white;
 }
 
 #settings:hover{
