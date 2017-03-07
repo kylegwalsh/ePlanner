@@ -16,9 +16,7 @@ angular.module('app').service('todoStorage', function ($q) {
     }
 
     this.sync = function() {
-        chrome.storage.sync.set({todo: this.data}, function() {
-            console.log('Data is stored in Chrome storage');
-        });
+        chrome.storage.sync.set({todo: this.data}, function() {});
     }
 
     this.add = function (newContent) {
