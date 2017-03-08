@@ -1,6 +1,7 @@
 'use strict';
+var app = angular.module('app', []);
 
-angular.module('app').controller('todoCtrl', function ($scope, todoStorage) {
+app.controller('todoCtrl', function ($scope, todoStorage) {
 
     $scope.todoStorage = todoStorage;
 
@@ -30,4 +31,20 @@ angular.module('app').controller('todoCtrl', function ($scope, todoStorage) {
         todoStorage.sync();
     }
 
+});
+
+app.controller('completed', function($scope) {
+    $scope.firstName = "John";
+    $scope.lastName = "Doe";
+});
+
+
+app.controller('calendar', function($scope) {
+    $scope.firstName = "John";
+    $scope.lastName = "Doe";
+});
+
+app.controller('settings', function($scope) {
+    $scope.firstName = "John";
+    $scope.lastName = "Doe";
 });

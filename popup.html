@@ -5,63 +5,72 @@
     <link rel="stylesheet" type="text/css" href="style.css">
   </head>
 
-  <body ng-controller="todoCtrl">
-    <div class="container" id="top-bar">
-        <div class="row" id="header">
-          <a class='filter pull-left'><i id="filter" class='fa fa-lg fa-filter'></i> </a>
-          <div id="appName">
-            <strong class="noselect" style="cursor:default;">ePlanner</strong>
-          </div>
-          <a class='filter pull-right'><i id="settings" class='fa fa-lg fa-cog'></i> </a>
-        </div>
-    </div>
-    <div class="row tabs">
-      <div class="col-xs-4 tab active noselect" id="To-do">To-do</div>
-      <div class="col-xs-4 tab noselect" id="Completed">Completed</div>
-      <div class="col-xs-4 tab noselect" id="Calendar">Calendar</div>
-    </div>
-    <div class="container" id="Main">
-          <div id="FIRST">
-            <div class="row">
-                <div class="col-md-12">
-                    <form id="todo-form" ng-submit="add()">
-                        <div class="form-group">
-                            <input type="text" id="new-todo" ng-model="newContent" class="form-control" placeholder="What you need to do ?"/>
-                        </div>
-                    </form>
-                </div>
+  <body>
+    <div id="PRIMARY">
+      <div class="container" id="top-bar">
+          <div class="row" id="header">
+            <a class='filter pull-left'><i id="filter" class='fa fa-lg fa-filter'></i> </a>
+            <div id="appName">
+              <strong class="noselect" style="cursor:default;">ePlanner</strong>
             </div>
-            <div class="row" id="todo-list">
-                <div class="todo-item col-md-12" ng-repeat="todo in todoList track by todo.id| orderBy: createdAt" ng-class="{completed: todo.completed}">
-                    <input type="checkbox" ng-model="todo.completed" ng-click="toggleCompleted()"/>
-                    <span class="todo-content">{{todo.content}}</span>
-                    <a class="btn-remove-todo pull-right" ng-click="remove(todo)"><i class="fa fa-remove"></i> </a>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div id="toolbar">
-                        <a id="btn-remove-all"
-                            ng-click="removeAll()"
-                            class="btn btn-small btn-default pull-right"
-                            ng-show="todoList.length > 0">
-                            <i class="fa fa-remove"></i> Clear all
-                        </a>
-                    </div>
-                </div>
-            </div>
+            <a class='filter pull-right'><i id="settings" class='fa fa-lg fa-cog'></i> </a>
           </div>
-          <div id="SECOND">
-              This is where the completed will go
-          </div>
+      </div>
+      <div class="row tabs">
+        <div class="col-xs-4 tab active noselect" id="To-do">To-do</div>
+        <div class="col-xs-4 tab noselect" id="Completed">Completed</div>
+        <div class="col-xs-4 tab noselect" id="Calendar">Calendar</div>
+      </div>
+      <div class="container" id="Main">
+            <div id="FIRST" ng-controller="todoCtrl">
+              <div class="row">
+                  <div class="col-md-12">
+                      <form id="todo-form" ng-submit="add()">
+                          <div class="form-group">
+                              <input type="text" id="new-todo" ng-model="newContent" class="form-control" placeholder="What you need to do ?"/>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+              <div class="row" id="todo-list">
+                  <div class="todo-item col-md-12" ng-repeat="todo in todoList track by todo.id| orderBy: createdAt" ng-class="{completed: todo.completed}">
+                      <input type="checkbox" ng-model="todo.completed" ng-click="toggleCompleted()"/>
+                      <span class="todo-content">{{todo.content}}</span>
+                      <a class="btn-remove-todo pull-right" ng-click="remove(todo)"><i class="fa fa-remove"></i> </a>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-12">
+                      <div id="toolbar">
+                          <a id="btn-remove-all"
+                              ng-click="removeAll()"
+                              class="btn btn-small btn-default pull-right"
+                              ng-show="todoList.length > 0">
+                              <i class="fa fa-remove"></i> Clear all
+                          </a>
+                      </div>
+                  </div>
+              </div>
+            </div>
+            <div id="SECOND" ng-controller="completed">
+                This is where the completed will go
+            </div>
 
-          <div id="THIRD">
-              This is where the calendar stuff will go
-          </div>
+            <div id="THIRD" ng-controller="calendar">
+                This is where the calendar stuff will go
+            </div>
+      </div>
+    </div>
+    <div id="SETTINGS" ng-controller="settings">
+            <div>Settings</div>
+            <button id="return">return</button>
+            The settings page is going to be here
+
     </div>
   </body>
 
   <footer>
+
     <script type="text/javascript" src="lib/js/jquery-3.1.1.min.js"></script>
     <script type="text/javascript" src="lib/js/angular.js"></script>
     <script type="text/javascript" src="lib/js/bootstrap.min.js"></script>
