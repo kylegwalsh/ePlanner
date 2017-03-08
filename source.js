@@ -6,13 +6,19 @@ $(document).ready(function(){
 });
 
 function loadToDo() {
-    document.getElementById('Main').innerHTML = 'This is going to be the Todo';
+  $("#FIRST").show();
+  $("#SECOND").hide();
+  $('#THIRD').hide();
 }
 function loadCompleted() {
-    document.getElementById('Main').innerHTML = "Completed Section!!!";
+  $("#FIRST").hide();
+  $("#SECOND").show();
+  $('#THIRD').hide();
 }
 function loadCalendar() {
-    document.getElementById('Main').innerHTML = 'Calendar Section!!!';
+  $("#FIRST").hide();
+  $("#SECOND").hide();
+  $('#THIRD').show();
 }
 
 document.addEventListener('DOMContentLoaded', function () {

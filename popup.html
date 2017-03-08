@@ -21,34 +21,43 @@
       <div class="col-xs-4 tab noselect" id="Calendar">Calendar</div>
     </div>
     <div class="container" id="Main">
-        <div class="row">
-            <div class="col-md-12">
-                <form id="todo-form" ng-submit="add()">
-                    <div class="form-group">
-                        <input type="text" id="new-todo" ng-model="newContent" class="form-control" placeholder="What you need to do ?"/>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="row" id="todo-list">
-            <div class="todo-item col-md-12" ng-repeat="todo in todoList track by todo.id| orderBy: createdAt" ng-class="{completed: todo.completed}">
-                <input type="checkbox" ng-model="todo.completed" ng-click="toggleCompleted()"/>
-                <span class="todo-content">{{todo.content}}</span>
-                <a class="btn-remove-todo pull-right" ng-click="remove(todo)"><i class="fa fa-remove"></i> </a>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div id="toolbar">
-                    <a id="btn-remove-all"
-                        ng-click="removeAll()"
-                        class="btn btn-small btn-default pull-right"
-                        ng-show="todoList.length > 0">
-                        <i class="fa fa-remove"></i> Clear all
-                    </a>
+          <div id="FIRST">
+            <div class="row">
+                <div class="col-md-12">
+                    <form id="todo-form" ng-submit="add()">
+                        <div class="form-group">
+                            <input type="text" id="new-todo" ng-model="newContent" class="form-control" placeholder="What you need to do ?"/>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </div>
+            <div class="row" id="todo-list">
+                <div class="todo-item col-md-12" ng-repeat="todo in todoList track by todo.id| orderBy: createdAt" ng-class="{completed: todo.completed}">
+                    <input type="checkbox" ng-model="todo.completed" ng-click="toggleCompleted()"/>
+                    <span class="todo-content">{{todo.content}}</span>
+                    <a class="btn-remove-todo pull-right" ng-click="remove(todo)"><i class="fa fa-remove"></i> </a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="toolbar">
+                        <a id="btn-remove-all"
+                            ng-click="removeAll()"
+                            class="btn btn-small btn-default pull-right"
+                            ng-show="todoList.length > 0">
+                            <i class="fa fa-remove"></i> Clear all
+                        </a>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div id="SECOND">
+              This is where the completed will go
+          </div>
+
+          <div id="THIRD">
+              This is where the calendar stuff will go
+          </div>
     </div>
   </body>
 
