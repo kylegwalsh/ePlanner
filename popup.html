@@ -3,6 +3,7 @@
   <head>
     <title>ePlanner Extension</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="bower_components/fullcalendar/dist/fullcalendar.css"/>
   </head>
 
   <body>
@@ -62,7 +63,7 @@
             </div>
 
             <div id="THIRD" ng-controller="calendar">
-                This is where the calendar stuff will go
+              <div ui-calendar ng-model="eventSources"></div>
             </div>
       </div>
     </div>
@@ -75,7 +76,7 @@
   </body>
 
   <footer>
-
+    <script type="text/javascript" src="bower_components/moment/min/moment.min.js"></script>
     <script type="text/javascript" src="lib/js/jquery-3.1.1.min.js"></script>
     <script type="text/javascript" src="lib/js/angular.js"></script>
     <script type="text/javascript" src="lib/js/bootstrap.min.js"></script>
@@ -83,6 +84,9 @@
     <script type="text/javascript" src="todo/todoCtrl.js"></script>
     <script type="text/javascript" src="todo/todoStorage.js"></script>
     <script type="text/javascript" src="source.js"></script>
+    <script type="text/javascript" src="bower_components/angular-ui-calendar/src/calendar.js"></script>
+    <script type="text/javascript" src="bower_components/fullcalendar/dist/fullcalendar.min.js"></script>
+    <script type="text/javascript" src="bower_components/fullcalendar/dist/gcal.js"></script>
   </footer>
 </html>
 
