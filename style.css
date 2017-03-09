@@ -172,14 +172,18 @@ footer{
 
 .TO-DO-TITLE{
   border-style: solid;
-  padding:10px;
+  padding-top:10px;
   margin:0px;
+  padding-bottom:10px;
   background-color: orange;
 }
 .TITLE-TEXT{
   float:left;
   width:84%;
   max-width: 84%;
+}
+.TITLE-BUTTON:hover{
+  cursor: pointer;
 }
 
 .SUB-TO_DO{
@@ -207,6 +211,14 @@ footer{
   display: inline-block;
   padding-left:23px;
   width:10%;
+}
+.OPTIONS{ 
+  display: inline-block;
+  width:100%;
+  padding-bottom:30px;
+}
+.SUB-OPTIONS:hover{
+  cursor: pointer;
 }
 
 .row{
