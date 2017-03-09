@@ -28,6 +28,15 @@ function returntoMain(){
   $("#PRIMARY").show();
   $("#SETTINGS").hide();
 }
+function slide(){
+
+}
+
+$( ".TITLE-BUTTON" ).click(function() {
+    console.log("clicked");
+     $(this).parent().parent().children(".SUB-TO_DO").toggle("slow");
+});
+
 
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('#To-do').addEventListener('click', loadToDo);
@@ -35,4 +44,5 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelector('#Calendar').addEventListener('click', loadCalendar);
   document.querySelector('#settings').addEventListener('click', loadSettings);
   document.querySelector('#return').addEventListener('click',returntoMain);
+  document.querySelector('.TITLE-BUTTON').addEventListener('click',slide);
 });

@@ -57,7 +57,7 @@ html{
 
 .container{
   width: 100%;
-  padding: 20px;
+  padding:0px;
 }
 
 .tabs{
@@ -96,6 +96,7 @@ html{
   width: 100%;
   height: 81.5%;
   overflow: none !important;
+  margin-left: 0px;
 }
 
 ::-webkit-scrollbar {
@@ -140,7 +141,7 @@ footer{
 }
 
 #todo-list {
-    margin-bottom: 10px;
+    
 }
 
 #btn-remove-all {
@@ -148,7 +149,7 @@ footer{
 }
 
 #FIRST{
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   min-width: 100%;
   width: 100%;
@@ -167,5 +168,56 @@ footer{
 
 #PRIMARY{
   overflow: hidden;
-  margin-bottom: 10px;
+}
+
+.TO-DO-TITLE{
+  border-style: solid;
+  padding:10px;
+  margin:0px;
+  background-color: orange;
+}
+.TITLE-TEXT{
+  float:left;
+  width:84%;
+  max-width: 84%;
+}
+
+.SUB-TO_DO{
+  margin: 0px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.SUB-SELECT{
+  display: inline-block;
+  max-width: 10%
+  width:10%;
+  padding-left:20px;
+  padding-right:20px;
+}
+.SUB-NAME{
+  display: inline-block;
+  width:60%;
+  max-width: 60%;
+}
+.SUB-DATE{
+  display: inline-block;
+  width:10%;
+}
+.SUB-OPTIONS{
+  display: inline-block;
+  padding-left:23px;
+  width:10%;
+}
+
+.row{
+  margin: 0px;
+}
+
+
+hr{
+  display: block;
+  border-width: 2px;
+  border-color: black;
+  margin: 0px;
+  padding: 0px;
 }
