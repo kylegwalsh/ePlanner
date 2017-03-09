@@ -213,12 +213,17 @@ footer{
   width:10%;
 }
 .OPTIONS{ 
-  display: inline-block;
+  display: none;
   width:100%;
   padding-bottom:30px;
 }
 .SUB-OPTIONS:hover{
   cursor: pointer;
+}
+.ADD-NEW-TEMPLATE{
+  display: inline-block;
+  width:100%;
+  background-color: teal;
 }
 
 .row{
