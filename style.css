@@ -11,6 +11,10 @@ body {
   padding: 0;
   margin: 0;
 }
+html{
+  overflow: hidden;
+}
+
 
 #top-bar{
   text-align: center;
@@ -91,7 +95,7 @@ body {
 #Main{
   width: 100%;
   height: 81.5%;
-  overflow:auto;
+  overflow: none !important;
 }
 
 ::-webkit-scrollbar {
@@ -109,9 +113,11 @@ body {
 }
 
 footer{
+  position:fixed;
   background-color: #3498db;
   height: 4%;
   width: 100%;
+  bottom:0px;
   padding: 0;
   margin: 0;
 }
@@ -142,7 +148,11 @@ footer{
 }
 
 #FIRST{
-
+  overflow-y: scroll;
+  overflow-x: hidden;
+  min-width: 100%;
+  width: 100%;
+  height: 450px;  
 }
 #SECOND{
   display:none;
@@ -153,4 +163,9 @@ footer{
 
 #SETTINGS{
   display:none;
+}
+
+#PRIMARY{
+  overflow: hidden;
+  margin-bottom: 10px;
 }
