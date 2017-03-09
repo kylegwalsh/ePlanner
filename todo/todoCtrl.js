@@ -39,18 +39,22 @@ app.controller('todoCtrl', function ($scope, todoStorage) {
 
     $scope.addToDo = function(data){ // data is the category that gets set          
         /*  Heirarchy for TO-DO Item
-                <TO-DO-ITEM>
+
+
+                <TO-DO-ITEM>     This is what gets created in this function, addToDo
                     <TO-DO-TITLE>
                         <TITLE-TEXT></>
                         <TITLE-BUTTON></>
                     </>
-                    <SUB-TO-DO>
-                        <SUB-SELECT></>
-                        <SUB-NAME></>
-                        <SUB-DATE></>
-                        <SUB-OPTION></>
-                    </>
-                    <OPTIONSPAGE>
+                    <div>
+                        <SUB-TO-DO>  This and below gets added with with the addSubSection function
+                            <SUB-SELECT></>
+                            <SUB-NAME></>
+                            <SUB-DATE></>
+                            <SUB-OPTION></>
+                        </>
+                        <OPTIONSPAGE>
+                        </>
                     </>
                 </>
             */
@@ -67,14 +71,23 @@ app.controller('todoCtrl', function ($scope, todoStorage) {
 
                 // function to slide in/out the toDos for a category
                 $(button).bind( "click", function() { 
-                    $(this).parent().parent().children(".SUB-TO_DO").toggle("slow");
-                    $(this).parent().parent().children(".OPTIONS").slideUp("slow"); // toggle away options in case they are open 
+                    $(this).parent().parent().children().children(".SUB-TO_DO").toggle("slow");
+                    $(this).parent().parent().children().children(".OPTIONS").slideUp("slow"); // toggle away options in case they are open 
                 });
 
         top.appendChild(title);  // append title and button the TOP div element
         top.appendChild(button);
         addMe.appendChild(top);
 
+        $scope.addSubSectionForTodo(addMe)
+        $scope.addSubSectionForTodo(addMe)
+        $scope.addSubSectionForTodo(addMe)
+
+        $("#ITEMS").prepend(addMe); // here we actually append the newly created HTML section to the existing DOM
+    }
+
+    $scope.addSubSectionForTodo = function(Category){
+        var divider = document.createElement('div');
         var sub  = document.createElement('div'); // Create Div that houses the information for a single row To-DO
         sub.className = "SUB-TO_DO";
                 var select  = document.createElement('div'); // This is where the draggable thing will be
@@ -102,13 +115,17 @@ app.controller('todoCtrl', function ($scope, todoStorage) {
         sub.appendChild(name);
         sub.appendChild(date);
         sub.appendChild(options); // append select, name, date, options to TO-DO item, 
-        addMe.appendChild(sub);  // append the whole thing to join up wit the title that was preivously added
-        addMe.appendChild(optionsPage);
-
-        $("#ITEMS").prepend(addMe); // here we actually append the newly created HTML section to the existing DOM
+        divider.appendChild(sub);
+        divider.appendChild(optionsPage);
+        Category.appendChild(divider);// append the whole thing to join up wit the title that was preivously added
     }
 
+
 });
+
+
+
+
 
 
 // Temporary these are here, was running into errors putting these into separate files
