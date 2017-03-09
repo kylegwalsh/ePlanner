@@ -63,7 +63,8 @@
             </div>
 
             <div id="THIRD" ng-controller="calendar">
-              <div ui-calendar ng-model="eventSources"></div>
+              <p ng-model="alertMessage">{{alertMessage}}</p>
+              <div ui-calendar="uiConfig.calendar" class="span8 calendar"  ng-model="eventSources" calendar="calendar"></div>
             </div>
       </div>
     </div>
