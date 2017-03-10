@@ -11,10 +11,6 @@ body {
   padding: 0;
   margin: 0;
 }
-html{
-  overflow: hidden;
-}
-
 
 #top-bar{
   text-align: center;
@@ -31,32 +27,31 @@ html{
   padding-top: 7px;
 }
 
-#appName{
+#appName, #settingsName{
   display: inline-block;
 }
 
-#filter{
+#filterButton{
   float: left;
   margin-left: 25px;
   color: white;
 }
 
-#filter:hover{
-  cursor: pointer;
-}
-
-#settings{
+#settingsButton, #return{
   float: right;
   margin-right: 25px;
   color: white;
 }
 
-#settings:hover{
+#return{
+  margin-top: -5px;
+}
+
+#settingsButton:hover, #filterButton:hover, #return:hover{
   cursor: pointer;
 }
 
-.container{
-  width: 100%;
+.no-padding{
   padding:0px;
 }
 
@@ -90,13 +85,19 @@ html{
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none; /* Non-prefixed version */
+  cursor: default;
 }
 
-#Main{
+#MainPage{
+  height: 96%;
+}
+
+.main{
   width: 100%;
-  height: 81.5%;
-  overflow: none !important;
+  height: 85% !important;
+  overflow: auto !important;
   margin-left: 0px;
+  padding-top: 15px; 
 }
 
 ::-webkit-scrollbar {
@@ -124,20 +125,20 @@ footer{
 }
 
 .todo-item .btn-remove-todo {
-    display:none;
+  display:none;
 }
 
 .todo-item:hover .btn-remove-todo {
-    display: block;
+  display: block;
 }
 
 .todo-item .todo-content {
-    font-weight: bold;
+  font-weight: bold;
 }
 .todo-item.completed .todo-content {
-    color:darkgray;
-    font-weight: normal;
-    text-decoration: line-through;
+  color:darkgray;
+  font-weight: normal;
+  text-decoration: line-through;
 }
 
 #todo-list {
@@ -145,91 +146,83 @@ footer{
 }
 
 #btn-remove-all {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
-#FIRST{
-  overflow-y: auto;
-  overflow-x: hidden;
-  min-width: 100%;
-  width: 100%;
-  height: 450px;  
+#ToDoView{
+
 }
-#SECOND{
-  display:none;
-}
-#THIRD{
+
+#CompletedView{
   display:none;
 }
 
-#SETTINGS{
+#CalendarView{
   display:none;
 }
 
-#PRIMARY{
-  overflow: hidden;
+#SettingsPage{
+  display:none;
 }
 
-.TO-DO-TITLE{
-  border-style: solid;
+.CategoryBar{
   padding-top:10px;
   margin:0px;
   padding-bottom:10px;
-  background-color: orange;
-}
-.TITLE-TEXT{
-  float:left;
-  width:84%;
-  max-width: 84%;
-}
-.TITLE-BUTTON:hover{
-  cursor: pointer;
+  background-color: #F5B041;
 }
 
-.SUB-TO_DO{
-  margin: 0px;
-  margin-top: 5px;
-  margin-bottom: 5px;
+.CategoryName{
+  float:left;
 }
-.SUB-SELECT{
-  display: inline-block;
-  max-width: 10%
-  width:10%;
-  padding-left:20px;
-  padding-right:20px;
-}
-.SUB-NAME{
-  display: inline-block;
-  width:60%;
-  max-width: 60%;
-}
-.SUB-DATE{
-  display: inline-block;
-  width:10%;
-}
-.SUB-OPTIONS{
-  display: inline-block;
-  padding-left:23px;
-  width:10%;
-}
-.OPTIONS{ 
-  display: none;
-  width:100%;
-  padding-bottom:30px;
-}
-.SUB-OPTIONS:hover{
+
+.CategoryToggle:hover{
   cursor: pointer;
-}
-.ADD-NEW-TEMPLATE{
-  display: inline-block;
-  width:100%;
-  background-color: teal;
 }
 
 .row{
   margin: 0px;
 }
 
+.vcenter {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
+
+.SubToDo{
+  padding: 5px;
+  border-bottom: 1px solid lightgray;
+}
+
+.Checkbox{
+  
+}
+
+.SubName{
+  
+}
+
+.SubDateTime{
+  font-size: 15px;
+  color: gray;
+}
+
+.SubOptions{
+  color: gray;
+}
+
+.AddNewTask{
+  display: inline-block;
+  cursor: pointer;
+  margin-left: 64px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.Options{
+  margin-left: 65px;
+}
 
 hr{
   display: block;
@@ -237,4 +230,64 @@ hr{
   border-color: black;
   margin: 0px;
   padding: 0px;
+}
+
+.filterMenu {
+  display: none;
+  position: fixed;
+  top: 50px;
+  left: 15px;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0px 2px 10px #888888;
+  padding: 8px 8px;
+  z-index: 1;
+  font-size: 18px;
+  max-width: 100px;
+  color: black;
+}
+
+.filterMenu:before {
+border-bottom: 10px solid white;
+border-left: 10px solid transparent;
+border-right: 10px solid transparent;
+content: "";
+height: 0;
+position: absolute;
+left: 16px;
+top: -10px;
+width: 0;
+}
+
+.filterMenu .show {
+    visibility: visible;
+}
+
+input[type=checkbox]{
+  -webkit-appearance: none;
+  background-color: #fafafa;
+  border: 1px solid #cacece;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+  padding: 9px;
+  border-radius: 10px;
+  display: inline-block;
+  position: relative;
+}
+
+input[type=checkbox]:checked {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05), inset 15px 10px -12px rgba(255,255,255,0.1);
+  color: #67b2e4;
+}
+
+input[type=checkbox]:checked:after {
+  content: '\2714';
+  font-size: 25px;
+  left: 1px;
+  position: absolute;
+  top: -12px;
+  color: #67b2e4;
+}
+
+input[type="checkbox"]:focus{
+    outline:0;
 }

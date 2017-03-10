@@ -3,7 +3,7 @@
 var app = angular.module("app", []);
 
 // controller for the completed section area
-app.controller('completted', function($scope) {
+app.controller('completed', function($scope) {
 
 
 

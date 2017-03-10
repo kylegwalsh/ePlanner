@@ -6,76 +6,97 @@
   </head>
 
   <body>
-    <div id="PRIMARY">
-      <div class="container" id="top-bar">
+    <!-- Main page that can be swapped with settings page -->
+    <div id="MainPage">
+      <!-- Top header bar -->
+      <div class="container no-padding" id="top-bar">
           <div class="row" id="header">
-            <a class='filter pull-left'><i id="filter" class='fa fa-lg fa-filter'></i> </a>
-            <div id="appName">
-              <strong class="noselect" style="cursor:default;">ePlanner</strong>
+            <!-- Filter button -->
+            <div class="pull-left"><i id="filterButton" class='fa fa-lg fa-filter'></i></div>
+            <!-- Pop up filter menu -->
+            <div class="container filterMenu">
+              Filter Menu
             </div>
-            <a class='filter pull-right'><i id="settings" class='fa fa-lg fa-cog'></i> </a>
+            <!-- Title of App -->
+            <div id="appName">
+              <strong class="noselect">ePlanner</strong>
+            </div>
+            <!-- Settings button -->
+            <div class="pull-right"><i id="settingsButton" class='fa fa-lg fa-cog'></i></div>
           </div>
       </div>
+      <!-- Tabs -->
       <div class="row tabs">
-        <div class="col-xs-4 tab active noselect" id="To-do">To-do</div>
-        <div class="col-xs-4 tab noselect" id="Completed">Completed</div>
-        <div class="col-xs-4 tab noselect" id="Calendar">Calendar</div>
+        <div class="col-xs-4 tab active noselect" id="ToDoTab">To-do</div>
+        <div class="col-xs-4 tab noselect" id="CompletedTab">Completed</div>
+        <div class="col-xs-4 tab noselect" id="CalendarTab">Calendar</div>
       </div>
-      <div class="container" id="Main">
-            <div id="FIRST" ng-controller="todoCtrl">
-              <div class="row">
-                  <div class="col-md-12">
-                      <form id="todo-form" ng-submit="add()">
-                          <div class="form-group">
-                              <input type="text" id="new-todo" ng-model="newContent" class="form-control" placeholder="New Category"/>
-                          </div>
-                      </form>
-                  </div>
-              </div>
-
-              <!--
-              <div class="row" id="todo-list">
-                  <div class="todo-item col-md-12" ng-repeat="todo in todoList track by todo.id| orderBy: createdAt">
-                      <input type="checkbox" ng-model="todo.completed" ng-click="toggleCompleted()"/>
-                      <span class="todo-content">{{ todo.content}}</span>
-                      <a class="btn-remove-todo pull-right" ng-click="remove(todo)"><i class="fa fa-remove"></i> </a>
-                  </div>
-              -->
-              <div id="ITEMS">
-                    <!-- To-do's will be added here by javascript -->
-              </div>
-              <div class="row">
-                  <div class="col-md-12">
-                      <div id="toolbar">
-                          <a id="btn-remove-all"
-                              ng-click="removeAll()"
-                              class="btn btn-small btn-default pull-right"
-                              ng-show="todoList.length > 0">
-                              <i class="fa fa-remove"></i> Clear all
-                          </a>
+      <!-- Main area that holds contents of different tabs -->
+      <div class="main container no-padding">
+        <!-- To do View -->
+        <div id="ToDoView" ng-controller="todoCtrl">
+          <div class="row">
+              <div class="col-md-12">
+                  <form id="todo-form" ng-submit="add()">
+                      <div class="form-group">
+                          <input type="text" id="new-todo" ng-model="newContent" class="form-control" placeholder="New Category"/>
                       </div>
-                  </div>
+                  </form>
+              </div>
+          </div>
+
+          <div id="ITEMS">
+                <!-- To-do's will be added here by javascript -->
+          </div>
+
+          <!-- Remove button -->
+          <div class="row">
+            <div class="col-md-12">
+              <div id="toolbar">
+                <a id="btn-remove-all"
+                    ng-click="removeAll()"
+                    class="btn btn-small btn-default pull-right"
+                    ng-show="todoList.length > 0">
+                    <i class="fa fa-remove"></i>
+                </a>
               </div>
             </div>
-            <div id="SECOND" ng-controller="completed">
-                This is where the completed will go
-            </div>
+          </div>
 
-            <div id="THIRD" ng-controller="calendar">
-                This is where the calendar stuff will go
-            </div>
+        </div>
+
+        <!-- Completed View -->
+        <div id="CompletedView" ng-controller="completed">
+            This is where the completed will go
+        </div>
+
+        <!-- Calendar View-->
+        <div id="CalendarView" ng-controller="calendar">
+            This is where the calendar stuff will go
+        </div>
+
       </div>
     </div>
-    <div id="SETTINGS" ng-controller="settings">
-            <div>Settings</div>
-            <button id="return">return</button>
-            The settings page is going to be here
 
+    <!-- Settings Page that can be swapped with Main Page -->
+    <div id="SettingsPage">
+      <!-- New top bar for settings -->
+      <div class="container no-padding" id="top-bar">
+          <div class="row" id="header">
+            <div id="settingsName">
+              <strong class="noselect">ePlanner Settings</strong>
+            </div>
+            <a class="pull-right" id="return"><i class="fa fa-lg fa-remove"></i></a>
+          </div>
+      </div>
+      <!-- Main area for settings -->
+      <div class="main container">
+        The settings page is going to be here
+      </div>
     </div>
   </body>
 
   <footer>
-
     <script type="text/javascript" src="lib/js/jquery-3.1.1.min.js"></script>
     <script type="text/javascript" src="lib/js/angular.js"></script>
     <script type="text/javascript" src="lib/js/bootstrap.min.js"></script>

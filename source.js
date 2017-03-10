@@ -3,36 +3,52 @@ $(document).ready(function(){
         $('.tab.active').removeClass('active');
         $(this).addClass('active');
     });
+
+    $('#filterButton').on('click', function(){
+        $('.filterMenu').toggle();
+    });
+
+    $('html').on('click', function() {
+        $('.filterMenu').hide();
+    });
+
+    $('.filterMenu').on('click', function(e){
+        e.stopPropagation();
+    });
+
+    $('#filterButton').on('click', function(e){
+        e.stopPropagation();
+    });
 });
 
 function loadToDo() {
-  $("#FIRST").show();
-  $("#SECOND").hide();
-  $('#THIRD').hide();
+  $("#ToDoView").show();
+  $("#CompletedView").hide();
+  $('#CalendarView').hide();
 }
 function loadCompleted() {
-  $("#FIRST").hide();
-  $("#SECOND").show();
-  $('#THIRD').hide();
+  $("#ToDoView").hide();
+  $("#CompletedView").show();
+  $('#CalendarView').hide();
 }
 function loadCalendar() {
-  $("#FIRST").hide();
-  $("#SECOND").hide();
-  $('#THIRD').show();
+  $("#ToDoView").hide();
+  $("#CompletedView").hide();
+  $('#CalendarView').show();
 }
 function loadSettings(){
-  $("#PRIMARY").hide();
-  $("#SETTINGS").show();
+  $("#MainPage").hide();
+  $("#SettingsPage").show();
 }
 function returntoMain(){
-  $("#PRIMARY").show();
-  $("#SETTINGS").hide();
+  $("#MainPage").show();
+  $("#SettingsPage").hide();
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  document.querySelector('#To-do').addEventListener('click', loadToDo);
-  document.querySelector('#Completed').addEventListener('click', loadCompleted);
-  document.querySelector('#Calendar').addEventListener('click', loadCalendar);
-  document.querySelector('#settings').addEventListener('click', loadSettings);
+  document.querySelector('#ToDoTab').addEventListener('click', loadToDo);
+  document.querySelector('#CompletedTab').addEventListener('click', loadCompleted);
+  document.querySelector('#CalendarTab').addEventListener('click', loadCalendar);
+  document.querySelector('#settingsButton').addEventListener('click', loadSettings);
   document.querySelector('#return').addEventListener('click',returntoMain);
 });

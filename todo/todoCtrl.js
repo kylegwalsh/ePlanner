@@ -14,13 +14,13 @@ app.controller('todoCtrl', function ($scope, todoStorage) {
         $scope.$apply();
 
         angular.forEach($scope.todoList, function(item){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
-            $scope.addToDo(item.content)
+            $scope.addCategory(item.content)
         })
     });
 
     $scope.add = function() {
         todoStorage.add($scope.newContent);
-        $scope.addToDo($scope.newContent); // when a new item is added, we add a corresponding HTML for it
+        $scope.addCategory($scope.newContent); // when a new item is added, we add a corresponding HTML for it
         $scope.newContent = '';
     }
 
@@ -37,38 +37,38 @@ app.controller('todoCtrl', function ($scope, todoStorage) {
         todoStorage.sync();
     }
 
-    $scope.addToDo = function(data){ // data is the category that gets set          
+    $scope.addCategory = function(data){ // data is the category that gets set          
         /*  Heirarchy for TO-DO Item
 
 
-                <TO-DO-ITEM>                      This is what gets created in this function, addToDo()
-                    <TO-DO-TITLE>
-                        <TITLE-TEXT></>
-                        <TITLE-BUTTON></>
+                <Category>                      This is what gets created in this function, addCategory()
+                    <CategoryBar>
+                        <CategoryName></>
+                        <CategoryToggle></>
                     </>
                     <div>
-                        <SUB-TO-DO>               This and below gets added with with the addSubSection() function
-                            <SUB-SELECT></>
-                            <SUB-NAME></>
-                            <SUB-DATE></>
-                            <SUB-OPTION></>
+                        <SubToDo>               This and below gets added with with the addSubSection() function
+                            <Checkbox></>
+                            <SubName></>
+                            <SubDateTime></>
+                            <SubOptions></>
                         </>
-                        <OPTIONSPAGE>
+                        <OptionsPAGE>
                         </>
                     </>
 
-                    <div>                          Possible to have lots of sub-to-dos per category, just keep appending
-                        <SUB-TO-DO>  
-                            <SUB-SELECT></>
-                            <SUB-NAME></>
-                            <SUB-DATE></>
-                            <SUB-OPTION></>
+                    <div>                          Possible to have lots of SubToDos per category, just keep appending
+                        <SubToDo>  
+                            <Checkbox></>
+                            <SubName></>
+                            <SubDateTime></>
+                            <SubOptions></>
                         </>
-                        <OPTIONSPAGE>
+                        <OptionsPAGE>
                         </>
                     </>
                     <div END>                           This gets created in the addSubSectionTemplate() Function
-                        <SUB-TO-DO>
+                        <SubToDo>
                             <ADD-BUTTON>
                             </>
                         </>
@@ -76,22 +76,21 @@ app.controller('todoCtrl', function ($scope, todoStorage) {
                 </>
             */
         var addMe = document.createElement('div'); // Create Div that will encapuslate the entire new HTML section, the parent 
-        addMe.className = "TO-DO-ITEM";
-                var top = document.createElement('div'); // Create Title div that houses To-Do category and button for in/out sliding
-                top.className = "TO-DO-TITLE";
-                var title  = document.createElement('div'); // title 
-                title.className = "TITLE-TEXT";
-                title.innerHTML = data;
-                var button  = document.createElement('div'); // button
-                button.className = "TITLE-BUTTON";
-                button.innerHTML = "Click";
+        addMe.className = "Category";
+            var top = document.createElement('div'); // Create Title div that houses To-Do category and button for in/out sliding
+            top.className = "CategoryBar row";
+            var title  = document.createElement('div'); // title 
+            title.className = "CategoryName col-xs-10";
+            title.innerHTML = data;
+            var button  = document.createElement('div'); // toggle
+            button.className = "CategoryToggle col-xs-1 col-xs-offset-1";
+            button.innerHTML = "<i class='fa fa-lg fa-angle-down'></i>";
 
-                // function to slide in/out the toDos for a category
-                $(button).bind( "click", function() { 
-                   $(this).parent().parent().children(".END").toggle("slow");
-                   $(this).parent().parent().children().children().children(".OPTIONS").slideUp("slow"); // toggle away options in case they are open 
-
-                });
+            // function to slide in/out the toDos for a category
+            $(button).bind( "click", function() { 
+               $(this).parent().parent().children(".EndCategory").toggle("slow");
+               $(this).parent().parent().children().children().children(".Options").slideUp("slow"); // toggle away options in case they are open 
+            });
 
         top.appendChild(title);  // append title and button the TOP div element
         top.appendChild(button);
@@ -112,48 +111,55 @@ app.controller('todoCtrl', function ($scope, todoStorage) {
     // This function adds the blank template that is at the bottom of every 
     $scope.addSubSectionTemplate = function(Category){
         var divider = document.createElement('div');
-        divider.className ="END";
-        var sub  = document.createElement('div'); // Create Div that houses the information for a single row To-DO
-        sub.className = "ADD-NEW-TEMPLATE";
-        sub.innerHTML = "Click to add new";
+        divider.className ="EndCategory";
+        var addnewbar  = document.createElement('div'); // Create Div that houses the information for a single row To-DO
+        addnewbar.className = "AddNewTaskBar container";
+        var addnew = document.createElement('div');
+        addnew.className = "AddNewTask";
+        addnew.innerHTML = "<i class='fa fa-plus'></i> &nbsp; &nbsp; Add New";
 
-        $(sub).bind( "click", function() {   
-                    $scope.addSubSectionForTodo($(this), "testing", "4/20");
+        $(addnew).bind( "click", function() {   
+            $scope.addSubSectionForTodo($(this), "testing", "4/20/2017", "4:20pm");
         });
-        divider.appendChild(sub);
+
+        divider.appendChild(addnewbar);
+        addnewbar.appendChild(addnew);
         Category.appendChild(divider);
     }
 
-    $scope.addSubSectionForTodo = function(addSection, nameData, dateData){
+    $scope.addSubSectionForTodo = function(addSection, nameData, dateData, timeData){
         var divider = document.createElement('div');
         var sub  = document.createElement('div'); // Create Div that houses the information for a single row To-DO
-        sub.className = "SUB-TO_DO";
-                var select  = document.createElement('div'); // This is where the draggable thing will be
-                select.className = "SUB-SELECT";
-                select.innerHTML = "#";
-                var name  = document.createElement('div'); // The name will go here
-                name.className = "SUB-NAME";
-                name.innerHTML = nameData;
-                var date = document.createElement('div');  // The date goes here
-                date.className = "SUB-DATE";
-                date.innerHTML = dateData;
-                var options  = document.createElement('div'); // The options will go here
-                options.className = "SUB-OPTIONS";
-                options.innerHTML = " ... ";
-                $(options).bind( "click", function() {   
-                    $(this).parent().parent().children(".OPTIONS").slideToggle("slow"); // TODO toggle some options window
-                });
+        sub.className = "SubToDo row";
+            var select  = document.createElement('div'); // This is where the draggable thing will be
+            select.className = "Checkbox col-xs-offset-1 col-xs-1 vcenter";
+            select.innerHTML = "<input type='checkbox'/>";
+            var center = document.createElement('div');  // Top center row (for styling)
+            center.className = "col-xs-9 vcenter";
+            var name  = document.createElement('div'); // The name will go here
+            name.className = "SubName row";
+            name.innerHTML = nameData;
+            var dateandtime = document.createElement('div');  // The date and time go here
+            dateandtime.className = "SubDateTime row";
+            dateandtime.innerHTML = dateData + "&nbsp; &nbsp;" + timeData;
+            var Options  = document.createElement('div'); // The Options will go here
+            Options.className = "SubOptions col-xs-1 vcenter";
+            Options.innerHTML = "<i class='fa fa-ellipsis-h'></i>";
+            $(Options).bind( "click", function() {   
+                $(this).parent().parent().children(".Options").slideToggle("slow"); // TODO toggle some Options window
+            });
 
-                var optionsPage  = document.createElement('div'); // The options will go here
-                optionsPage.className = "OPTIONS";
-                optionsPage.innerHTML = " Settings and buttons should go here";
+            var OptionsPage  = document.createElement('div'); // The Options will go here
+            OptionsPage.className = "Options";
+            OptionsPage.innerHTML = " Settings and buttons should go here";
 
         sub.appendChild(select);
-        sub.appendChild(name);
-        sub.appendChild(date);
-        sub.appendChild(options); // append select, name, date, options to TO-DO item, 
+        sub.appendChild(center);
+        center.appendChild(name);
+        center.appendChild(dateandtime);
+        sub.appendChild(Options); // append select, name, date, Options to TO-DO item, 
         divider.appendChild(sub);
-        divider.appendChild(optionsPage);
+        divider.appendChild(OptionsPage);
         addSection.parent().prepend(divider);// append the whole thing to join up wit the title that was preivously added
     }
 
@@ -177,13 +183,6 @@ app.controller('completed', function($scope) {
 // controller for the calendar section area
 app.controller('calendar', function($scope) {
 
-
-
-});
-
-// controller for hte settings section area
-app.controller('settings', function($scope) {
- 
 
 
 });
