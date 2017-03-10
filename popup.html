@@ -73,16 +73,10 @@
 
         <!-- Calendar View-->
         <div id="CalendarView" ng-controller="calendar">
-            This is where the calendar stuff will go
+            <p ng-model="alertMessage">{{alertMessage}}</p>
+            <div ui-calendar="uiConfig.calendar" class="span8 calendar"  ng-model="eventSources" calendar="calendar"></div>
         </div>
 
-<<<<<<< HEAD
-=======
-            <div id="THIRD" ng-controller="calendar">
-              <p ng-model="alertMessage">{{alertMessage}}</p>
-              <div ui-calendar="uiConfig.calendar" class="span8 calendar"  ng-model="eventSources" calendar="calendar"></div>
-            </div>
->>>>>>> 920e4ee791ed186d762f1e4b5bb53a7bf3bce132
       </div>
     </div>
 
@@ -105,10 +99,7 @@
   </body>
 
   <footer>
-<<<<<<< HEAD
-=======
     <script type="text/javascript" src="bower_components/moment/min/moment.min.js"></script>
->>>>>>> 920e4ee791ed186d762f1e4b5bb53a7bf3bce132
     <script type="text/javascript" src="lib/js/jquery-3.1.1.min.js"></script>
     <script type="text/javascript" src="lib/js/angular.js"></script>
     <script type="text/javascript" src="lib/js/bootstrap.min.js"></script>

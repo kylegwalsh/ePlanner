@@ -181,13 +181,6 @@ app.controller('completed', function($scope) {
 });
 
 // controller for the calendar section area
-<<<<<<< HEAD
-app.controller('calendar', function($scope) {
-
-
-
-});
-=======
 app.controller('calendar', function($scope,$compile,uiCalendarConfig) {
 var date = new Date();
     var d = date.getDate();
@@ -291,4 +284,3 @@ app.controller('settings', function($scope) {
 
 
 });
->>>>>>> 920e4ee791ed186d762f1e4b5bb53a7bf3bce132
