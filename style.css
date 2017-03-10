@@ -222,6 +222,10 @@ footer{
 
 .Options{
   margin-left: 65px;
+  padding-top:10px;
+  padding-bottom:10px;
+  background-color: teal;
+  display: none;
 }
 
 hr{

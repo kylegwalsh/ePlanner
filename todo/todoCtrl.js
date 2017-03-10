@@ -1,9 +1,10 @@
 'use strict';
 var app = angular.module('app', ['ui.calendar']);
 
-app.controller('todoCtrl', function ($scope, todoStorage) {
+app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
     $scope.todoStorage = todoStorage;
+    $scope.testing = "test";
 
     $scope.$watch('todoStorage.data', function() {
         $scope.todoList = $scope.todoStorage.data;
@@ -88,9 +89,17 @@ app.controller('todoCtrl', function ($scope, todoStorage) {
 
             // function to slide in/out the toDos for a category
             $(button).bind( "click", function() { 
+
+               $(this).css('-webkit-transform', 'rotate(' + 180 + 'deg)');  // rotate image TODO don't know how to get current angle
+               $(this).css('-moz-transform', 'rotate(' + 180 + 'deg)'); 
+               $(this).css('-ms-transform', 'rotate(' + 180 + 'deg)'); 
+               $(this).css('-o-transform', 'rotate(' + 180 + 'deg)');
+               $(this).css('transform', 'rotate(' + 180 + 'deg)');
+
+
                $(this).parent().parent().children(".EndCategory").toggle("slow");
-               $(this).parent().parent().children().children().children(".Options").slideUp("slow"); // toggle away options in case they are open 
-            });
+               $(this).parent().parent().children().children().children(".Options").slideUp("slow"); // toggle away options in case they are open     
+            });               
 
         top.appendChild(title);  // append title and button the TOP div element
         top.appendChild(button);
@@ -118,7 +127,7 @@ app.controller('todoCtrl', function ($scope, todoStorage) {
         addnew.className = "AddNewTask";
         addnew.innerHTML = "<i class='fa fa-plus'></i> &nbsp; &nbsp; Add New";
 
-        $(addnew).bind( "click", function() {   
+        $(addnew).bind( "click", function() {
             $scope.addSubSectionForTodo($(this), "testing", "4/20/2017", "4:20pm");
         });
 
@@ -146,12 +155,34 @@ app.controller('todoCtrl', function ($scope, todoStorage) {
             Options.className = "SubOptions col-xs-1 vcenter";
             Options.innerHTML = "<i class='fa fa-ellipsis-h'></i>";
             $(Options).bind( "click", function() {   
-                $(this).parent().parent().children(".Options").slideToggle("slow"); // TODO toggle some Options window
+
+                        if ($(this).parent().parent().children(".Options").css("display")=="none") {
+                            // what we currently clicked on needs to be displayed
+                            $(this).parent().parent().parent().children().children(".Options").slideUp("slow"); // close any other ones that my by open
+                            $(this).parent().parent().children(".Options").slideDown("slow"); // Display options
+                        }
+                        else{
+                            // what we currently clicked on needs to be closed
+                            $(this).parent().parent().children(".Options").slideUp("slow"); // Close options
+                        }        
             });
+
 
             var OptionsPage  = document.createElement('div'); // The Options will go here
             OptionsPage.className = "Options";
-            OptionsPage.innerHTML = " Settings and buttons should go here";
+
+            var textInput = '<input type="text" ng-model="testing">Click Me</button>';
+            var button = '<button type="button" ng-click="myFunc()">Click Me</button>';
+            var temp = $compile(button)($scope);
+            var temp2 = $compile(textInput)($scope);
+
+            $(OptionsPage).append(temp2);
+            $(OptionsPage).append(temp);
+            $(OptionsPage).append('<div><input type="date"  name="date"></div>');
+            $(OptionsPage).append('<div><input type="time" name="time"></div>');      
+            $(OptionsPage).bind( "click", function() {   
+                $(this).parent("SubName row").slideToggle("slow"); // TODO toggle some Options window
+            });
 
         sub.appendChild(select);
         sub.appendChild(center);
@@ -161,6 +192,15 @@ app.controller('todoCtrl', function ($scope, todoStorage) {
         divider.appendChild(sub);
         divider.appendChild(OptionsPage);
         addSection.parent().prepend(divider);// append the whole thing to join up wit the title that was preivously added
+        addSection.parent().children().children(".Options").slideUp("slow"); // close any existing options
+        $(Options).parent().parent().children(".Options").slideDown("slow"); // make options for newly created ToDo visible
+
+
+    }
+
+    $scope.myFunc = function(){
+        console.log("working");
+        console.log($scope.testing + " is the current input");
     }
 
 
@@ -284,3 +324,5 @@ app.controller('settings', function($scope) {
 
 
 });
+
+
