@@ -178,20 +178,21 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             button.className = "editing";
             button.innerHTML = "Update";
 
-            var datePicker = document.createElement("div"); // date picker
-            $(datePicker).append("<input type='date'>");
-                                                                 // TODO don't know how to set or get the date from the picker
+            var datePicker = document.createElement("input"); // date picker
+            datePicker.type = "date";
+            datePicker.className = "DatePicker";                                                 
 
-            var timePicker = document.createElement("div");
-            $(timePicker).append('<input type="time">');
-
-                                                                // TODO don't know how to set or get the time from the picker
+            var timePicker = document.createElement("input"); // Time picker
+            timePicker.type = "time";
+            timePicker.className = "TimePicker";
 
             $(button).bind("click", function(){            
                     var userInput = $(this).parent().children(".OptionsText").val(); // get the input that is in the textBox
                     $(this).parent().parent().children().children().children(".SubName").html(userInput); // update the data
-                    var dateInput = $(this).parent().children(".OptionsText").val(); // get the input that is in the textBox
-                    $(this).parent().parent().children().children().children(".SubDateTime").html("Date updates | Time updates"); // update the data                    
+                    var dateInput = new Date($(this).parent().children(".DatePicker").val()); // get the date input value
+                    var timeInput = $(this).parent().children(".TimePicker").val(); // get the time input value
+                    var test = $scope.formatTime(timeInput);
+                    $(this).parent().parent().children().children().children(".SubDateTime").html($scope.formatDate(dateInput) + " " + timeInput); // update the data                    
             });
 
 
@@ -225,6 +226,20 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
 
     }
+
+    $scope.formatTime = function(date){
+        // Time isn't working for some reason, idk 
+
+    }
+
+    // function used to format date month/day/year
+    $scope.formatDate = function(date){
+        var day = date.getDate() +1; // ?!?!? i have no idea why but I have to add 1 for some reason 
+        var month = date.getMonth() +1;  // ?!?!? i have no idea why but I have to add 1 for some reason 
+        var year =  date.getFullYear();  // ?!?!? year is fine for some reason 
+        return month + "/" + day + "/" + year;
+    }
+
 });
 
 
