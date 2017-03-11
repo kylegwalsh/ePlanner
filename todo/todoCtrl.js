@@ -125,6 +125,13 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         var addnew = document.createElement('div');
         addnew.className = "AddNewTask";
         addnew.innerHTML = "<i class='fa fa-plus'></i> &nbsp; &nbsp; Add New";
+        var deleteCategory = document.createElement('div');
+        deleteCategory.innerHTML = "<i class='fa fa-remove'></i> &nbsp; &nbsp; Delete Entire Category";
+
+        $(deleteCategory).bind( "click", function() {       // funcion that removes category
+            $scope.remove($(this).parent().parent().parent().children(".CategoryBar").text());
+            $(this).parent().parent().parent().empty(); // deletes the entire Category
+        });
 
         $(addnew).bind( "click", function() {
             $scope.addSubSectionForTodo($(this), "testing", "4/20/2017", "4:20pm");
@@ -132,6 +139,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
         divider.appendChild(addnewbar);
         addnewbar.appendChild(addnew);
+        addnewbar.appendChild(deleteCategory);
         Category.appendChild(divider);
     }
 
