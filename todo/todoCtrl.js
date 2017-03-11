@@ -4,7 +4,6 @@ var app = angular.module('app', ['ui.calendar']);
 app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
     $scope.todoStorage = todoStorage;
-    $scope.testing = "test";
 
     $scope.$watch('todoStorage.data', function() {
         $scope.todoList = $scope.todoStorage.data;
@@ -90,7 +89,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             // function to slide in/out the toDos for a category
             $(button).bind( "click", function() { 
 
-               $(this).css('-webkit-transform', 'rotate(' + 180 + 'deg)');  // rotate image TODO don't know how to get current angle
+               $(this).css('-webkit-transform', 'rotate(' + 180 + 'deg)');  // rotate image TODO don't know how to get current angle to get it back to rotate
                $(this).css('-moz-transform', 'rotate(' + 180 + 'deg)'); 
                $(this).css('-ms-transform', 'rotate(' + 180 + 'deg)'); 
                $(this).css('-o-transform', 'rotate(' + 180 + 'deg)');
@@ -138,6 +137,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
     $scope.addSubSectionForTodo = function(addSection, nameData, dateData, timeData){
         var divider = document.createElement('div');
+        divider.className = "Divider";
         var sub  = document.createElement('div'); // Create Div that houses the information for a single row To-DO
         sub.className = "SubToDo row";
             var select  = document.createElement('div'); // This is where the draggable thing will be
@@ -155,7 +155,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             Options.className = "SubOptions col-xs-1 vcenter";
             Options.innerHTML = "<i class='fa fa-ellipsis-h'></i>";
             $(Options).bind( "click", function() {   
-
                         if ($(this).parent().parent().children(".Options").css("display")=="none") {
                             // what we currently clicked on needs to be displayed
                             $(this).parent().parent().parent().children().children(".Options").slideUp("slow"); // close any other ones that my by open
@@ -171,18 +170,47 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             var OptionsPage  = document.createElement('div'); // The Options will go here
             OptionsPage.className = "Options";
 
-            var textInput = '<input type="text" ng-model="testing">Click Me</button>';
-            var button = '<button type="button" ng-click="myFunc()">Click Me</button>';
-            var temp = $compile(button)($scope);
-            var temp2 = $compile(textInput)($scope);
+            var textInput = document.createElement('input');  // main description will go here
+            textInput.className = "OptionsText";              // class tied to the input field
+            textInput.value = nameData
 
-            $(OptionsPage).append(temp2);
-            $(OptionsPage).append(temp);
-            $(OptionsPage).append('<div><input type="date"  name="date"></div>');
-            $(OptionsPage).append('<div><input type="time" name="time"></div>');      
+            var button = document.createElement("button"); // The button to confirm the user click to update everything 
+            button.className = "editing";
+            button.innerHTML = "Update";
+
+            var datePicker = document.createElement("div"); // date picker
+            $(datePicker).append("<input type='date'>");
+                                                                 // TODO don't know how to set or get the date from the picker
+
+            var timePicker = document.createElement("div");
+            $(timePicker).append('<input type="time">');
+
+                                                                // TODO don't know how to set or get the time from the picker
+
+            $(button).bind("click", function(){            
+                    var userInput = $(this).parent().children(".OptionsText").val(); // get the input that is in the textBox
+                    $(this).parent().parent().children().children().children(".SubName").html(userInput); // update the data
+                    var dateInput = $(this).parent().children(".OptionsText").val(); // get the input that is in the textBox
+                    $(this).parent().parent().children().children().children(".SubDateTime").html("Date updates | Time updates"); // update the data                    
+            });
+
+
+            var button2 = document.createElement('button');  // Delete button for the Todo that is at the bottom
+            button2.innerHTML = "Delete";
+            $(button2).bind( "click", function() {   
+                $(this).parent().parent().empty(); // Deletes the entire ToDo
+            });
+            
+            $(OptionsPage).append(textInput);
+            $(OptionsPage).append(button);
+            $(OptionsPage).append(datePicker);
+            $(OptionsPage).append(timePicker);
+            $(OptionsPage).append(button2);    
+
             $(OptionsPage).bind( "click", function() {   
                 $(this).parent("SubName row").slideToggle("slow"); // TODO toggle some Options window
             });
+        
 
         sub.appendChild(select);
         sub.appendChild(center);
@@ -197,13 +225,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
 
     }
-
-    $scope.myFunc = function(){
-        console.log("working");
-        console.log($scope.testing + " is the current input");
-    }
-
-
 });
 
 
