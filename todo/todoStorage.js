@@ -1,4 +1,5 @@
 angular.module('app').service('todoStorage', function ($q) {
+
     var _this = this;
     this.data = [];
 
@@ -25,8 +26,10 @@ angular.module('app').service('todoStorage', function ($q) {
             id: id,
             content: newContent,
             completed: false,
-            createdAt: new Date()
+            createdAt: new Date(),
+            subToDo: new Array(1), // array to keep track of the subToDoS
         };
+
         this.data.push(todo);
         this.sync();
     }
@@ -34,6 +37,21 @@ angular.module('app').service('todoStorage', function ($q) {
     this.remove = function(todo) {
         this.data.splice(this.data.indexOf(todo), 1);
         this.sync();
+    }
+
+    this.addSubToDo = function(index, name, date, time){
+        console.log("save is being added here");
+
+        var category =  _this.data[index];
+        var newData = {
+            name: "newly added",
+            date: new Date(),
+            time: 0,
+        }  
+        category.subToDo.push(newData);         
+        this.sync();
+
+        console.log(category);
     }
 
     this.removeAll = function() {

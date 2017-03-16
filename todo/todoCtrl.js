@@ -12,15 +12,21 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
     $scope.todoStorage.findAll(function(data){
         $scope.todoList = data;
         $scope.$apply();
+        console.log(data);
 
         angular.forEach($scope.todoList, function(item){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
-            $scope.addCategory(item.content)
+            var htmlCategory = $scope.addCategory(item.content) // Loop through each of the categories 
+            var arrayLength = item.subToDo.length;
+                for(var j=1; j < item.subToDo.length; j++){ // start at 1 because for some reason 0 always contains a null element 
+                    $scope.displaySubSectionForTodo(j, htmlCategory, item.subToDo[j].name,item.subToDo[j].date,item.subToDo[j].time);            
+            } 
         })
     });
 
     $scope.add = function() {
+        $scope.newContent = "test"; // just for testing
         todoStorage.add($scope.newContent);
-        $scope.addCategory($scope.newContent); // when a new item is added, we add a corresponding HTML for it
+        var categoryHTML = $scope.addCategory($scope.newContent); // when a new item is added, we add a corresponding HTML for it
         $scope.newContent = '';
     }
 
@@ -104,17 +110,11 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         top.appendChild(button);
         addMe.appendChild(top);
 
-        /*
-        var name = 'this is a test';
-        var date = '4/20';
-
-        $scope.addSubSectionForTodo(addMe, name, date)
-        $scope.addSubSectionForTodo(addMe, name, date)
-        $scope.addSubSectionForTodo(addMe, name, date)
-        */
-        $scope.addSubSectionTemplate(addMe); // append the "add" portion at the bottom
+        var templateToAdd = $scope.addSubSectionTemplate(addMe); // append the "add" portion at the bottom
         $("#ITEMS").prepend(addMe); // here we actually append the newly created HTML section to the existing DOM
+        return templateToAdd;
     }
+
 
     // This function adds the blank template that is at the bottom of every 
     $scope.addSubSectionTemplate = function(Category){
@@ -134,16 +134,31 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         });
 
         $(addnew).bind( "click", function() {
-            $scope.addSubSectionForTodo($(this), "testing", "4/20/2017", "4:20pm");
+
+            // call funciton to save the new information
+            $scope.saveSubSectionForTodo(0, $(this), "testing", "4/20/2017", "4:20pm");
+
+            // call function to display the information
+            $scope.displaySubSectionForTodo(0, $(this), "testing", "4/20/2017", "4:20pm");
+
         });
 
         divider.appendChild(addnewbar);
         addnewbar.appendChild(addnew);
         addnewbar.appendChild(deleteCategory);
         Category.appendChild(divider);
+
+        return $(addnew);
     }
 
-    $scope.addSubSectionForTodo = function(addSection, nameData, dateData, timeData){
+    $scope.saveSubSectionForTodo = function(index, addSection, nameData, dateData, timeData){
+           todoStorage.addSubToDo(0,nameData,dateData,timeData)
+           console.log("save has been called");
+    }
+
+    $scope.displaySubSectionForTodo = function(index, addSection, nameData, dateData, timeData){
+
+
         var divider = document.createElement('div');
         divider.className = "Divider";
         var sub  = document.createElement('div'); // Create Div that houses the information for a single row To-DO
