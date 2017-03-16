@@ -100,6 +100,15 @@ body {
   padding-top: 15px; 
 }
 
+.newCourse.btn{
+  background-color: #3498db;
+  float: right;
+  color: white;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+}
+
 ::-webkit-scrollbar {
     width: 12px;
 }
