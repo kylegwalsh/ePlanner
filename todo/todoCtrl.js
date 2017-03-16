@@ -1,7 +1,7 @@
 'use strict';
 var app = angular.module('app', ['ui.calendar']);
 
-app.controller('todoCtrl', function ($scope, todoStorage) {
+app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
     $scope.todoStorage = todoStorage;
 
@@ -88,9 +88,17 @@ app.controller('todoCtrl', function ($scope, todoStorage) {
 
             // function to slide in/out the toDos for a category
             $(button).bind( "click", function() { 
+
+               $(this).css('-webkit-transform', 'rotate(' + 180 + 'deg)');  // rotate image TODO don't know how to get current angle to get it back to rotate
+               $(this).css('-moz-transform', 'rotate(' + 180 + 'deg)'); 
+               $(this).css('-ms-transform', 'rotate(' + 180 + 'deg)'); 
+               $(this).css('-o-transform', 'rotate(' + 180 + 'deg)');
+               $(this).css('transform', 'rotate(' + 180 + 'deg)');
+
+
                $(this).parent().parent().children(".EndCategory").toggle("slow");
-               $(this).parent().parent().children().children().children(".Options").slideUp("slow"); // toggle away options in case they are open 
-            });
+               $(this).parent().parent().children().children().children(".Options").slideUp("slow"); // toggle away options in case they are open     
+            });               
 
         top.appendChild(title);  // append title and button the TOP div element
         top.appendChild(button);
@@ -117,18 +125,27 @@ app.controller('todoCtrl', function ($scope, todoStorage) {
         var addnew = document.createElement('div');
         addnew.className = "AddNewTask";
         addnew.innerHTML = "<i class='fa fa-plus'></i> &nbsp; &nbsp; Add New";
+        var deleteCategory = document.createElement('div');
+        deleteCategory.innerHTML = "<i class='fa fa-remove'></i> &nbsp; &nbsp; Delete Entire Category";
 
-        $(addnew).bind( "click", function() {   
+        $(deleteCategory).bind( "click", function() {       // funcion that removes category
+            $scope.remove($(this).parent().parent().parent().children(".CategoryBar").text());
+            $(this).parent().parent().parent().empty(); // deletes the entire Category
+        });
+
+        $(addnew).bind( "click", function() {
             $scope.addSubSectionForTodo($(this), "testing", "4/20/2017", "4:20pm");
         });
 
         divider.appendChild(addnewbar);
         addnewbar.appendChild(addnew);
+        addnewbar.appendChild(deleteCategory);
         Category.appendChild(divider);
     }
 
     $scope.addSubSectionForTodo = function(addSection, nameData, dateData, timeData){
         var divider = document.createElement('div');
+        divider.className = "Divider";
         var sub  = document.createElement('div'); // Create Div that houses the information for a single row To-DO
         sub.className = "SubToDo row";
             var select  = document.createElement('div'); // This is where the draggable thing will be
@@ -146,12 +163,63 @@ app.controller('todoCtrl', function ($scope, todoStorage) {
             Options.className = "SubOptions col-xs-1 vcenter";
             Options.innerHTML = "<i class='fa fa-ellipsis-h'></i>";
             $(Options).bind( "click", function() {   
-                $(this).parent().parent().children(".Options").slideToggle("slow"); // TODO toggle some Options window
+                        if ($(this).parent().parent().children(".Options").css("display")=="none") {
+                            // what we currently clicked on needs to be displayed
+                            $(this).parent().parent().parent().children().children(".Options").slideUp("slow"); // close any other ones that my by open
+                            $(this).parent().parent().children(".Options").slideDown("slow"); // Display options
+                        }
+                        else{
+                            // what we currently clicked on needs to be closed
+                            $(this).parent().parent().children(".Options").slideUp("slow"); // Close options
+                        }        
             });
+
 
             var OptionsPage  = document.createElement('div'); // The Options will go here
             OptionsPage.className = "Options";
-            OptionsPage.innerHTML = " Settings and buttons should go here";
+
+            var textInput = document.createElement('input');  // main description will go here
+            textInput.className = "OptionsText";              // class tied to the input field
+            textInput.value = nameData
+
+            var button = document.createElement("button"); // The button to confirm the user click to update everything 
+            button.className = "editing";
+            button.innerHTML = "Update";
+
+            var datePicker = document.createElement("input"); // date picker
+            datePicker.type = "date";
+            datePicker.className = "DatePicker";                                                 
+
+            var timePicker = document.createElement("input"); // Time picker
+            timePicker.type = "time";
+            timePicker.className = "TimePicker";
+
+            $(button).bind("click", function(){            
+                    var userInput = $(this).parent().children(".OptionsText").val(); // get the input that is in the textBox
+                    $(this).parent().parent().children().children().children(".SubName").html(userInput); // update the data
+                    var dateInput = new Date($(this).parent().children(".DatePicker").val()); // get the date input value
+                    var timeInput = $(this).parent().children(".TimePicker").val(); // get the time input value
+                    var test = $scope.formatTime(timeInput);
+                    $(this).parent().parent().children().children().children(".SubDateTime").html($scope.formatDate(dateInput) + " " + timeInput); // update the data                    
+            });
+
+
+            var button2 = document.createElement('button');  // Delete button for the Todo that is at the bottom
+            button2.innerHTML = "Delete";
+            $(button2).bind( "click", function() {   
+                $(this).parent().parent().empty(); // Deletes the entire ToDo
+            });
+            
+            $(OptionsPage).append(textInput);
+            $(OptionsPage).append(button);
+            $(OptionsPage).append(datePicker);
+            $(OptionsPage).append(timePicker);
+            $(OptionsPage).append(button2);    
+
+            $(OptionsPage).bind( "click", function() {   
+                $(this).parent("SubName row").slideToggle("slow"); // TODO toggle some Options window
+            });
+        
 
         sub.appendChild(select);
         sub.appendChild(center);
@@ -161,8 +229,24 @@ app.controller('todoCtrl', function ($scope, todoStorage) {
         divider.appendChild(sub);
         divider.appendChild(OptionsPage);
         addSection.parent().prepend(divider);// append the whole thing to join up wit the title that was preivously added
+        addSection.parent().children().children(".Options").slideUp("slow"); // close any existing options
+        $(Options).parent().parent().children(".Options").slideDown("slow"); // make options for newly created ToDo visible
+
+
     }
 
+    $scope.formatTime = function(date){
+        // Time isn't working for some reason, idk 
+
+    }
+
+    // function used to format date month/day/year
+    $scope.formatDate = function(date){
+        var day = date.getDate() +1; // ?!?!? i have no idea why but I have to add 1 for some reason 
+        var month = date.getMonth() +1;  // ?!?!? i have no idea why but I have to add 1 for some reason 
+        var year =  date.getFullYear();  // ?!?!? year is fine for some reason 
+        return month + "/" + day + "/" + year;
+    }
 
 });
 
@@ -284,3 +368,5 @@ app.controller('settings', function($scope) {
 
 
 });
+
+

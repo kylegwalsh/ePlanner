@@ -229,10 +229,6 @@ footer{
   padding-bottom: 10px;
 }
 
-.Options{
-  margin-left: 65px;
-}
-
 hr{
   display: block;
   border-width: 2px;
@@ -299,4 +295,16 @@ input[type=checkbox]:checked:after {
 
 input[type="checkbox"]:focus{
     outline:0;
+}
+
+.Options{
+  margin-left: 65px;
+  padding-top:10px;
+  padding-bottom:10px;
+  background-color: teal;
+  display: none;
+}
+
+.OptionsText{
+
 }
