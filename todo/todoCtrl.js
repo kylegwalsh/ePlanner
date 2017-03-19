@@ -394,32 +394,49 @@ app.controller('completed', function($scope) {
 });
 
 // controller for the calendar section area
-app.controller('calendar', function($scope,$compile,uiCalendarConfig) {
-var date = new Date();
+app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorage) {
+    $scope.todoStorage = todoStorage;
+
+    $scope.$watch('todoStorage.data', function() {
+        $scope.todoList = $scope.todoStorage.data;
+    });
+
+    var date = new Date();
     var d = date.getDate();
     var m = date.getMonth();
     var y = date.getFullYear();
-    
-    $scope.changeTo = 'Hungarian';
-    /* event source that pulls from google.com */
-    $scope.eventSource = {
-            url: "http://www.google.com/calendar/feeds/usa__en%40holiday.calendar.google.com/public/basic",
-            className: 'gcal-event',           // an option!
-            currentTimezone: 'America/Chicago' // an option!
-    };
-    /* event source that contains custom events on the scope */
-    $scope.events = [
-      {title: 'All Day Event',start: new Date(y, m, 1)},
-      {title: 'Long Event',start: new Date(y, m, d - 5),end: new Date(y, m, d - 2)},
-      {id: 999,title: 'Repeating Event',start: new Date(y, m, d - 3, 16, 0),allDay: false},
-      {id: 999,title: 'Repeating Event',start: new Date(y, m, d + 4, 16, 0),allDay: false},
-      {title: 'Birthday Party',start: new Date(y, m, d + 1, 19, 0),end: new Date(y, m, d + 1, 22, 30),allDay: false},
-      {title: 'Click for Google',start: new Date(y, m, 28),end: new Date(y, m, 29),url: 'http://google.com/'}
-    ];
+
+    $scope.events = [];
+    $scope.events.push({title: 'instantiate',start: new Date(y, m, 1)});
+
+    $scope.todoStorage.findAll(function(data){
+        $scope.todoList = data;
+        $scope.$apply();
+        var count = 0;
+        angular.forEach($scope.todoList, function(item){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
+            
+            for(var j=0; j < item.subToDo.length; j++){
+                $scope.addEvent(item.subToDo[j], item.color);
+                if(count == 0){
+                    $scope.remove(0)
+                }
+                count = count + 1;         
+            } 
+        })
+
+    });
+    // $scope.events = [
+    //   {title: 'All Day Event',start: new Date(y, m, 1)},
+    //   {title: 'Long Event',start: new Date(y, m, d - 5),end: new Date(y, m, d - 2)},
+    //   {id: 999,title: 'Repeating Event',start: new Date(y, m, d - 3, 16, 0),allDay: false},
+    //   {id: 999,title: 'Repeating Event',start: new Date(y, m, d + 4, 16, 0),allDay: false},
+    //   {title: 'Birthday Party',start: new Date(y, m, d + 1, 19, 0),end: new Date(y, m, d + 1, 22, 30),allDay: false},
+    //   {title: 'Click for Google',start: new Date(y, m, 28),end: new Date(y, m, 29),url: 'http://google.com/'}
+    // ];
 
     /* alert on eventClick */
     $scope.alertOnEventClick = function( date, jsEvent, view){
-        $scope.alertMessage = (date.title + ' was clicked ');
+        $scope.alertMessage = (date.title);
     };
     /* alert on Drop */
      $scope.alertOnDrop = function(event, delta, revertFunc, jsEvent, ui, view){
@@ -443,21 +460,20 @@ var date = new Date();
       }
     };
     /* add custom event*/
-    $scope.addEvent = function() {
+    $scope.addEvent = function(subToDo, color) {
+      var eventDate = new Date(subToDo.date);
+      eventDate.setDate(eventDate.getDate() + 1);
       $scope.events.push({
-        title: 'Open Sesame',
-        start: new Date(y, m, 28),
-        end: new Date(y, m, 29),
-        className: ['openSesame']
+        title: subToDo.name,
+        start: eventDate,
+        backgroundColor: "#" + color,
+        //start: $scope.setTime(eventDate, subToDo.time)
+        stick: true
       });
     };
     /* remove event */
     $scope.remove = function(index) {
       $scope.events.splice(index,1);
-    };
-    /* Change View */
-    $scope.changeView = function(view,calendar) {
-      uiCalendarConfig.calendars[calendar].fullCalendar('changeView',view);
     };
     /* Change View */
     $scope.renderCalender = function(calendar) {
@@ -467,15 +483,34 @@ var date = new Date();
     };
      /* Render Tooltip */
     $scope.eventRender = function( event, element, view ) { 
-        element.attr({'tooltip': event.title,
+        element.attr({'uib-tooltip-html': "\'<p>" + event.title + "</p>\'",
                      'tooltip-append-to-body': true});
         $compile(element)($scope);
     };
+
+    $scope.setTime = function setDateTime(date, time) {
+        var index = time.indexOf(":"); 
+        var index2 = time.indexOf(" ");
+
+        var hours = time.substring(0, index);
+        var minutes = time.substring(index + 1, index2);
+
+        var mer = time.substring(index2 + 1, time.length);
+
+
+        date.setHours(hours);
+        date.setMinutes(minutes);
+        date.setSeconds("00");
+
+        return date;
+    }
     /* config object */
     $scope.uiConfig = {
       calendar:{
         height: 450,
         editable: true,
+        eventTextColor: "black",
+        eventBoarderColor: "black",
         header:{
           left: 'title',
           center: '',
@@ -488,7 +523,7 @@ var date = new Date();
       }
     };
     /* event sources array*/
-    $scope.eventSources = [$scope.events, $scope.eventSource, $scope.eventsF];
+    $scope.eventSources = [$scope.events];
 });
 
 // controller for hte settings section area
