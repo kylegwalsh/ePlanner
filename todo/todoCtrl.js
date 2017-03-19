@@ -18,8 +18,8 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             var htmlCategory = $scope.addCategory(item.content, value) // Loop through each of the categories 
             var arrayLength = item.subToDo.length;
             console.log("category running");
-                for(var j=item.subToDo.length-1; j >= 1; j--){ // start at 1 because for some reason 0 always contains a null element 
-                    $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,item.subToDo[j].date,item.subToDo[j].time);            
+                for(var j=0; j < item.subToDo.length; j++){
+                    $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,item.subToDo[j].date,item.subToDo[j].time);          
             } 
         })
     });
@@ -90,6 +90,16 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             var title  = document.createElement('div'); // title 
             title.className = "CategoryName col-xs-10";
             title.innerHTML = data;
+            var buttonB4  = document.createElement('div'); // settings for the category
+            buttonB4.innerHTML = "X";
+            buttonB4.className = "CategoryOptions";
+
+            $(buttonB4).bind( "click", function() { 
+
+
+
+            });
+
             var button  = document.createElement('div'); // toggle
             button.className = "CategoryToggle col-xs-1 col-xs-offset-1";
             button.innerHTML = "<i class='fa fa-lg fa-angle-down'></i>";
@@ -109,6 +119,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             });               
 
         top.appendChild(title);  // append title and button the TOP div element
+        top.appendChild(buttonB4);
         top.appendChild(button);
         addMe.appendChild(top);
 
@@ -156,9 +167,9 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
            todoStorage.addSubToDo(index,nameData,dateData,timeData)
     }
 
-    $scope.displaySubSectionForTodo = function( addSection, nameData, dateData, timeData){
+    $scope.displaySubSectionForTodo = function(addSection, nameData, dateData, timeData){
 
-
+        console.log(nameData + " : " + dateData + " : " + timeData);
         var divider = document.createElement('div');
         divider.className = "Divider";
         var sub  = document.createElement('div'); // Create Div that houses the information for a single row To-DO
@@ -209,20 +220,44 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             timePicker.type = "time";
             timePicker.className = "TimePicker";
 
-            $(button).bind("click", function(){            
+            $(button).bind("click", function(){  
+
                     var userInput = $(this).parent().children(".OptionsText").val(); // get the input that is in the textBox
                     $(this).parent().parent().children().children().children(".SubName").html(userInput); // update the data
                     var dateInput = new Date($(this).parent().children(".DatePicker").val()); // get the date input value
                     var timeInput = $(this).parent().children(".TimePicker").val(); // get the time input value
-                    var test = $scope.formatTime(timeInput);
-                    $(this).parent().parent().children().children().children(".SubDateTime").html($scope.formatDate(dateInput) + " " + timeInput); // update the data                    
+                    var test = $scope.formatTime(timeInput);      
+                   
+                    var child = $(this).parent().parent();
+                    var parent = $(this).parent().parent().parent();
+                    var subToDoindex = $(parent).children(".Divider").index(child);
+                    // subToDoindex contains the value of what we currently want to edit
+
+                    var categoryChild = $(this).parent().parent().parent().parent().parent();
+                    var categoryParent = $(this).parent().parent().parent().parent().parent().parent();
+                    var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+                    // Category of the subToDo that we want to edit
+
+                    todoStorage.modifySubToDo(categoryIndex, subToDoindex, userInput, dateInput, timeInput); // Update in memory
+                    $(this).parent().parent().children().children().children(".SubDateTime").html($scope.formatDate(dateInput) + " " + timeInput); // Update in HTML                  
             });
 
 
             var button2 = document.createElement('button');  // Delete button for the Todo that is at the bottom
             button2.innerHTML = "Delete";
             $(button2).bind( "click", function() {   
-                $(this).parent().parent().empty(); // Deletes the entire ToDo
+                var child = $(this).parent().parent();
+                var parent = $(this).parent().parent().parent();
+                var subToDoindex = $(parent).children(".Divider").index(child);
+                // subToDoindex contains the value of what we currently want to delete
+
+                var categoryChild = $(this).parent().parent().parent().parent().parent();
+                var categoryParent = $(this).parent().parent().parent().parent().parent().parent();
+                var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+                // categoryIndex contains the value of the entire Category that the subToDo is being deleted in
+
+                todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory
+                $(this).parent().parent().remove(); // Clear from HTML
             });
             
             $(OptionsPage).append(textInput);

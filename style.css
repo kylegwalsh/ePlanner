@@ -183,6 +183,19 @@ footer{
 
 .CategoryName{
   float:left;
+  display: inline-block;
+  max-width: 410px;
+}
+.CategoryOptions{
+  max-width: 10px;
+  display: inline-block;
+}
+.CategoryOptions:hover{
+  cursor: pointer;
+}
+.CategoryToggle{
+   display: inline-block;
+   float: right;
 }
 
 .CategoryToggle:hover{
@@ -308,3 +321,15 @@ input[type="checkbox"]:focus{
 .OptionsText{
 
 }
+
+#HoverOptions{
+  width: 400px;
+  height: 300px;
+  float: right;
+  position: absolute;
+  z-index: 10;
+  margin: 0 auto;
+  background-color: red;
+  position: relative;
+}
+
