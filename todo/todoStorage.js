@@ -69,7 +69,6 @@ angular.module('app').service('todoStorage', function ($q) {
             deleteMe : false,
         }  
         category.subToDo[size2 - subToDoIndex] = newData;
-        console.log(category);
         this.sync();
     }
 
@@ -78,6 +77,8 @@ angular.module('app').service('todoStorage', function ($q) {
         if(category == undefined){
             category = _this.data[index-1]; 
         }
+
+
         var newData = {
             name: name,
             date: date,

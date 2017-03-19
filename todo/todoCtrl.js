@@ -17,15 +17,14 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         angular.forEach($scope.todoList, function(item, value){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
             var htmlCategory = $scope.addCategory(item.content, value) // Loop through each of the categories 
             var arrayLength = item.subToDo.length;
-            console.log("category running");
                 for(var j=0; j < item.subToDo.length; j++){
-                    $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,item.subToDo[j].date,item.subToDo[j].time);          
+                    $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,$scope.formatDate(new Date(item.subToDo[j].date)),item.subToDo[j].time);          
             } 
         })
     });
 
     $scope.add = function() {
-        $scope.newContent = "testing"; // just for testing
+        $scope.newContent = "testing    "; // just for testing
         var index = todoStorage.add($scope.newContent);
         var categoryHTML = $scope.addCategory(index,index); // when a new item is added, we add a corresponding HTML for it
         $scope.newContent = '';
@@ -224,7 +223,10 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
                     var userInput = $(this).parent().children(".OptionsText").val(); // get the input that is in the textBox
                     $(this).parent().parent().children().children().children(".SubName").html(userInput); // update the data
-                    var dateInput = new Date($(this).parent().children(".DatePicker").val()); // get the date input value
+                    var datePickerValue = $(this).parent().children(".DatePicker").val();
+                    var date  = new Date(datePickerValue);
+ 
+
                     var timeInput = $(this).parent().children(".TimePicker").val(); // get the time input value
                     var test = $scope.formatTime(timeInput);      
                    
@@ -238,8 +240,8 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                     var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
                     // Category of the subToDo that we want to edit
 
-                    todoStorage.modifySubToDo(categoryIndex, subToDoindex, userInput, dateInput, timeInput); // Update in memory
-                    $(this).parent().parent().children().children().children(".SubDateTime").html($scope.formatDate(dateInput) + " " + timeInput); // Update in HTML                  
+                    todoStorage.modifySubToDo(categoryIndex, subToDoindex, userInput, datePickerValue, timeInput); // Update in memory
+                    $(this).parent().parent().children().children().children(".SubDateTime").html($scope.formatDate(date)    + " " + timeInput); // Update in HTML                  
             });
 
 
