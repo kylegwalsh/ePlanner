@@ -12,10 +12,9 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
     $scope.todoStorage.findAll(function(data){
         $scope.todoList = data;
         $scope.$apply();
-        console.log(data);
 
         angular.forEach($scope.todoList, function(item, value){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
-            var htmlCategory = $scope.addCategory(item.content, value) // Loop through each of the categories 
+            var htmlCategory = $scope.addCategory(item.content, value, item.color) // Loop through each of the categories 
             var arrayLength = item.subToDo.length;
                 for(var j=0; j < item.subToDo.length; j++){
                     $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,$scope.formatDate(new Date(item.subToDo[j].date)),item.subToDo[j].time, item.subToDo[j].notes, false);          
@@ -32,9 +31,8 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         $scope.newContent = '';
     }
 
-    $scope.remove = function(todo, index) {
-        console.log("calling remove");
-        todoStorage.remove(todo, index);
+    $scope.remove = function(index) {
+        todoStorage.remove(index);
     }
 
     $scope.removeAll = function() {
@@ -46,7 +44,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         todoStorage.sync();
     }
 
-    $scope.addCategory = function(data, index){ // data is the category that gets set          
+    $scope.addCategory = function(data, index, color){ // data is the category that gets set          
         /*  Heirarchy for TO-DO Item
 
 
@@ -95,9 +93,67 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             buttonB4.innerHTML = "X";
             buttonB4.className = "CategoryOptions";
 
-            $(buttonB4).bind( "click", function() { 
+            // CATEGORY OVERLAY
+            $(buttonB4).bind( "click",{ category: addMe},  function(event) { 
+                document.getElementById("CategoryOptionsOverlay").style.display = "inline-block"; 
+                var button  = document.createElement('div'); // toggle on/off button
+                button.innerHTML="close button";
+                // TODO add class and CSS
+                
+                var categoryName = document.createElement('input');  // main description will go here
+                categoryName.className = "CategoryNameInput";     
+                categoryName.value =data;
+                // TODO add CSS   // class tied to the input field    
 
+                var updateButton  = document.createElement('div'); // toggle on/off button
+                updateButton.innerHTML = "update button";
+                // TODO add CSS and class
 
+                $(updateButton).bind('click', function(){         
+                    var userInput = $(categoryName).val(); // get the input that is in the textBox
+                    todoStorage.changeCategoryName(index, userInput); // update Category name in memory
+                    title.innerHTML = userInput;
+                });
+
+                var colorButton  = document.createElement('div'); // toggle on/off button
+                colorButton.innerHTML = "color Update";
+                // TODO add CSS and class
+                $(colorButton).bind('click', function(){
+                     $(top).css('background-color', "#"+colorPicker.value); // updates the color in the Category
+                     todoStorage.changeCategoryColor(index,colorPicker.value);
+                });
+   
+                var colorPicker  = document.createElement('input'); // colorPicker
+                colorPicker.className= "jscolor"; // DON'T change this
+                colorPicker.value="ab2567"; // default color
+
+                $(colorPicker).ready(function() {
+                  jscolor.installByClassName("jscolor"); // don't change this
+                });
+
+                
+                var deleteCategory = document.createElement('div');
+                deleteCategory.innerHTML = "<i class='fa fa-remove'></i> &nbsp; &nbsp; Delete Entire Category";
+
+                $(deleteCategory).bind('click', {category: event.data.category }, function(event){
+                    var data = event.data.category;
+                    $(data).empty(); // deletes the entire Category in the HTML
+                    todoStorage.remove(index); // remove Category from memory
+                    document.getElementById("CategoryOptionsOverlay").innerHTML = ""; // clear contents of overlay
+                    document.getElementById("CategoryOptionsOverlay").style.display = "none";  // close overlay
+                });
+
+                 document.getElementById("CategoryOptionsOverlay").appendChild(button);
+                 document.getElementById("CategoryOptionsOverlay").appendChild(categoryName);
+                 document.getElementById("CategoryOptionsOverlay").appendChild(updateButton);
+                 document.getElementById("CategoryOptionsOverlay").appendChild(colorButton);
+                 document.getElementById("CategoryOptionsOverlay").appendChild(colorPicker);
+                 document.getElementById("CategoryOptionsOverlay").appendChild(deleteCategory);
+
+                $(button).bind("click", function(){
+                    document.getElementById("CategoryOptionsOverlay").innerHTML = ""; // clear contents of overlay
+                    document.getElementById("CategoryOptionsOverlay").style.display = "none";  // close overlay
+                });
 
             });
 
@@ -126,6 +182,13 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
         var templateToAdd = $scope.addSubSectionTemplate(addMe, index); // append the "add" portion at the bottom
         $("#ITEMS").prepend(addMe); // here we actually append the newly created HTML section to the existing DOM
+
+       
+        if(color != undefined){
+            console.log(color);
+            $(top).css('background-color', "#" +color); // updates the color in the Category
+        }
+
         return templateToAdd;
     }
 
@@ -139,28 +202,19 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         var addnew = document.createElement('div');
         addnew.className = "AddNewTask";
         addnew.innerHTML = "<i class='fa fa-plus'></i> &nbsp; &nbsp; Add New";
-        var deleteCategory = document.createElement('div');
-        deleteCategory.innerHTML = "<i class='fa fa-remove'></i> &nbsp; &nbsp; Delete Entire Category";
-
-        $(deleteCategory).bind( "click", function() {       // funcion that removes category
-            $scope.remove($(this).parent().parent().parent().children(".CategoryBar").text(), index);
-            $(this).parent().parent().parent().empty(); // deletes the entire Category
-        });
 
         $(addnew).bind( "click", function() {
             // call funciton to save the new information
-            $scope.saveSubSectionForTodo(index, $(this), "testing", "4/20/2017", "4:20pm", "extra information");
+            $scope.saveSubSectionForTodo(index, $(this), "New ToDo", "4/20/2017", "4:20pm", "Extra Notes to add");
 
             // call function to display the information
-            $scope.displaySubSectionForTodo( $(this), "testing", "4/20/2017", "4:20pm", "extra information", true);
+            $scope.displaySubSectionForTodo( $(this), "New ToDo", "4/20/2017", "4:20pm", "Extra Notes to add", true);
 
         });
 
         divider.appendChild(addnewbar);
         addnewbar.appendChild(addnew);
-        addnewbar.appendChild(deleteCategory);
         Category.appendChild(divider);
-
         return $(addnew);
     }
 
@@ -170,7 +224,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
     $scope.displaySubSectionForTodo = function(addSection, nameData, dateData, timeData, notesData, boolean){
 
-        console.log(nameData + " : " + dateData + " : " + timeData);
         var divider = document.createElement('div');
         divider.className = "Divider";
         var sub  = document.createElement('div'); // Create Div that houses the information for a single row To-DO
@@ -183,7 +236,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             var name  = document.createElement('div'); // The name will go here
             name.className = "SubName row";
             name.innerHTML = nameData;
-            var notes  = document.createElement('div'); // The name will go here
+            var notes  = document.createElement('div'); // The notes will go here
             notes.className = "Notes";
             notes.innerHTML = notesData;
             var dateandtime = document.createElement('div');  // The date and time go here
@@ -217,7 +270,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             button.className = "editing";
             button.innerHTML = "Update";
 
-            var notesInput = document.createElement("textarea"); // The button to confirm the user click to update everything 
+            var notesInput = document.createElement("textarea"); // text are where notes can be updated
             notesInput.className = "NotesText";
             notesInput.defaultValue = "Add notes to your ToDo";
 
@@ -235,7 +288,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                     $(this).parent().parent().children().children().children(".SubName").html(userInput); // update the data
 
                     var userInputNotes = $(this).parent().children(".NotesText").val(); // get the input that is in the textBox
-                    console.log("notes " +userInputNotes);
                     $(this).parent().parent().children().children().children(".Notes").html(userInputNotes); // update the data
                     var datePickerValue = $(this).parent().children(".DatePicker").val();
                     var notesInput = $(this).parent().children(".Text").val();
@@ -300,7 +352,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         addSection.parent().prepend(divider);// append the whole thing to join up wit the title that was preivously added
         addSection.parent().children().children(".Options").slideUp("slow"); // close any existing options
         if(boolean == false ){
-           
+           // startup, we don't want to animate
         } else {
              $(Options).parent().parent().children(".Options").slideDown("slow"); // make options for newly created ToDo visible
         }

@@ -33,6 +33,7 @@ angular.module('app').service('todoStorage', function ($q) {
             id: id,
             content: id,
             completed: false,
+            color: "FFF2A20", // default color
             createdAt: new Date(),
             subToDo: new Array(0), // array to keep track of the subToDoS
         };
@@ -43,8 +44,18 @@ angular.module('app').service('todoStorage', function ($q) {
 
         return id;
     }
+    this.changeCategoryName = function(index, newName){
+        var todo = _this.data[index];
+        todo.content = newName;
+        this.sync();
+    }
+    this.changeCategoryColor = function(index, hexValue){
+        var todo = _this.data[index];
+        todo.color = hexValue;
+        this.sync();
+    }
 
-    this.remove = function(todo, index) {
+    this.remove = function(index) {
         this.data.splice(index, 1);
         this.updateIndexes();
         this.sync();
@@ -83,7 +94,6 @@ angular.module('app').service('todoStorage', function ($q) {
             date: date,
             time: time,
             notes: notes,
-            deleteMe : false,
         }        
         category.subToDo.push(newData);         
         this.sync();
