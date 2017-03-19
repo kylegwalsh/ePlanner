@@ -56,7 +56,7 @@ angular.module('app').service('todoStorage', function ($q) {
         category.subToDo.splice(category.subToDo.length-1-subToDoIndex, 1);
         this.sync();
     }
-    this.modifySubToDo = function(Categoryindex, subToDoIndex, name, date, time){
+    this.modifySubToDo = function(Categoryindex, subToDoIndex, name, date, time, notes){
         var size = _this.data.length-1; 
         var category = _this.data[size-Categoryindex];
         var size2 = category.subToDo.length-1;
@@ -65,14 +65,14 @@ angular.module('app').service('todoStorage', function ($q) {
             name: name,
             date: date,
             time: time,
-            notes: "extra information that can be added",
+            notes: notes,
             deleteMe : false,
         }  
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
     }
 
-    this.addSubToDo = function(index, name, date, time){
+    this.addSubToDo = function(index, name, date, time, notes){
         var category =  _this.data[index];
         if(category == undefined){
             category = _this.data[index-1]; 
@@ -83,7 +83,7 @@ angular.module('app').service('todoStorage', function ($q) {
             name: name,
             date: date,
             time: time,
-            notes: "extra information that can be added",
+            notes: notes,
             deleteMe : false,
         }        
         category.subToDo.push(newData);         

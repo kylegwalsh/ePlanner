@@ -18,7 +18,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             var htmlCategory = $scope.addCategory(item.content, value) // Loop through each of the categories 
             var arrayLength = item.subToDo.length;
                 for(var j=0; j < item.subToDo.length; j++){
-                    $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,$scope.formatDate(new Date(item.subToDo[j].date)),item.subToDo[j].time);          
+                    $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,$scope.formatDate(new Date(item.subToDo[j].date)),item.subToDo[j].time, item.subToDo[j].notes);          
             } 
         })
     });
@@ -147,10 +147,10 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
         $(addnew).bind( "click", function() {
             // call funciton to save the new information
-            $scope.saveSubSectionForTodo(index, $(this), "testing", "4/20/2017", "4:20pm");
+            $scope.saveSubSectionForTodo(index, $(this), "testing", "4/20/2017", "4:20pm", "extra information");
 
             // call function to display the information
-            $scope.displaySubSectionForTodo( $(this), "testing", "4/20/2017", "4:20pm");
+            $scope.displaySubSectionForTodo( $(this), "testing", "4/20/2017", "4:20pm", "extra information");
 
         });
 
@@ -162,11 +162,11 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         return $(addnew);
     }
 
-    $scope.saveSubSectionForTodo = function(index, addSection, nameData, dateData, timeData){
-           todoStorage.addSubToDo(index,nameData,dateData,timeData)
+    $scope.saveSubSectionForTodo = function(index, addSection, nameData, dateData, timeData, notesData){
+           todoStorage.addSubToDo(index,nameData,dateData,timeData, notesData)
     }
 
-    $scope.displaySubSectionForTodo = function(addSection, nameData, dateData, timeData){
+    $scope.displaySubSectionForTodo = function(addSection, nameData, dateData, timeData, notesData){
 
         console.log(nameData + " : " + dateData + " : " + timeData);
         var divider = document.createElement('div');
@@ -181,6 +181,9 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             var name  = document.createElement('div'); // The name will go here
             name.className = "SubName row";
             name.innerHTML = nameData;
+            var notes  = document.createElement('div'); // The name will go here
+            notes.className = "Notes";
+            notes.innerHTML = notesData;
             var dateandtime = document.createElement('div');  // The date and time go here
             dateandtime.className = "SubDateTime row";
             dateandtime.innerHTML = dateData + "&nbsp; &nbsp;" + timeData;
@@ -211,9 +214,13 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             button.className = "editing";
             button.innerHTML = "Update";
 
+            var notesInput = document.createElement("textarea"); // The button to confirm the user click to update everything 
+            notesInput.className = "NotesText";
+            notesInput.defaultValue = "Add notes to your ToDo";
+
             var datePicker = document.createElement("input"); // date picker
             datePicker.type = "date";
-            datePicker.className = "DatePicker";                                                 
+            datePicker.className = "DatePicker"; 
 
             var timePicker = document.createElement("input"); // Time picker
             timePicker.type = "time";
@@ -223,7 +230,12 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
                     var userInput = $(this).parent().children(".OptionsText").val(); // get the input that is in the textBox
                     $(this).parent().parent().children().children().children(".SubName").html(userInput); // update the data
+
+                    var userInputNotes = $(this).parent().children(".NotesText").val(); // get the input that is in the textBox
+                    console.log("notes " +userInputNotes);
+                    $(this).parent().parent().children().children().children(".Notes").html(userInputNotes); // update the data
                     var datePickerValue = $(this).parent().children(".DatePicker").val();
+                    var notesInput = $(this).parent().children(".Text").val();
                     var date  = new Date(datePickerValue);
  
 
@@ -240,7 +252,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                     var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
                     // Category of the subToDo that we want to edit
 
-                    todoStorage.modifySubToDo(categoryIndex, subToDoindex, userInput, datePickerValue, timeInput); // Update in memory
+                    todoStorage.modifySubToDo(categoryIndex, subToDoindex, userInput, datePickerValue, timeInput, userInputNotes); // Update in memory
                     $(this).parent().parent().children().children().children(".SubDateTime").html($scope.formatDate(date)    + " " + timeInput); // Update in HTML                  
             });
 
@@ -264,6 +276,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             
             $(OptionsPage).append(textInput);
             $(OptionsPage).append(button);
+            $(OptionsPage).append(notesInput);
             $(OptionsPage).append(datePicker);
             $(OptionsPage).append(timePicker);
             $(OptionsPage).append(button2);    
@@ -276,6 +289,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         sub.appendChild(select);
         sub.appendChild(center);
         center.appendChild(name);
+        center.appendChild(notes);
         center.appendChild(dateandtime);
         sub.appendChild(Options); // append select, name, date, Options to TO-DO item, 
         divider.appendChild(sub);
