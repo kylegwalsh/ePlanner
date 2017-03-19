@@ -125,7 +125,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
    
                 var colorPicker  = document.createElement('input'); // colorPicker
                 colorPicker.className= "jscolor"; // DON'T change this
-                colorPicker.value="ab2567"; // default color
+                colorPicker.value=color; // default color
 
                 $(colorPicker).ready(function() {
                   jscolor.installByClassName("jscolor"); // don't change this

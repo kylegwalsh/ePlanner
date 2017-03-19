@@ -33,7 +33,7 @@ angular.module('app').service('todoStorage', function ($q) {
             id: id,
             content: id,
             completed: false,
-            color: "FFF2A20", // default color
+            color: "33C2FF", // default color
             createdAt: new Date(),
             subToDo: new Array(0), // array to keep track of the subToDoS
         };
