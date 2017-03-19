@@ -182,10 +182,8 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
         var templateToAdd = $scope.addSubSectionTemplate(addMe, index); // append the "add" portion at the bottom
         $("#ITEMS").prepend(addMe); // here we actually append the newly created HTML section to the existing DOM
-
        
         if(color != undefined){
-            console.log(color);
             $(top).css('background-color', "#" +color); // updates the color in the Category
         }
 
@@ -228,6 +226,9 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         divider.className = "Divider";
         var sub  = document.createElement('div'); // Create Div that houses the information for a single row To-DO
         sub.className = "SubToDo row";
+
+
+            // TODO CSS stuff here, TODO gets structured here
             var select  = document.createElement('div'); // This is where the draggable thing will be
             select.className = "Checkbox col-xs-offset-1 col-xs-1 vcenter";
             select.innerHTML = "<input type='checkbox'/>";
@@ -265,24 +266,28 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             var textInput = document.createElement('input');  // main description will go here
             textInput.className = "OptionsText";              // class tied to the input field
             textInput.value = nameData
+            // TODO modify CSS and class stuff here 
 
             var button = document.createElement("button"); // The button to confirm the user click to update everything 
             button.className = "editing";
             button.innerHTML = "Update";
+            // TODO modify CSS and class stuff here 
 
             var notesInput = document.createElement("textarea"); // text are where notes can be updated
             notesInput.className = "NotesText";
             notesInput.defaultValue = "Add notes to your ToDo";
+            // TODO modify CSS and class stuff here
 
             var datePicker = document.createElement("input"); // date picker
             datePicker.type = "date";
             datePicker.className = "DatePicker"; 
+            // TODO modify CSS and class stuff here
 
             var timePicker = document.createElement("input"); // Time picker
             timePicker.type = "time";
             timePicker.className = "TimePicker";
 
-            $(button).bind("click", function(){  
+            $(button).bind("click", function(){   // Button that handles updating the TODO
 
                     var userInput = $(this).parent().children(".OptionsText").val(); // get the input that is in the textBox
                     $(this).parent().parent().children().children().children(".SubName").html(userInput); // update the data
@@ -314,7 +319,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
             var button2 = document.createElement('button');  // Delete button for the Todo that is at the bottom
             button2.innerHTML = "Delete";
-            $(button2).bind( "click", function() {   
+            $(button2).bind( "click", function() {    // button that handles deleting a TODO
                 var child = $(this).parent().parent();
                 var parent = $(this).parent().parent().parent();
                 var subToDoindex = $(parent).children(".Divider").index(child);
@@ -357,8 +362,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
              $(Options).parent().parent().children(".Options").slideDown("slow"); // make options for newly created ToDo visible
         }
        
-
-
     }
 
     $scope.formatTime = function(date){
