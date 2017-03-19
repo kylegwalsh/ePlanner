@@ -18,9 +18,11 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             var htmlCategory = $scope.addCategory(item.content, value) // Loop through each of the categories 
             var arrayLength = item.subToDo.length;
                 for(var j=0; j < item.subToDo.length; j++){
-                    $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,$scope.formatDate(new Date(item.subToDo[j].date)),item.subToDo[j].time, item.subToDo[j].notes);          
+                    $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,$scope.formatDate(new Date(item.subToDo[j].date)),item.subToDo[j].time, item.subToDo[j].notes, false);          
             } 
         })
+
+
     });
 
     $scope.add = function() {
@@ -150,7 +152,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             $scope.saveSubSectionForTodo(index, $(this), "testing", "4/20/2017", "4:20pm", "extra information");
 
             // call function to display the information
-            $scope.displaySubSectionForTodo( $(this), "testing", "4/20/2017", "4:20pm", "extra information");
+            $scope.displaySubSectionForTodo( $(this), "testing", "4/20/2017", "4:20pm", "extra information", true);
 
         });
 
@@ -166,7 +168,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
            todoStorage.addSubToDo(index,nameData,dateData,timeData, notesData)
     }
 
-    $scope.displaySubSectionForTodo = function(addSection, nameData, dateData, timeData, notesData){
+    $scope.displaySubSectionForTodo = function(addSection, nameData, dateData, timeData, notesData, boolean){
 
         console.log(nameData + " : " + dateData + " : " + timeData);
         var divider = document.createElement('div');
@@ -190,7 +192,8 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             var Options  = document.createElement('div'); // The Options will go here
             Options.className = "SubOptions col-xs-1 vcenter";
             Options.innerHTML = "<i class='fa fa-ellipsis-h'></i>";
-            $(Options).bind( "click", function() {   
+            $(Options).bind( "click", function(boolean) {   
+
                         if ($(this).parent().parent().children(".Options").css("display")=="none") {
                             // what we currently clicked on needs to be displayed
                             $(this).parent().parent().parent().children().children(".Options").slideUp("slow"); // close any other ones that my by open
@@ -199,7 +202,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                         else{
                             // what we currently clicked on needs to be closed
                             $(this).parent().parent().children(".Options").slideUp("slow"); // Close options
-                        }        
+                        }   
             });
 
 
@@ -296,7 +299,12 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         divider.appendChild(OptionsPage);
         addSection.parent().prepend(divider);// append the whole thing to join up wit the title that was preivously added
         addSection.parent().children().children(".Options").slideUp("slow"); // close any existing options
-        $(Options).parent().parent().children(".Options").slideDown("slow"); // make options for newly created ToDo visible
+        if(boolean == false ){
+           
+        } else {
+             $(Options).parent().parent().children(".Options").slideDown("slow"); // make options for newly created ToDo visible
+        }
+       
 
 
     }

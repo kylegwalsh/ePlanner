@@ -66,7 +66,6 @@ angular.module('app').service('todoStorage', function ($q) {
             date: date,
             time: time,
             notes: notes,
-            deleteMe : false,
         }  
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
