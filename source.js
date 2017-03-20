@@ -4,10 +4,6 @@ $(document).ready(function(){
         $(this).addClass('active');
     });
 
-    $('#filterButton').on('click', function(){
-        $('.filterMenu').toggle();
-    });
-
     $('html').on('click', function() {
         $('.filterMenu').hide();
     });
@@ -18,6 +14,7 @@ $(document).ready(function(){
 
     $('#filterButton').on('click', function(e){
         e.stopPropagation();
+        $('.filterMenu').toggle();
     });
 });
 
