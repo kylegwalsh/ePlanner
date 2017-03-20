@@ -9,6 +9,16 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         $scope.todoList = $scope.todoStorage.data;
     });
 
+    $scope.$watch('todoStorage.persistentInformation', function(){
+        $scope.extraInformation = $scope.todoStorage.persistentInformation;
+    });
+
+
+    $scope.todoStorage.findAll2(function(moreData){
+            // just gets the information
+    });
+
+
     $scope.todoStorage.findAll(function(data){
         $scope.todoList = data;
         $scope.$apply();
@@ -20,9 +30,8 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                     $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,$scope.formatDate(new Date(item.subToDo[j].date)),item.subToDo[j].time, item.subToDo[j].notes, false);          
             } 
         })
-
-
     });
+
 
     $scope.add = function() {
         $scope.newContent = "testing    "; // just for testing

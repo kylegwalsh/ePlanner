@@ -2,10 +2,11 @@ angular.module('app').service('todoStorage', function ($q) {
 
     var _this = this;
     this.data = [];
+    this.persistentInformation = [];
 
     this.findAll = function(callback) {
-        console.log("this is running at the beggining");
         chrome.storage.sync.get('todo', function(keys) {
+            console.log(keys);
             if (keys.todo != null) {
                 _this.data = keys.todo;
                 for (var i=0; i<_this.data.length; i++) {
@@ -14,6 +15,13 @@ angular.module('app').service('todoStorage', function ($q) {
                 callback(_this.data);
             }
         });
+    }
+    this.findAll2 = function(callback){   
+        chrome.storage.sync.get('info', function(keys){    
+            _this.persistentInformation = keys.info;
+            callback(_this.persistentInformation);      
+        });
+
     }
 
     this.updateIndexes = function(){
@@ -25,10 +33,13 @@ angular.module('app').service('todoStorage', function ($q) {
 
     this.sync = function() {
         chrome.storage.sync.set({todo: this.data}, function() {});
+        chrome.storage.sync.set({info: this.data}, function() {
+            
+        });
     }
 
     this.add = function (newContent) {
-        var id = this.data.length + 1;
+        var id = this.data.length;
         var todo = {
             id: id,
             content: id,
@@ -40,8 +51,8 @@ angular.module('app').service('todoStorage', function ($q) {
         console.log("new data");
         console.log(_this);
         this.data.push(todo); // adds new category to the end of the array
+        this.persistentInformation = "this is working!>!>!";
         this.sync();
-
         return id;
     }
     this.changeCategoryName = function(index, newName){
@@ -78,6 +89,7 @@ angular.module('app').service('todoStorage', function ($q) {
             time: time,
             notes: notes,
         }  
+        console.log(newData.time);   
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
     }
@@ -95,7 +107,7 @@ angular.module('app').service('todoStorage', function ($q) {
             time: time,
             notes: notes,
         }        
-        category.subToDo.push(newData);         
+        category.subToDo.push(newData);       
         this.sync();
     }
 
