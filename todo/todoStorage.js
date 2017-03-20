@@ -27,31 +27,33 @@ angular.module('app').service('todoStorage', function ($q) {
         chrome.storage.sync.set({todo: this.data}, function() {});
     }
 
-    this.add = function (newContent) {
-        var id = this.data.length + 1;
+    this.add = function () {
+        var id = this.data.length;
         var todo = {
             id: id,
-            content: id,
+            content: "",
             completed: false,
-            color: "33C2FF", // default color
+            color: "F5B041", // default color
             createdAt: new Date(),
-            subToDo: new Array(0), // array to keep track of the subToDoS
+            subToDo: new Array(0), // array to keep track of the subToDos
         };
-        console.log("new data");
-        console.log(_this);
+        console.log("New category at index: " + id);
         this.data.push(todo); // adds new category to the end of the array
         this.sync();
 
         return id;
     }
+
     this.changeCategoryName = function(index, newName){
         var todo = _this.data[index];
         todo.content = newName;
         this.sync();
     }
+
     this.changeCategoryColor = function(index, hexValue){
         var todo = _this.data[index];
         todo.color = hexValue;
+        console.log("(Storage) Category Index " + index + " color changed to: " + todo.color);
         this.sync();
     }
 
@@ -67,6 +69,24 @@ angular.module('app').service('todoStorage', function ($q) {
         category.subToDo.splice(category.subToDo.length-1-subToDoIndex, 1);
         this.sync();
     }
+
+    this.changeSubToDoName = function(Categoryindex, subToDoIndex, name){
+        var size = _this.data.length-1; 
+        var category = _this.data[size-Categoryindex];
+        var size2 = category.subToDo.length-1;
+
+        var newData = {
+            name: name,
+            date: category.subToDo[size2 - subToDoIndex].date,
+            time: category.subToDo[size2 - subToDoIndex].time,
+            notes: category.subToDo[size2 - subToDoIndex].notes,
+        }
+        console.log("Passed in name: " + name + ", Stored name : " + newData.name);
+        category.subToDo[size2 - subToDoIndex] = newData;
+        console.log("Updated name: " + category.subToDo[size2 - subToDoIndex].name);
+        this.sync();
+    }
+
     this.modifySubToDo = function(Categoryindex, subToDoIndex, name, date, time, notes){
         var size = _this.data.length-1; 
         var category = _this.data[size-Categoryindex];
