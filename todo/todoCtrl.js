@@ -468,10 +468,10 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
         $scope.todoList = $scope.todoStorage.data;
     });
 
-    var date = new Date();
-    var d = date.getDate();
-    var m = date.getMonth();
-    var y = date.getFullYear();
+    var newDate = new Date();
+    var d = newDate.getDate();
+    var m = newDate.getMonth();
+    var y = newDate.getFullYear();
     $scope.count = 0;
 
     $scope.events = [];
@@ -481,14 +481,16 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
         $scope.todoList = data;
         $scope.$apply();
         angular.forEach($scope.todoList, function(item){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
-            
             for(var j=0; j < item.subToDo.length; j++){
                 $scope.addEvent(item.subToDo[j], item.color);
                 if($scope.count == 0){
-                    $scope.remove(0)
+                    $scope.remove(0);
                 }
                 $scope.count = $scope.count + 1;         
-            } 
+            }
+                if($scope.count == 0 && events.length == 1){
+                    $scope.remove(0);
+                }
         })
 
     });
@@ -504,7 +506,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     /* alert on eventClick */
     $scope.alertOnEventClick = function( date, jsEvent, view){
         var eventDate = new Date(date.start);;
-        $scope.alertMessage = (date.title + " " + eventDate);
+        $scope.alertMessage = (date.title + " " + eventDate + date.notes);
     };
     /* alert on Drop */
      $scope.alertOnDrop = function(event, delta, revertFunc, jsEvent, ui, view){
@@ -579,7 +581,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     $scope.uiConfig = {
       calendar:{
         height: 450,
-        editable: true,
+        editable: false,
         eventTextColor: "black",
         eventBoarderColor: "black",
         header:{
@@ -594,6 +596,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
       }
     };
     /* event sources array*/
+    console.log($scope.events);
     $scope.eventSources = [$scope.events];
 });
 
