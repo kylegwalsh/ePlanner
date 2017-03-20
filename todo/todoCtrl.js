@@ -270,7 +270,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             var name  = document.createElement('input'); // The name will go here
             name.type = "text";
             name.className = "SubName row";
-            name.innerHTML = nameData;
+            name.value = nameData;
             var notes  = document.createElement('div'); // The notes will go here
             notes.className = "Notes";
             notes.innerHTML = notesData;

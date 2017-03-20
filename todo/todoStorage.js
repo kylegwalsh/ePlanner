@@ -83,6 +83,7 @@ angular.module('app').service('todoStorage', function ($q) {
         }
         console.log("Passed in name: " + name + ", Stored name : " + newData.name);
         category.subToDo[size2 - subToDoIndex] = newData;
+        console.log("Updated name: " + category.subToDo[size2 - subToDoIndex].name);
         this.sync();
     }
 
