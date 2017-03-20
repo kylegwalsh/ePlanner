@@ -10,7 +10,7 @@
     <!-- Main page that can be swapped with settings page -->
     <div id="MainPage">
       <!-- Top header bar -->
-      <div class="container no-padding" id="top-bar">
+      <div class="container no-padding" id="topBar">
           <div class="row" id="header">
             <!-- Filter button -->
             <div class="pull-left"><i id="filterButton" class='fa fa-lg fa-filter'></i></div>
@@ -76,7 +76,7 @@
     <!-- Settings Page that can be swapped with Main Page -->
     <div id="SettingsPage">
       <!-- New top bar for settings -->
-      <div class="container no-padding" id="top-bar">
+      <div class="container no-padding" id="topBar2">
           <div class="row" id="header">
             <div id="settingsName">
               <strong class="noselect">ePlanner Settings</strong>
@@ -85,9 +85,9 @@
           </div>
       </div>
       <!-- Main area for settings -->
-      <div class="main container">
-        The settings page is going to be here
-        Color: <input class="jscolor" value="ab2567">
+      <div class="main container" ng-controller="setting">
+        Color: <input class="jscolor" ng-model="colorCode" value="3498DB">
+        <button ng-click="update()">Click to Update </button>
       </div>
     </div>
   </body>
