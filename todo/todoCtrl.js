@@ -503,8 +503,87 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
 
     /* alert on eventClick */
     $scope.alertOnEventClick = function( date, jsEvent, view){
-        $scope.alertMessage = (date.title);
+                var calendarOverlay = document.getElementById("CalendarOverlay");
+
+                // Closes options if they're open
+                if(calendarOverlay.style.display == "inline-block"){
+                    calendarOverlay.innerHTML = ""; // clear contents of overlay
+                    calendarverlay.style.display = "none";  // close overlay
+                }
+                // Otherwise, sets up menu
+                else{
+                    calendarOverlay.style.display = "inline-block";
+
+                    var saveButton = document.createElement("button"); // The button to confirm the user click to update name 
+                    saveButton.innerHTML = "Save Changes";
+                    // TODO modify CSS and class stuff here
+
+                    var discardButton = document.createElement("button"); // The button to confirm the user click to update name 
+                    discardButton.innerHTML = "Discard Changes";
+                    // TODO modify CSS and class stuff here 
+
+                    var name = document.createElement('input'); // Field where new name goes
+                    name.type = 'test';
+                    name.value = date.title;
+
+                    var note = document.createElement("textarea"); // button that brings up notes text field
+                    note.value = "Notes";
+                    // TODO modify CSS and class stuff here
+
+                    var datePicker = document.createElement("input"); // date picker
+                    datePicker.type = "date";
+                    datePicker.className = "DatePicker";
+                    // TODO modify CSS and class stuff here
+
+                    var timePicker = document.createElement("input"); // Time picker
+                    timePicker.type = "time";
+                    timePicker.className = "TimePicker";
+
+                    $(saveButton).bind("click", function(){   // Button that handles updating the TODO
+                        var nameChanges = name.value;
+                        var noteChanges = note.value;
+                        var dateChanges = new Date(datePicker.value);
+                        var timeChanges = $scope.formatTime(timePicker.value);     
+                       
+                        // UPDATE EVENT ON CALENDAR
+
+                        // PUSH CHANGES TO STORAGE
+
+                        todoStorage.modifySubToDo(date.categoryIndex, date.subToDoindex, nameChanges, dateChanges, timeChanges, noteChanges); // Update in memory                 
+                    });
+
+
+                    var deleteTodo = document.createElement('div');  // Delete button for the Todo that is at the bottom
+                    deleteTodo.className = "";
+                    deleteTodo.innerHTML = "Delete Assignment";
+                    
+                    $(deleteTodo).bind( "click", function() {    // button that handles deleting a TODO
+                        var child = divider;
+                        var parent = $(divider).parent();
+                        var subToDoindex = $(parent).children(".Divider").index(child);
+                        // subToDoindex contains the value of what we currently want to delete
+
+                        var categoryChild = $(divider).parent().parent().parent();
+                        var categoryParent = $(divider).parent().parent().parent().parent();
+                        var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+                        // categoryIndex contains the value of the entire Category that the subToDo is being deleted in
+
+                        todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory
+                        divider.remove(); // Clear from HTML
+                        calendarOverlay.innerHTML = ""; // clear contents of overlay
+                        calendarOverlay.style.display = "none";  // close overlay
+                    });
+                    
+                    calendarOverlay.appendChild(saveButton);
+                    calendarOverlay.appendChild(discardButton);
+                    calendarOverlay.appendChild(name);
+                    calendarOverlay.appendChild(note);
+                    calendarOverlay.appendChild(datePicker);
+                    calendarOverlay.appendChild(timePicker);
+                    calendarOverlay.appendChild(deleteTodo);   
+        }
     };
+
     /* alert on Drop */
      $scope.alertOnDrop = function(event, delta, revertFunc, jsEvent, ui, view){
        $scope.alertMessage = ('Event Droped to make dayDelta ' + delta);
