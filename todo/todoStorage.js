@@ -33,7 +33,7 @@ angular.module('app').service('todoStorage', function ($q) {
 
     this.sync = function() {
         chrome.storage.sync.set({todo: this.data}, function() {});
-        chrome.storage.sync.set({info: this.data}, function() {
+        chrome.storage.sync.set({info: this.persistentInformation}, function() {
             
         });
     }
@@ -50,7 +50,6 @@ angular.module('app').service('todoStorage', function ($q) {
         };
         console.log("New category at index: " + id);
         this.data.push(todo); // adds new category to the end of the array
-        this.persistentInformation = "this is working!>!>!";
         this.sync();
         return id;
     }
@@ -79,6 +78,17 @@ angular.module('app').service('todoStorage', function ($q) {
         var category = _this.data[size-Categoryindex]; // we have to go backwards essentially since on the DOM they are displayed backwards (newest first)
         category.subToDo.splice(category.subToDo.length-1-subToDoIndex, 1);
         this.sync();
+    }
+
+    this.updateColor = function(color){
+
+        var information = {
+            topColor: color,    
+
+        }
+
+        this.persistentInformation = information;
+        this.sync()
     }
 
     this.changeSubToDoName = function(Categoryindex, subToDoIndex, name){
