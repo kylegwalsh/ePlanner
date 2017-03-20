@@ -38,6 +38,7 @@
         <div id="ToDoView" ng-controller="todoCtrl">
           <div class="row">
               <div class="col-md-12">
+                <button id="toggleAlarm">Activate alarm</button>
                 <div class="newCourse btn" ng-click="add()">
                     Add New Course
                 </div>
@@ -65,6 +66,9 @@
         <div id="CalendarView" ng-controller="calendar">
             <p ng-model="alertMessage">{{alertMessage}}</p>
             <div ui-calendar="uiConfig.calendar" class="span8 calendar"  ng-model="eventSources" calendar="calendar"></div>
+            <div id="CalendarOverlay">
+                <!-- Options for a category, will be handled by Javascipt -->
+            </div>
         </div>
 
       </div>
@@ -103,6 +107,7 @@
     <script type="text/javascript" src="bower_components/angular-ui-calendar/src/calendar.js"></script>
     <script type="text/javascript" src="bower_components/fullcalendar/dist/fullcalendar.min.js"></script>
     <script type="text/javascript" src="bower_components/fullcalendar/dist/gcal.js"></script>
+    <script src="todo/alarms.js"></script>
   </footer>
 </html>
 

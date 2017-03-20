@@ -10,10 +10,18 @@
     "default_popup": "popup.html",
     "default_title": "ePlanner Extension"
   },
+
+  "background": {
+    "scripts": ["background.js"]
+  },
+
   "permissions": [
     "activeTab",
     "debugger",
     "storage",
+    "alarms", 
+    "notifications",
     "https://ajax.googleapis.com/"
-  ]
+  ],
+  "minimum_chrome_version": "23"
 }
