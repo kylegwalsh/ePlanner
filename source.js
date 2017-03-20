@@ -4,10 +4,6 @@ $(document).ready(function(){
         $(this).addClass('active');
     });
 
-    $('#filterButton').on('click', function(){
-        $('.filterMenu').toggle();
-    });
-
     $('html').on('click', function() {
         $('.filterMenu').hide();
     });
@@ -18,23 +14,31 @@ $(document).ready(function(){
 
     $('#filterButton').on('click', function(e){
         e.stopPropagation();
+        $('.filterMenu').toggle();
     });
 });
 
 function loadToDo() {
-  $("#ToDoView").show();
-  $("#CompletedView").hide();
-  $('#CalendarView').hide();
+  if(!$('#ToDoTab').hasClass('active')){
+    $("#ToDoView").show();
+    $("#CompletedView").hide();
+    $('#CalendarView').hide();
+  }
 }
 function loadCompleted() {
-  $("#ToDoView").hide();
-  $("#CompletedView").show();
-  $('#CalendarView').hide();
+  if(!$('#CompletedTab').hasClass('active')){
+    $("#ToDoView").hide();
+    $("#CompletedView").show();
+    $('#CalendarView').hide();
+  }
 }
 function loadCalendar() {
-  $("#ToDoView").hide();
-  $("#CompletedView").hide();
-  $('#CalendarView').show();
+  if(!$('CalendarTab').hasClass('active')){
+    $("#ToDoView").hide();
+    $("#CompletedView").hide();
+    $('#CalendarView').show();
+    $('.fc-today-button').trigger('click');
+  }
 }
 function loadSettings(){
   $("#MainPage").hide();

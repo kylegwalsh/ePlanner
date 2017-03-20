@@ -35,9 +35,6 @@
       <!-- Main area that holds contents of different tabs -->
       <div class="main container no-padding">
         <!-- To do View -->
-          <!--<div id ="HoverOptions">
-
-          </div>  -->
         <div id="ToDoView" ng-controller="todoCtrl">
           <div class="row">
               <div class="col-md-12">
@@ -47,32 +44,16 @@
               </div>
           </div>
           <div id="Container">
-
               <div id="CategoryOptionsOverlay">
                   <!-- Options for a category, will be handled by Javascipt -->
               </div>
-
+              <div id="TodoOptionsOverlay">
+                  <!-- Options for a category, will be handled by Javascipt -->
+              </div>
               <div id="ITEMS">
                     <!-- To-do's will be added here by javascript -->
               </div>
-
           </div>
-
-
-          <!-- Remove button -->
-          <div class="row">
-            <div class="col-md-12">
-              <div id="toolbar">
-                <a id="btn-remove-all"
-                    ng-click="removeAll()"
-                    class="btn btn-small btn-default pull-right"
-                    ng-show="todoList.length > 0">
-                    <i class="fa fa-remove"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-
         </div>
 
         <!-- Completed View -->
