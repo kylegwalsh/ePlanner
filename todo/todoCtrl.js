@@ -9,6 +9,16 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         $scope.todoList = $scope.todoStorage.data;
     });
 
+    $scope.$watch('todoStorage.persistentInformation', function(){
+        $scope.extraInformation = $scope.todoStorage.persistentInformation;
+    });
+
+
+    $scope.todoStorage.findAll2(function(moreData){
+            // just gets the information
+    });
+
+
     $scope.todoStorage.findAll(function(data){
         $scope.todoList = data;
         $scope.$apply();
@@ -20,9 +30,8 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                 $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,$scope.formatDate(new Date(item.subToDo[j].date)),item.subToDo[j].time, item.subToDo[j].notes, false);          
             }
         })
-
-
     });
+
 
     $scope.add = function() {
         var index = todoStorage.add();
@@ -472,22 +481,22 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     var d = date.getDate();
     var m = date.getMonth();
     var y = date.getFullYear();
+    $scope.count = 0;
 
     $scope.events = [];
-    $scope.events.push({title: 'instantiate',start: new Date(y, m, 1)});
+    $scope.events.push({title: 'instantiate',start: new Date(y, m, 1), stick: false});
 
     $scope.todoStorage.findAll(function(data){
         $scope.todoList = data;
         $scope.$apply();
-        var count = 0;
         angular.forEach($scope.todoList, function(item){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
             
             for(var j=0; j < item.subToDo.length; j++){
                 $scope.addEvent(item.subToDo[j], item.color);
-                if(count == 0){
+                if($scope.count == 0){
                     $scope.remove(0)
                 }
-                count = count + 1;         
+                $scope.count = $scope.count + 1;         
             } 
         })
 
@@ -609,6 +618,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     $scope.addEvent = function(subToDo, color) {
       var eventDate = new Date(subToDo.date);
       eventDate.setDate(eventDate.getDate() + 1);
+      $scope.setTime(eventDate, subToDo.time);
       $scope.events.push({
         title: subToDo.name,
         start: eventDate,
@@ -636,20 +646,22 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
 
     $scope.setTime = function setDateTime(date, time) {
         var index = time.indexOf(":"); 
-        var index2 = time.indexOf(" ");
 
         var hours = time.substring(0, index);
-        var minutes = time.substring(index + 1, index2);
-
-        var mer = time.substring(index2 + 1, time.length);
-
+        var minutes = time.substring(index + 1, time.length);
 
         date.setHours(hours);
         date.setMinutes(minutes);
         date.setSeconds("00");
-
         return date;
     }
+
+    $scope.renderCalendar = function (calendarId) {
+        $timeout(function () {
+            calendarTag = $('#' + calendarId);
+            calendarTag.fullCalendar('render');
+        }, 0);
+    };
     /* config object */
     $scope.uiConfig = {
       calendar:{
