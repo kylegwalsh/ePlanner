@@ -42,10 +42,12 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
 
         var information = {
             topColor: color,
-            completedStuff, temp,    
+            completedStuff: temp,    
         }
         this.persistentInformation = information;
         this.sync();
+        console.log("AFTER COLOR CHANGE");
+        console.log(this.persistentInformation);
     }
 
     this.sync = function() {
