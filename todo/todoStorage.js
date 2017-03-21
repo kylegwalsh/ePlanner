@@ -64,7 +64,10 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
             color: "F5B041", // default color
             createdAt: new Date(),
             subToDo: new Array(0), // array to keep track of the subToDos
+            uniqueHash: _this.persistentInformation.currentHash,
         };
+        console.log(_this.persistentInformation.currentHash);
+        _this.persistentInformation.currentHash++;
         this.data.push(todo); // adds new category to the end of the array
         this.sync();
         return id;

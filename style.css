@@ -293,6 +293,11 @@ input[type="checkbox"]:focus{
 
 .Notes{
   height: 40px;
+  font-size: 16px;
+  color: darkgray;
+  width: 100%;
+  border: none;
+  overflow:hidden;
 }
 
 .Notes:focus{
@@ -355,18 +360,12 @@ input[type="checkbox"]:focus{
   width: 100%;
 }
 
-.Notes{
-  font-size: 16px;
-  color: darkgray;
-  width: 100%;
-  border: none;
-  overflow:hidden;
-}
-
 .SubDateTime{
   font-size: 15px;
   width: 100%;
   color: gray;
+  position: relative;
+  bottom: 5px;
 }
 
 .date, .time{
@@ -513,20 +512,34 @@ input[type=checkbox]:checked:after {
 }
 
 .CompleteCategory{
-  background-color: red;
+
 }
+
 .CompleteName{
 
 }
+
+.CompleteDateTime{
+  font-size: 15px;
+  width: 100%;
+  color: gray;
+}
+
 .CompleteDate{
-
+  display: inline-block;
 }
+
 .CompleteTime{
-
+  display: inline-block;
+  margin-left: 10px;
 }
+
 .CompleteNotes{
-
+  font-size: 16px;
+  color: darkgray;
+  width: 100%;
 }
-.CompleteAt{
 
+.deleteCompleted:hover{
+  cursor: pointer;
 }

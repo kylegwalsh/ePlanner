@@ -35,9 +35,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
     });
 
     $scope.updateBackgroundColors = function(topColor, tabColor){
-
-        console.log("UPDATING COLOR: " + topColor);
-
         $('#topBar').css("background-color", "#" +topColor); // update colors
         $('#topBar2').css("background-color", "#" +topColor); // update colors 
         $('footer').css("background-color", "#" +topColor); // update colors
@@ -618,13 +615,13 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         // Time isn't working for some reason, idk 
     }
 
-    // // function used to format date month/day/year
-    // $scope.formatDate = function(date){
-    //     var day = date.getDate() + 1; // ?!?!? i have no idea why but I have to add 1 for some reason 
-    //     var month = date.getMonth() + 1;  // ?!?!? i have no idea why but I have to add 1 for some reason 
-    //     var year =  date.getFullYear();  // ?!?!? year is fine for some reason 
-    //     return month + "/" + day + "/" + year;
-    // }
+    // function used to format date month/day/year
+    $scope.formatDate = function(date){
+        var day = date.getDate() + 1; // ?!?!? i have no idea why but I have to add 1 for some reason 
+        var month = date.getMonth() + 1;  // ?!?!? i have no idea why but I have to add 1 for some reason 
+        var year =  date.getFullYear();  // ?!?!? year is fine for some reason 
+        return month + "/" + day + "/" + year;
+    }
 
 });
 
@@ -673,36 +670,58 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
                  var container = document.createElement("div");
                  container.className = "SubToDo row";
 
+                 var left = document.createElement("div");
+                 left.className = "col-xs-10 vcenter";
+                 var right = document.createElement("div");
+                 right.className = "col-xs-1 col-xs-offset-1 vcenter"
                  var completedCategory = document.createElement("div"); // create new elements for each of the categories in a 
+                 completedCategory.className = "row";
                  var completedName = document.createElement("div");
-                 var completedDate = document.createElement("div");
-                 var completedTime= document.createElement("div");
+                 completedName.className = "row";
                  var completedNotes= document.createElement("div");
-                 var completedAt= document.createElement("div");
-                 var deleteOption = document.createElement("button");
+                 completedNotes.className = "row";
+                 var completedDateAndTime = document.createElement("div");
+                 completedDateAndTime.className = "CompleteDateTime row";
+                 var completedDate = document.createElement("div");
+                 completedDate.className = "CompleteDate";
+                 var completedTime= document.createElement("div");
+                 completedDate.className = "CompleteTime";
+                 var deleteOption = document.createElement("div");
+                 deleteOption.className = "deleteCompleted";
 
                  completedCategory.innerHTML = $scope.extraInformation.completedStuff[i].category;
                  completedName.innerHTML = $scope.extraInformation.completedStuff[i].name;
-                 completedDate.innerHTML = $scope.extraInformation.completedStuff[i].date;
-                 completedTime.innerHTML = $scope.extraInformation.completedStuff[i].time;
+                 completedDate.innerHTML = formatDate($scope.extraInformation.completedStuff[i].date);
+                 completedTime.innerHTML = formatTime($scope.extraInformation.completedStuff[i].time);
                  completedNotes.innerHTML = $scope.extraInformation.completedStuff[i].notes;
-                 completedAt.innerHTML = $scope.extraInformation.completedStuff[i].completedAt;
-                 deleteOption.innerHTML = "Delete";
+                 deleteOption.innerHTML = "<i class='fa fa-remove'></i>";
 
                  completedCategory.className = "CompleteCategory";
                  completedName.className = "CompleteName";
                  completedDate.className = "CompleteDate";
                  completedTime.className = "CompleteTime";
                  completedNotes.className = "CompleteNotes";
-                 completedAt.className = "CompleteAt";
 
-                 container.appendChild(completedCategory);
-                 container.appendChild(completedName);
-                 container.appendChild(completedDate);
-                 container.appendChild(completedTime);
-                 container.appendChild(completedNotes);
-                 container.appendChild(completedAt);
-                 container.appendChild(deleteOption);
+
+                 container.appendChild(left);
+                 container.appendChild(right);
+                 if($scope.extraInformation.completedStuff[i].category != ""){
+                    left.appendChild(completedCategory);
+                 }
+                 if($scope.extraInformation.completedStuff[i].name != ""){
+                    left.appendChild(completedName);
+                 }
+                 if($scope.extraInformation.completedStuff[i].notes != ""){
+                    left.appendChild(completedNotes);
+                 }
+                 if(($scope.extraInformation.completedStuff[i].date != "")){
+                 left.appendChild(completedDateAndTime);
+                 completedDateAndTime.appendChild(completedDate);
+                 }
+                 if($scope.extraInformation.completedStuff[i].time != ""){
+                 completedDateAndTime.appendChild(completedTime);
+                 }
+                 right.appendChild(deleteOption);
 
                  $(deleteOption).bind( "click", {index: i}, function(event) { 
                     todoStorage.removeCompleted(event.data.index); // remove from memory
@@ -716,13 +735,13 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
 });
 
 app.controller('setting', function($scope, todoStorage) {
-    $scope.colorCode = "3498DB"; // deafult color;
+    $scope.colorCode = document.getElementById("topBar").style.backgroundColor; // deafult color;
 
     $scope.update = function(){
-        $('#topBar').css("background-color", "#" +$scope.colorCode); // update colors
-        $('#topBar2').css("background-color", "#" +$scope.colorCode); // update colors
-        $('footer').css("background-color", "#" +$scope.colorCode); // update colors 
-        $('.newCourse').css("background-color", "#" +$scope.colorCode); // update colors 
+        $('#topBar').css("background-color", "#" + $scope.colorCode); // update colors
+        $('#topBar2').css("background-color", "#" + $scope.colorCode); // update colors
+        $('footer').css("background-color", "#" + $scope.colorCode); // update colors 
+        $('.newCourse').css("background-color", "#" + $scope.colorCode); // update colors 
         todoStorage.updateColor($scope.colorCode);
     }
 });
@@ -792,7 +811,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     // TODO modify CSS and class stuff here 
 
                     var name = document.createElement('input'); // Field where new name goes
-                    name.type = 'test';
+                    name.type = 'text';
                     name.value = date.title;
 
                     var note = document.createElement("textarea"); // button that brings up notes text field
