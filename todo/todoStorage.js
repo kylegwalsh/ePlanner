@@ -1,4 +1,4 @@
-angular.module('app').service('todoStorage', function ($q) {
+angular.module('app').service('todoStorage', function ($q, NotifyingService) {
 
     var _this = this;
     this.data = [];
@@ -81,6 +81,12 @@ angular.module('app').service('todoStorage', function ($q) {
         this.sync();
     }
 
+    this.removeCompleted = function(index){
+        var extraInfo = _this.persistentInformation.completedStuff;
+        extraInfo.splice(index,1);
+        this.sync();
+    }
+
     this.removeSubToDo = function(categoryIndex, subToDoIndex){
         var size = _this.data.length-1; 
         var category = _this.data[size-categoryIndex]; // we have to go backwards essentially since on the DOM they are displayed backwards (newest first)
@@ -148,6 +154,30 @@ angular.module('app').service('todoStorage', function ($q) {
         this.sync();
     }
 
+    this.markToDoAsComplete = function(Categoryindex, subToDoIndex){
+
+        var size = _this.data.length-1; 
+        var categoryX = _this.data[size-Categoryindex];
+        var current = categoryX.subToDo[categoryX.subToDo.length-1-subToDoIndex];
+        var completedObject = {
+            category: categoryX.content,
+            name: current.name,
+            date: current.date,
+            time: current.time, 
+            notes: current.notes, 
+            completedAt: new Date(), // each new date gets set to creation time
+        }
+        if(this.persistentInformation.completedStuff != null){
+            this.persistentInformation.completedStuff.push(completedObject);
+        } else {
+            this.persistentInformation.completedStuff = new Array();
+            this.persistentInformation.completedStuff.push(completedObject);
+        }
+        
+        this.sync();
+        NotifyingService.notify(this.persistentInformation); // used to notify completed controller of any changes
+    }
+
     this.modifySubToDo = function(categoryIndex, subToDoIndex, name, date, time, notes){
         var size = _this.data.length-1; 
         var category = _this.data[size-categoryIndex];
@@ -184,4 +214,18 @@ angular.module('app').service('todoStorage', function ($q) {
         this.sync();
     }
 
+});
+
+// Used to notify the complete controller when something in the main controller has been marked as complete 
+angular.module('app').factory('NotifyingService', function($rootScope) {
+    return {
+        subscribe: function(scope, callback) {
+            var handler = $rootScope.$on('notifying-service-event', callback);
+            scope.$on('$destroy', handler);
+        },
+
+        notify: function(importantInfo) {
+            $rootScope.$emit('notifying-service-event', importantInfo);
+        }
+    };
 });
