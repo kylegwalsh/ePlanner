@@ -11,6 +11,8 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
                 for (var i=0; i<_this.data.length; i++) {
                     _this.data[i]['id'] = i + 1;
                 }
+                console.log("FINDALL:")
+                console.log(_this.data);
                 callback(_this.data);
             }
         });
@@ -19,7 +21,9 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
     this.findAll2 = function(callback){   
         chrome.storage.sync.get('info', function(keys){    
             _this.persistentInformation = keys.info;
-            callback(_this.persistentInformation);      
+            console.log("FINDALL2:")
+            console.log(_this.persistentInformation);
+            callback(_this.persistentInformation);
         });
 
     }

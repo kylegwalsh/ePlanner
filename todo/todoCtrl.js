@@ -645,11 +645,12 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
     $scope.todoStorage.findAll2(function(moreData){
         // just gets the information
         $scope.displayAllCompleted();
+        console.log("EXTRAINFORMATION__________________");
+        console.log($scope.extraInformation);
     });
 
     NotifyingService.subscribe($scope, function somethingChanged(event, info) {
         $scope.extraInformation = info;
-        console.log(info)
         $scope.displayAllCompleted(); // refresh page   
     });
  

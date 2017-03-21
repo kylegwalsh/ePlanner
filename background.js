@@ -1,24 +1,17 @@
 var dbName = 'todo';
 function showNotification(storedData) {
     findAll(function(data){
-      // var todoList = data;
-      // todoList.forEach(function(subToDo){
-      //   for(j = 0; j < subToDo.length; j++){
-      //     chrome.notifications.create('reminder', {
-      //       type: 'basic',
-      //       iconUrl: 'icon.png',
-      //       title: todoList[0].content,
-      //       message: 'You have things to do. Wake up, dude!'
-      //     }, function(notificationId) {});
-      //   }
-      // });
-
+      var todoList = data;
+      todoList.forEach(function(toDo){
+        for(var j = 0; j < toDo.subToDo.length; j++){
           chrome.notifications.create('reminder', {
             type: 'basic',
             iconUrl: 'icon.png',
-            title: todoList[0].content,
-            message: 'You have things to do. Wake up, dude!'
+            title: toDo.subToDo[j].name,
+            message: "Due: " + toDo.subToDo[j].date + " " + toDo.subToDo[j].time
           }, function(notificationId) {});
+        }
+      });
     });
 }
 
@@ -38,8 +31,4 @@ findAll = function(callback) {
 
 chrome.alarms.onAlarm.addListener(function( alarm ) {
 	chrome.storage.local.get(dbName, showNotification);
-});
-
-chrome.notifications.onClicked.addListener(function() {
-  chrome.browserAction.enable();
 });
