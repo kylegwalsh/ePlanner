@@ -46,13 +46,21 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         }
         this.persistentInformation = information;
         this.sync();
-        console.log("AFTER COLOR CHANGE");
-        console.log(this.persistentInformation);
     }
 
     this.sync = function() {
         chrome.storage.sync.set({todo: this.data}, function() {});
         chrome.storage.sync.set({info: this.persistentInformation}, function() {});
+    }
+
+    this.removeAllCompleted = function(){
+        var information = {
+            topColor: this.persistentInformation.topColor,
+            completedStuff: new Array(),    
+        }
+        this.persistentInformation = information;
+        NotifyingService.notify(this.persistentInformation);
+        this.sync();
     }
 
     this.add = function () {
