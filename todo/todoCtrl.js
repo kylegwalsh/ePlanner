@@ -22,20 +22,22 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
     $scope.todoStorage.findAll(function(data){
         $scope.todoList = data;
         $scope.$apply();
+        // after everything is loaded in, we update the colors
+        $scope.updateBackgroundColors($scope.extraInformation.topColor, $scope.extraInformation.topColor);
 
         angular.forEach($scope.todoList, function(item, value){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
             var htmlCategory = $scope.addCategory(item.content, value, item.color) // Loop through each of the categories 
             var arrayLength = item.subToDo.length;
             for(var j=0; j < item.subToDo.length; j++){
                 $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,item.subToDo[j].date,item.subToDo[j].time, item.subToDo[j].notes, false);
-
-            // after everything is loaded in, we update the colors
-            $scope.updateBackgroundColors($scope.extraInformation.topColor, $scope.extraInformation.topColor);
             }
         })
     });
 
     $scope.updateBackgroundColors = function(topColor, tabColor){
+
+        console.log("UPDATING COLOR: " + topColor);
+
         $('#topBar').css("background-color", "#" +topColor); // update colors
         $('#topBar2').css("background-color", "#" +topColor); // update colors 
         $('footer').css("background-color", "#" +topColor); // update colors
@@ -279,10 +281,13 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
 
             // TODO CSS stuff here, TODO gets structured here
-            var select  = document.createElement('div'); // This is where the draggable thing will be
+            var select  = document.createElement('input'); // This is where the draggable thing will be
             select.className = "Checkbox col-xs-offset-1 col-xs-1 vcenter";
-            select.innerHTML = "<input type='checkbox'/>";
+            select.style.width = "10px";
+            select.style.marginLeft = "55px";
+            select.type = 'checkbox';
             $(select).change(function(event) {   // event for when it is checked 
+
                 var child = divider;
                 var parent = $(divider).parent();
                 var subToDoindex = $(parent).children(".Divider").index(child);
@@ -291,9 +296,19 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                 var categoryParent = $(divider).parent().parent().parent().parent();
                 var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
 
-                todoStorage.markToDoAsComplete(categoryIndex, subToDoindex);
-                todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory
-                divider.remove(); // Clear from html
+                setTimeout(function(){
+                    $(divider).slideUp("slow");
+                    todoStorage.markToDoAsComplete(categoryIndex, subToDoindex);
+                    todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory
+                }, 500);
+                setTimeout(function(){
+                    if(select.checked){ // set to true                
+                        divider.remove(); // Clear from html
+                    } else { // set to false
+
+                    }
+                }, 1000);
+                
             })
 
             var center = document.createElement('div');  // Top center row (for styling)
@@ -655,12 +670,17 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
         $scope.extraInformation = info;
         $scope.displayAllCompleted(); // refresh page   
     });
+
+    $scope.removeAll = function(){
+        todoStorage.removeAllCompleted();
+    }
  
     $scope.displayAllCompleted = function(){
 
-        $("#CompletedView").empty(); // Clear everything that is displayAllCompleted
+        $("#CompletedView2").empty(); // Clear everything that is displayAllCompleted
 
-        if($scope.extraInformation.completedStuff == null){
+
+        if($scope.extraInformation.completedStuff == null || $scope.extraInformation.completedStuff.length == 0 ){
             // No date to display
         } else { 
             for(var i=$scope.extraInformation.completedStuff.length-1; i >= 0; i--){
@@ -702,8 +722,7 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
                     todoStorage.removeCompleted(event.data.index); // remove from memory
                     $scope.displayAllCompleted(); // refresh page
                 });
-
-                 $("#CompletedView").append(container);
+                 $("#CompletedView2").append(container);
            }             
         }
     }
