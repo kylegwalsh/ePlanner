@@ -767,6 +767,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     /* alert on eventClick */
     $scope.alertOnEventClick = function( date, jsEvent, view){
                 var calendarOverlay = document.getElementById("CalendarOverlay");
+                var calendarOverlay = document.getElementById("fade");
 
                 // Closes options if they're open
                 if(calendarOverlay.style.display == "inline-block"){
@@ -922,7 +923,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     /* config object */
     $scope.uiConfig = {
       calendar:{
-        height: 450,
+        height: 463,
         editable: true,
         eventTextColor: "black",
         eventBoarderColor: "black",

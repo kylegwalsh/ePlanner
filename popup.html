@@ -64,11 +64,13 @@
 
         <!-- Calendar View-->
         <div id="CalendarView" ng-controller="calendar">
-            <p ng-model="alertMessage">{{alertMessage}}</p>
-            <div ui-calendar="uiConfig.calendar" class="span8 calendar"  ng-model="eventSources" calendar="calendar"></div>
-            <div id="CalendarOverlay">
-                <!-- Options for a category, will be handled by Javascipt -->
-            </div>
+          <div id="blurred">
+              <p ng-model="alertMessage">{{alertMessage}}</p>
+              <div ui-calendar="uiConfig.calendar" class="span8 calendar"  ng-model="eventSources" calendar="calendar"></div>
+          </div>
+          <div id="CalendarOverlay">
+              <!-- Options for a category, will be handled by Javascipt -->
+          </div>
         </div>
 
       </div>
