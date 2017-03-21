@@ -38,7 +38,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         }
 
         this.persistentInformation = information;
-        this.sync()
+        this.sync();
     }
 
     this.sync = function() {

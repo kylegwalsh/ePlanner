@@ -417,7 +417,10 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             // If user presses enter, remove focus
             $(date).bind('keydown', function(event) {
                 if(event.keyCode == 13){
-                   date.blur();
+                    if(time.value == ""){
+                        time.focus();
+                        time.select();
+                    }
                 }
             });
 
@@ -529,6 +532,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                         // If there was no date, we need to show the date section
                         if(date.value == ""){
                             dateandtime.style.display = "inline-block";
+                            time.style.display = "inline-block";
                         }       
                         date.focus();
                         date.select();
@@ -765,7 +769,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                 // Closes options if they're open
                 if(calendarOverlay.style.display == "inline-block"){
                     calendarOverlay.innerHTML = ""; // clear contents of overlay
-                    calendarverlay.style.display = "none";  // close overlay
+                    calendarOverlay.style.display = "none";  // close overlay
                 }
                 // Otherwise, sets up menu
                 else{
