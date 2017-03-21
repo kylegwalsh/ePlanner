@@ -1,14 +1,24 @@
 var dbName = 'todo';
 function showNotification(storedData) {
     findAll(function(data){
-      var todoList = data;
-      chrome.notifications.create('reminder', {
-        type: 'basic',
-        iconUrl: 'icon.png',
-        title: todoList[0].content,
-        message: 'You have things to do. Wake up, dude!'
-      }, function(notificationId) {});
+      // var todoList = data;
+      // todoList.forEach(function(subToDo){
+      //   for(j = 0; j < subToDo.length; j++){
+      //     chrome.notifications.create('reminder', {
+      //       type: 'basic',
+      //       iconUrl: 'icon.png',
+      //       title: todoList[0].content,
+      //       message: 'You have things to do. Wake up, dude!'
+      //     }, function(notificationId) {});
+      //   }
+      // });
 
+          chrome.notifications.create('reminder', {
+            type: 'basic',
+            iconUrl: 'icon.png',
+            title: todoList[0].content,
+            message: 'You have things to do. Wake up, dude!'
+          }, function(notificationId) {});
     });
 }
 

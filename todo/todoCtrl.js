@@ -648,6 +648,7 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
 
     NotifyingService.subscribe($scope, function somethingChanged(event, info) {
         $scope.extraInformation = info;
+        console.log(info)
         $scope.displayAllCompleted(); // refresh page   
     });
  
