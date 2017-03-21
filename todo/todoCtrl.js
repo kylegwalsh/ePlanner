@@ -669,6 +669,7 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
             for(var i=$scope.extraInformation.completedStuff.length-1; i >= 0; i--){
     
                  var container = document.createElement("div");
+                 container.className = "SubToDo row";
 
                  var completedCategory = document.createElement("div"); // create new elements for each of the categories in a 
                  var completedName = document.createElement("div");
