@@ -359,6 +359,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                 // don't allow time field without a date field
                 if(date.value == ""){
                     todoStorage.changeSubToDoTime(categoryIndex, subToDoIndex, "");
+                    time.value = "";
                     dateandtime.style.display = "none";
                 }
             });
