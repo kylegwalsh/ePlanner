@@ -18,22 +18,78 @@
      })
    }
 
-   function createAlarm() {
+   function create1HourAlarm() {
     findAll(function(data){
       var todoList = data;
-            console.log("TODOLIST____________________");
-      console.log(todoList);
       for(var k = 0; k < todoList.length; k++){
-        console.log("TODOLIST.SUBTODO____________________");
-        console.log(todoList[k].subToDo);
         for(var j = 0; j < todoList[k].subToDo.length; j++){
-          console.log("SUBTODO____________________");
-          console.log(todoList);
-          chrome.alarms.create(todoList[k].subToDo[j].name, {when: Date.now() + 60000});
+          var subToDo = todoList[k].subToDo[j];
+          var dueDate = new Date(subToDo.date);
+          setTime(dueDate, subToDo.time);
+          dueDate.setDate(dueDate.getDate() + 1);
+          var nameOfAlarm = todoList[k].content + subToDo.name + "1Hour";
+          if(dueDate.getTime() - 3.6e6 > Date.now()){
+            chrome.alarms.create(nameOfAlarm, {when: dueDate.getTime() - 3.6e6});
+          }
         }
       }
     });
    }
+
+   function create1DayAlarm() {
+    findAll(function(data){
+      var todoList = data;
+      for(var k = 0; k < todoList.length; k++){
+        for(var j = 0; j < todoList[k].subToDo.length; j++){
+          var subToDo = todoList[k].subToDo[j];
+          var dueDate = new Date(subToDo.date);
+          setTime(dueDate, subToDo.time);
+          dueDate.setDate(dueDate.getDate() + 1);
+          var nameOfAlarm = todoList[k].content + subToDo.name + "1Day";
+          if(dueDate.getTime() - 8.64e7 > Date.now()){
+            chrome.alarms.create(nameOfAlarm, {when: dueDate.getTime() - 8.64e7});
+          }
+        }
+      }
+    });
+   }
+
+  function create1WeekAlarm() {
+    findAll(function(data){
+      var todoList = data;
+      for(var k = 0; k < todoList.length; k++){
+        for(var j = 0; j < todoList[k].subToDo.length; j++){
+          var subToDo = todoList[k].subToDo[j];
+          var dueDate = new Date(subToDo.date);
+          setTime(dueDate, subToDo.time);
+          dueDate.setDate(dueDate.getDate() + 1);
+          var nameOfAlarm = todoList[k].content + subToDo.name + "1Week";
+          if(dueDate.getTime() - 6.048e8 > Date.now()){
+            chrome.alarms.create(nameOfAlarm, {when: dueDate.getTime() - 6.048e8});
+          }
+        }
+      }
+    });
+   }
+
+   function createOverdueAlarm(){
+    findAll(function(data){
+      var todoList = data;
+      for(var k = 0; k < todoList.length; k++){
+        for(var j = 0; j < todoList[k].subToDo.length; j++){
+          var subToDo = todoList[k].subToDo[j];
+          var dueDate = new Date(subToDo.date);
+          setTime(dueDate, subToDo.time);
+          dueDate.setDate(dueDate.getDate() + 1);
+          var nameOfAlarm = todoList[k].content + subToDo.name + "Overdue";
+          if(dueDate.getTime() > Date.now()){
+            chrome.alarms.create(nameOfAlarm, {when: dueDate.getTime()});
+          }
+        }
+      }
+    });
+   }
+
    function cancelAlarm() {
      chrome.alarms.clear(alarmName);
    }
@@ -42,7 +98,10 @@
        if (hasAlarm) {
          cancelAlarm();
        } else {
-         createAlarm();
+         create1HourAlarm();
+         create1DayAlarm();
+         create1WeekAlarm();
+         createOverdueAlarm();
        }
        checkAlarm();
      });
@@ -62,4 +121,16 @@ findAll = function(callback) {
             callback(data);
         }
     });
+}
+
+setTime = function setDateTime(date, time) {
+    var index = time.indexOf(":"); 
+
+    var hours = time.substring(0, index);
+    var minutes = time.substring(index + 1, time.length);
+
+    date.setHours(hours);
+    date.setMinutes(minutes);
+    date.setSeconds("00");
+    return date;
 }
