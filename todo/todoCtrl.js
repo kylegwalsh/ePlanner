@@ -281,9 +281,11 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
 
             // TODO CSS stuff here, TODO gets structured here
-            var select  = document.createElement('div'); // This is where the draggable thing will be
+            var select  = document.createElement('input'); // This is where the draggable thing will be
             select.className = "Checkbox col-xs-offset-1 col-xs-1 vcenter";
-            select.innerHTML = "<input type='checkbox'/>";
+            select.style.width = "10px";
+            select.style.marginLeft = "55px";
+            select.type = 'checkbox';
             $(select).change(function(event) {   // event for when it is checked 
                 var child = divider;
                 var parent = $(divider).parent();
@@ -294,8 +296,12 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                 var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
 
                 todoStorage.markToDoAsComplete(categoryIndex, subToDoindex);
-                todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory
-                divider.remove(); // Clear from html
+
+                setTimeout(function(){
+                    todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory
+                    divider.remove(); // Clear from html
+                }, 3000);
+                
             })
 
             var center = document.createElement('div');  // Top center row (for styling)
