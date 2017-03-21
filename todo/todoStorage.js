@@ -1,4 +1,4 @@
-angular.module('app').service('todoStorage', function ($q) {
+angular.module('app').service('todoStorage', function ($q, NotifyingService) {
 
     var _this = this;
     this.data = [];
@@ -6,7 +6,6 @@ angular.module('app').service('todoStorage', function ($q) {
 
     this.findAll = function(callback) {
         chrome.storage.sync.get('todo', function(keys) {
-            console.log(keys);
             if (keys.todo != null) {
                 _this.data = keys.todo;
                 for (var i=0; i<_this.data.length; i++) {
@@ -16,6 +15,7 @@ angular.module('app').service('todoStorage', function ($q) {
             }
         });
     }
+
     this.findAll2 = function(callback){   
         chrome.storage.sync.get('info', function(keys){    
             _this.persistentInformation = keys.info;
@@ -29,6 +29,16 @@ angular.module('app').service('todoStorage', function ($q) {
             _this.data[i]['id'] = i + 1;
         }
         this.sync();
+    }
+
+    this.updateColor = function(color){
+
+        var information = {
+            topColor: color,    
+        }
+
+        this.persistentInformation = information;
+        this.sync()
     }
 
     this.sync = function() {
@@ -48,7 +58,6 @@ angular.module('app').service('todoStorage', function ($q) {
             createdAt: new Date(),
             subToDo: new Array(0), // array to keep track of the subToDos
         };
-        console.log("New category at index: " + id);
         this.data.push(todo); // adds new category to the end of the array
         this.sync();
         return id;
@@ -63,7 +72,6 @@ angular.module('app').service('todoStorage', function ($q) {
     this.changeCategoryColor = function(index, hexValue){
         var todo = _this.data[index];
         todo.color = hexValue;
-        console.log("(Storage) Category Index " + index + " color changed to: " + todo.color);
         this.sync();
     }
 
@@ -73,27 +81,22 @@ angular.module('app').service('todoStorage', function ($q) {
         this.sync();
     }
 
-    this.removeSubToDo = function(Categoryindex, subToDoIndex){
+    this.removeCompleted = function(index){
+        var extraInfo = _this.persistentInformation.completedStuff;
+        extraInfo.splice(index,1);
+        this.sync();
+    }
+
+    this.removeSubToDo = function(categoryIndex, subToDoIndex){
         var size = _this.data.length-1; 
-        var category = _this.data[size-Categoryindex]; // we have to go backwards essentially since on the DOM they are displayed backwards (newest first)
+        var category = _this.data[size-categoryIndex]; // we have to go backwards essentially since on the DOM they are displayed backwards (newest first)
         category.subToDo.splice(category.subToDo.length-1-subToDoIndex, 1);
         this.sync();
     }
 
-    this.updateColor = function(color){
-
-        var information = {
-            topColor: color,    
-
-        }
-
-        this.persistentInformation = information;
-        this.sync()
-    }
-
-    this.changeSubToDoName = function(Categoryindex, subToDoIndex, name){
+    this.changeSubToDoName = function(categoryIndex, subToDoIndex, name){
         var size = _this.data.length-1; 
-        var category = _this.data[size-Categoryindex];
+        var category = _this.data[size-categoryIndex];
         var size2 = category.subToDo.length-1;
 
         var newData = {
@@ -102,15 +105,82 @@ angular.module('app').service('todoStorage', function ($q) {
             time: category.subToDo[size2 - subToDoIndex].time,
             notes: category.subToDo[size2 - subToDoIndex].notes,
         }
-        console.log("Passed in name: " + name + ", Stored name : " + newData.name);
         category.subToDo[size2 - subToDoIndex] = newData;
-        console.log("Updated name: " + category.subToDo[size2 - subToDoIndex].name);
         this.sync();
     }
 
-    this.modifySubToDo = function(Categoryindex, subToDoIndex, name, date, time, notes){
+    this.changeSubToDoNotes = function(categoryIndex, subToDoIndex, notes){
         var size = _this.data.length-1; 
-        var category = _this.data[size-Categoryindex];
+        var category = _this.data[size-categoryIndex];
+        var size2 = category.subToDo.length-1;
+
+        var newData = {
+            name: category.subToDo[size2 - subToDoIndex].name,
+            date: category.subToDo[size2 - subToDoIndex].date,
+            time: category.subToDo[size2 - subToDoIndex].time,
+            notes: notes,
+        }
+        category.subToDo[size2 - subToDoIndex] = newData;
+        this.sync();
+    }
+
+    this.changeSubToDoDate = function(categoryIndex, subToDoIndex, date){
+        var size = _this.data.length-1; 
+        var category = _this.data[size-categoryIndex];
+        var size2 = category.subToDo.length-1;
+
+        var newData = {
+            name: category.subToDo[size2 - subToDoIndex].name,
+            date: date,
+            time: category.subToDo[size2 - subToDoIndex].time,
+            notes: category.subToDo[size2 - subToDoIndex].notes,
+        } 
+        category.subToDo[size2 - subToDoIndex] = newData;
+        this.sync();
+    }
+
+    this.changeSubToDoTime = function(categoryIndex, subToDoIndex, time){
+        var size = _this.data.length-1; 
+        var category = _this.data[size-categoryIndex];
+        var size2 = category.subToDo.length-1;
+
+        var newData = {
+            name: category.subToDo[size2 - subToDoIndex].name,
+            date: category.subToDo[size2 - subToDoIndex].date,
+            time: time,
+            notes: category.subToDo[size2 - subToDoIndex].notes,
+        }
+        category.subToDo[size2 - subToDoIndex] = newData;
+        this.sync();
+    }
+
+    this.markToDoAsComplete = function(Categoryindex, subToDoIndex){
+
+        var size = _this.data.length-1; 
+        var categoryX = _this.data[size-Categoryindex];
+        var current = categoryX.subToDo[categoryX.subToDo.length-1-subToDoIndex];
+        var completedObject = {
+            category: categoryX.content,
+            name: current.name,
+            date: current.date,
+            time: current.time, 
+            notes: current.notes, 
+            completedAt: new Date(), // each new date gets set to creation time
+        }
+        if(this.persistentInformation.completedStuff != null){
+            this.persistentInformation.completedStuff.push(completedObject);
+        } else {
+            this.persistentInformation.completedStuff = new Array();
+            this.persistentInformation.completedStuff.push(completedObject);
+        }
+        
+        this.sync();
+        NotifyingService.notify(this.persistentInformation); // used to notify completed controller of any changes
+    }
+
+    this.modifySubToDo = function(categoryIndex, subToDoIndex, name, date, time, notes){
+        var size = _this.data.length-1; 
+        var category = _this.data[size-categoryIndex];
         var size2 = category.subToDo.length-1;
 
         var newData = {
@@ -118,8 +188,7 @@ angular.module('app').service('todoStorage', function ($q) {
             date: date,
             time: time,
             notes: notes,
-        }  
-        console.log(newData.time);   
+        }    
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
     }
@@ -129,7 +198,6 @@ angular.module('app').service('todoStorage', function ($q) {
         if(category == undefined){
             category = _this.data[index-1]; 
         }
-
 
         var newData = {
             name: name,
@@ -146,4 +214,18 @@ angular.module('app').service('todoStorage', function ($q) {
         this.sync();
     }
 
+});
+
+// Used to notify the complete controller when something in the main controller has been marked as complete 
+angular.module('app').factory('NotifyingService', function($rootScope) {
+    return {
+        subscribe: function(scope, callback) {
+            var handler = $rootScope.$on('notifying-service-event', callback);
+            scope.$on('$destroy', handler);
+        },
+
+        notify: function(importantInfo) {
+            $rootScope.$emit('notifying-service-event', importantInfo);
+        }
+    };
 });
