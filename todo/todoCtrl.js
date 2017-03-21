@@ -278,10 +278,13 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
 
             // TODO CSS stuff here, TODO gets structured here
-            var select  = document.createElement('div'); // This is where the draggable thing will be
+            var select  = document.createElement('input'); // This is where the draggable thing will be
             select.className = "Checkbox col-xs-offset-1 col-xs-1 vcenter";
-            select.innerHTML = "<input type='checkbox'/>";
+            select.style.width = "10px";
+            select.style.marginLeft = "55px";
+            select.type = 'checkbox';
             $(select).change(function(event) {   // event for when it is checked 
+
                 var child = divider;
                 var parent = $(divider).parent();
                 var subToDoindex = $(parent).children(".Divider").index(child);
@@ -290,9 +293,19 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                 var categoryParent = $(divider).parent().parent().parent().parent();
                 var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
 
-                todoStorage.markToDoAsComplete(categoryIndex, subToDoindex);
-                todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory
-                divider.remove(); // Clear from html
+                setTimeout(function(){
+                    $(divider).slideUp("slow");
+                    todoStorage.markToDoAsComplete(categoryIndex, subToDoindex);
+                    todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory
+                }, 500);
+                setTimeout(function(){
+                    if(select.checked){ // set to true                
+                        divider.remove(); // Clear from html
+                    } else { // set to false
+
+                    }
+                }, 1000);
+                
             })
 
             var center = document.createElement('div');  // Top center row (for styling)
@@ -648,19 +661,21 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
     $scope.todoStorage.findAll2(function(moreData){
         // just gets the information
         $scope.displayAllCompleted();
-        console.log("controller loaded");
-        console.log($scope.extraInformation);
     });
 
     NotifyingService.subscribe($scope, function somethingChanged(event, info) {
         $scope.extraInformation = info;
-        console.log(info)
         $scope.displayAllCompleted(); // refresh page   
     });
+
+    $scope.removeAll = function(){
+        todoStorage.removeAllCompleted();
+    }
  
     $scope.displayAllCompleted = function(){
 
-        $("#CompletedView").empty(); // Clear everything that is displayAllCompleted
+        $("#CompletedView2").empty(); // Clear everything that is displayAllCompleted
+
 
         if($scope.extraInformation.completedStuff == null || $scope.extraInformation.completedStuff.length == 0 ){
             // No date to display
@@ -727,8 +742,7 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
                     todoStorage.removeCompleted(event.data.index); // remove from memory
                     $scope.displayAllCompleted(); // refresh page
                 });
-
-                 $("#CompletedView").append(container);
+                 $("#CompletedView2").append(container);
            }             
         }
     }
