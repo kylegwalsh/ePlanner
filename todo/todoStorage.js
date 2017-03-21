@@ -174,24 +174,27 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         var size = _this.data.length-1; 
         var categoryX = _this.data[size-Categoryindex];
         var current = categoryX.subToDo[categoryX.subToDo.length-1-subToDoIndex];
-        var completedObject = {
+        if(current.name == "" && current.notes == ""){
+            // nothing, don't add
+        } else {
+            var completedObject = {
             category: categoryX.content,
             name: current.name,
             date: current.date,
             time: current.time, 
             notes: current.notes, 
             completedAt: new Date(), // each new date gets set to creation time
+            }
+            if(this.persistentInformation.completedStuff != null){
+                this.persistentInformation.completedStuff.push(completedObject);
+            } else {
+                this.persistentInformation.completedStuff = new Array();
+                this.persistentInformation.completedStuff.push(completedObject);
+            } 
+            this.sync();
+            NotifyingService.notify(this.persistentInformation); // used to notify completed controller of any changes
         }
-        if(this.persistentInformation.completedStuff != null){
-            this.persistentInformation.completedStuff.push(completedObject);
-        } else {
-            this.persistentInformation.completedStuff = new Array();
-            this.persistentInformation.completedStuff.push(completedObject);
-        } 
-        this.sync();
-        NotifyingService.notify(this.persistentInformation); // used to notify completed controller of any changes
-        console.log("AFTER");
-        console.log(this.persistentInformation);
+
     }
 
     this.modifySubToDo = function(categoryIndex, subToDoIndex, name, date, time, notes){
