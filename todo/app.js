@@ -16,10 +16,3 @@ app.controller('calendar', function($scope) {
 
 
 });
-
-// controller for hte settings section area
-app.controller('settings', function($scope) {
- 
-
-
-});

@@ -15,6 +15,7 @@ angular.module('app').service('todoStorage', function ($q) {
             }
         });
     }
+
     this.findAll2 = function(callback){   
         chrome.storage.sync.get('info', function(keys){    
             _this.persistentInformation = keys.info;
@@ -30,9 +31,19 @@ angular.module('app').service('todoStorage', function ($q) {
         this.sync();
     }
 
+    this.updateColor = function(color){
+
+        var information = {
+            topColor: color,    
+        }
+
+        this.persistentInformation = information;
+        this.sync()
+    }
+
     this.sync = function() {
         chrome.storage.sync.set({todo: this.data}, function() {});
-        chrome.storage.sync.set({info: this.data}, function() {
+        chrome.storage.sync.set({info: this.persistentInformation}, function() {
             
         });
     }
@@ -48,7 +59,6 @@ angular.module('app').service('todoStorage', function ($q) {
             subToDo: new Array(0), // array to keep track of the subToDos
         };
         this.data.push(todo); // adds new category to the end of the array
-        this.persistentInformation = "this is working!>!>!";
         this.sync();
         return id;
     }

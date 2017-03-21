@@ -27,11 +27,19 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             var htmlCategory = $scope.addCategory(item.content, value, item.color) // Loop through each of the categories 
             var arrayLength = item.subToDo.length;
             for(var j=0; j < item.subToDo.length; j++){
-                $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,item.subToDo[j].date,item.subToDo[j].time, item.subToDo[j].notes, false);          
+                $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,item.subToDo[j].date,item.subToDo[j].time, item.subToDo[j].notes, false);
+
+            // after everything is loaded in, we update the colors
+            $scope.updateBackgroundColors($scope.extraInformation.topColor, $scope.extraInformation.topColor);
             }
         })
     });
 
+    $scope.updateBackgroundColors = function(topColor, tabColor){
+        $('#topBar').css("background-color", "#" +topColor); // update colors
+        $('#topBar2').css("background-color", "#" +topColor); // update colors 
+        $('footer').css("background-color", "#" +topColor); // update colors 
+    }
 
     $scope.add = function() {
         var index = todoStorage.add();
@@ -606,10 +614,48 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 // Temporary these are here, was running into errors putting these into separate files
 
 // controller for the completed section area
-app.controller('completed', function($scope) {
+app.controller('completed', function($scope, todoStorage) {
+    $scope.todoStorage = todoStorage;
+
+    $scope.$watch('todoStorage.data', function() {
+        $scope.todoList = $scope.todoStorage.data;
+    });
+
+    $scope.$watch('todoStorage.persistentInformation', function(){
+        $scope.extraInformation = $scope.todoStorage.persistentInformation;
+    });
+
+    $scope.todoStorage.findAll2(function(moreData){
+        // just gets the information
+    });
 
 
+    $scope.todoStorage.findAll(function(data){
+        $scope.todoList = data;
+        $scope.$apply();
 
+        angular.forEach($scope.todoList, function(item, value){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
+            var htmlCategory = $scope.addCategory(item.content, value, item.color) // Loop through each of the categories 
+            var arrayLength = item.subToDo.length;
+            for(var j=0; j < item.subToDo.length; j++){
+                $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,$scope.formatDate(new Date(item.subToDo[j].date)),item.subToDo[j].time, item.subToDo[j].notes, false);          
+            }
+        })
+    });
+
+
+});
+
+app.controller('setting', function($scope, todoStorage) {
+    $scope.colorCode = "3498DB"; // deafult color;
+
+    $scope.update = function(){
+        $('#topBar').css("background-color", "#" +$scope.colorCode); // update colors
+        $('#topBar2').css("background-color", "#" +$scope.colorCode); // update colors
+        $('footer').css("background-color", "#" +$scope.colorCode); // update colors 
+
+        todoStorage.updateColor($scope.colorCode);
+    }
 });
 
 // controller for the calendar section area

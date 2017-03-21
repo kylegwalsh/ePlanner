@@ -12,7 +12,18 @@ body {
   margin: 0;
 }
 
-#top-bar{
+#topBar{
+  text-align: center;
+  font-size: 30px;
+  height: 8%;
+  width: 100%;
+  background-color: #3498db;
+  color: white;
+  padding: 0;
+  margin: 0;
+}
+
+#topBar2{
   text-align: center;
   font-size: 30px;
   height: 8%;
