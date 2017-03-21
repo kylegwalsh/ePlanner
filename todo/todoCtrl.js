@@ -653,6 +653,7 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
 
     NotifyingService.subscribe($scope, function somethingChanged(event, info) {
         $scope.extraInformation = info;
+        console.log(info)
         $scope.displayAllCompleted(); // refresh page   
     });
  
@@ -729,10 +730,10 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
         $scope.todoList = $scope.todoStorage.data;
     });
 
-    var date = new Date();
-    var d = date.getDate();
-    var m = date.getMonth();
-    var y = date.getFullYear();
+    var newDate = new Date();
+    var d = newDate.getDate();
+    var m = newDate.getMonth();
+    var y = newDate.getFullYear();
     $scope.count = 0;
 
     $scope.events = [];
@@ -742,16 +743,17 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
         $scope.todoList = data;
         $scope.$apply();
         angular.forEach($scope.todoList, function(item){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
-            
             for(var j=0; j < item.subToDo.length; j++){
                 $scope.addEvent(item.subToDo[j], item.color);
                 if($scope.count == 0){
-                    $scope.remove(0)
+                    $scope.remove(0);
                 }
                 $scope.count = $scope.count + 1;         
-            } 
+            }
+            if($scope.count == 0 && $scope.events.length == 1){
+                $scope.remove(0);
+            }
         })
-
     });
     // $scope.events = [
     //   {title: 'All Day Event',start: new Date(y, m, 1)},
@@ -788,13 +790,14 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     name.value = date.title;
 
                     var note = document.createElement("textarea"); // button that brings up notes text field
-                    note.value = "Notes";
+                    note.value = date.notes;
                     // TODO modify CSS and class stuff here
 
                     var datePicker = document.createElement("input"); // date picker
                     datePicker.type = "date";
                     datePicker.buttonText = "<i class='fa fa-calendar'></i>";
                     datePicker.className = "DatePicker";
+                    datePicker.value = new Date(date.start);
                     // TODO modify CSS and class stuff here
 
                     var timePicker = document.createElement("input"); // Time picker
@@ -875,6 +878,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
       $scope.events.push({
         title: subToDo.name,
         start: eventDate,
+        notes: subToDo.notes,
         backgroundColor: "#" + color,
         //start: $scope.setTime(eventDate, subToDo.time)
         stick: true
@@ -934,6 +938,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
       }
     };
     /* event sources array*/
+    console.log($scope.events);
     $scope.eventSources = [$scope.events];
 });
 
