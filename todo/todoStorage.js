@@ -33,19 +33,24 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
 
     this.updateColor = function(color){
 
-        var information = {
-            topColor: color,    
+        var temp;
+        if(this.persistentInformation.completedStuff != null){
+            temp = this.persistentInformation.completedStuff;
+        } else {
+            temp = new Array();
         }
 
+        var information = {
+            topColor: color,
+            completedStuff, temp,    
+        }
         this.persistentInformation = information;
         this.sync();
     }
 
     this.sync = function() {
         chrome.storage.sync.set({todo: this.data}, function() {});
-        chrome.storage.sync.set({info: this.persistentInformation}, function() {
-            
-        });
+        chrome.storage.sync.set({info: this.persistentInformation}, function() {});
     }
 
     this.add = function () {
@@ -172,10 +177,11 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         } else {
             this.persistentInformation.completedStuff = new Array();
             this.persistentInformation.completedStuff.push(completedObject);
-        }
-        
+        } 
         this.sync();
         NotifyingService.notify(this.persistentInformation); // used to notify completed controller of any changes
+        console.log("AFTER");
+        console.log(this.persistentInformation);
     }
 
     this.modifySubToDo = function(categoryIndex, subToDoIndex, name, date, time, notes){

@@ -649,6 +649,8 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
     $scope.todoStorage.findAll2(function(moreData){
         // just gets the information
         $scope.displayAllCompleted();
+        console.log("controller loaded");
+        console.log($scope.extraInformation);
     });
 
     NotifyingService.subscribe($scope, function somethingChanged(event, info) {
