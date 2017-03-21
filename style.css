@@ -511,3 +511,22 @@ input[type=checkbox]:checked:after {
 .jscolor:hover{
   cursor: pointer;
 }
+
+.CompleteCategory{
+  background-color: red;
+}
+.CompleteName{
+
+}
+.CompleteDate{
+
+}
+.CompleteTime{
+
+}
+.CompleteNotes{
+
+}
+.CompleteAt{
+
+}

@@ -38,7 +38,8 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
     $scope.updateBackgroundColors = function(topColor, tabColor){
         $('#topBar').css("background-color", "#" +topColor); // update colors
         $('#topBar2').css("background-color", "#" +topColor); // update colors 
-        $('footer').css("background-color", "#" +topColor); // update colors 
+        $('footer').css("background-color", "#" +topColor); // update colors
+        $('.newCourse').css("background-color", "#" +topColor); // update colors  
     }
 
     $scope.add = function() {
@@ -281,6 +282,20 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             var select  = document.createElement('div'); // This is where the draggable thing will be
             select.className = "Checkbox col-xs-offset-1 col-xs-1 vcenter";
             select.innerHTML = "<input type='checkbox'/>";
+            $(select).change(function(event) {   // event for when it is checked 
+                var child = divider;
+                var parent = $(divider).parent();
+                var subToDoindex = $(parent).children(".Divider").index(child);
+
+                var categoryChild = $(divider).parent().parent().parent();
+                var categoryParent = $(divider).parent().parent().parent().parent();
+                var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+
+                todoStorage.markToDoAsComplete(categoryIndex, subToDoindex);
+                todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory
+                divider.remove(); // Clear from html
+            })
+
             var center = document.createElement('div');  // Top center row (for styling)
             center.className = "col-xs-9 vcenter";
             var name  = document.createElement('input'); // The name will go here
@@ -614,7 +629,8 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 // Temporary these are here, was running into errors putting these into separate files
 
 // controller for the completed section area
-app.controller('completed', function($scope, todoStorage) {
+app.controller('completed', function($scope, todoStorage, NotifyingService) {
+
     $scope.todoStorage = todoStorage;
 
     $scope.$watch('todoStorage.data', function() {
@@ -627,23 +643,65 @@ app.controller('completed', function($scope, todoStorage) {
 
     $scope.todoStorage.findAll2(function(moreData){
         // just gets the information
+        $scope.displayAllCompleted();
     });
 
-
-    $scope.todoStorage.findAll(function(data){
-        $scope.todoList = data;
-        $scope.$apply();
-
-        angular.forEach($scope.todoList, function(item, value){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
-            var htmlCategory = $scope.addCategory(item.content, value, item.color) // Loop through each of the categories 
-            var arrayLength = item.subToDo.length;
-            for(var j=0; j < item.subToDo.length; j++){
-                $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,$scope.formatDate(new Date(item.subToDo[j].date)),item.subToDo[j].time, item.subToDo[j].notes, false);          
-            }
-        })
+    NotifyingService.subscribe($scope, function somethingChanged(event, info) {
+        $scope.extraInformation = info;
+        $scope.displayAllCompleted(); // refresh page   
     });
+ 
+    $scope.displayAllCompleted = function(){
 
+        $("#CompletedView").empty(); // Clear everything that is displayAllCompleted
 
+        if($scope.extraInformation.completedStuff == null){
+            // No date to display
+        } else { 
+            for(var i=$scope.extraInformation.completedStuff.length-1; i >= 0; i--){
+    
+                 var container = document.createElement("div");
+
+                 var completedCategory = document.createElement("div"); // create new elements for each of the categories in a 
+                 var completedName = document.createElement("div");
+                 var completedDate = document.createElement("div");
+                 var completedTime= document.createElement("div");
+                 var completedNotes= document.createElement("div");
+                 var completedAt= document.createElement("div");
+                 var deleteOption = document.createElement("button");
+
+                 completedCategory.innerHTML = $scope.extraInformation.completedStuff[i].category;
+                 completedName.innerHTML = $scope.extraInformation.completedStuff[i].name;
+                 completedDate.innerHTML = $scope.extraInformation.completedStuff[i].date;
+                 completedTime.innerHTML = $scope.extraInformation.completedStuff[i].time;
+                 completedNotes.innerHTML = $scope.extraInformation.completedStuff[i].notes;
+                 completedAt.innerHTML = $scope.extraInformation.completedStuff[i].completedAt;
+                 deleteOption.innerHTML = "Delete";
+
+                 completedCategory.className = "CompleteCategory";
+                 completedName.className = "CompleteName";
+                 completedDate.className = "CompleteDate";
+                 completedTime.className = "CompleteTime";
+                 completedNotes.className = "CompleteNotes";
+                 completedAt.className = "CompleteAt";
+
+                 container.appendChild(completedCategory);
+                 container.appendChild(completedName);
+                 container.appendChild(completedDate);
+                 container.appendChild(completedTime);
+                 container.appendChild(completedNotes);
+                 container.appendChild(completedAt);
+                 container.appendChild(deleteOption);
+
+                 $(deleteOption).bind( "click", {index: i}, function(event) { 
+                    todoStorage.removeCompleted(event.data.index); // remove from memory
+                    $scope.displayAllCompleted(); // refresh page
+                });
+
+                 $("#CompletedView").append(container);
+           }             
+        }
+    }
 });
 
 app.controller('setting', function($scope, todoStorage) {
@@ -653,7 +711,7 @@ app.controller('setting', function($scope, todoStorage) {
         $('#topBar').css("background-color", "#" +$scope.colorCode); // update colors
         $('#topBar2').css("background-color", "#" +$scope.colorCode); // update colors
         $('footer').css("background-color", "#" +$scope.colorCode); // update colors 
-
+        $('.newCourse').css("background-color", "#" +$scope.colorCode); // update colors 
         todoStorage.updateColor($scope.colorCode);
     }
 });
