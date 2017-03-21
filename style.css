@@ -475,3 +475,22 @@ input[type="checkbox"]:focus{
 .jscolor:focus{
   outline: none;
 }
+
+.CompleteCategory{
+  background-color: red;
+}
+.CompleteName{
+
+}
+.CompleteDate{
+
+}
+.CompleteTime{
+
+}
+.CompleteNotes{
+
+}
+.CompleteAt{
+
+}

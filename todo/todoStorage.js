@@ -1,4 +1,4 @@
-angular.module('app').service('todoStorage', function ($q) {
+angular.module('app').service('todoStorage', function ($q,  NotifyingService) {
 
     var _this = this;
     this.data = [];
@@ -6,7 +6,6 @@ angular.module('app').service('todoStorage', function ($q) {
 
     this.findAll = function(callback) {
         chrome.storage.sync.get('todo', function(keys) {
-            console.log(keys);
             if (keys.todo != null) {
                 _this.data = keys.todo;
                 for (var i=0; i<_this.data.length; i++) {
@@ -33,9 +32,7 @@ angular.module('app').service('todoStorage', function ($q) {
 
     this.sync = function() {
         chrome.storage.sync.set({todo: this.data}, function() {});
-        chrome.storage.sync.set({info: this.persistentInformation}, function() {
-            
-        });
+        chrome.storage.sync.set({info: this.persistentInformation}, function() {});
     }
 
     this.add = function () {
@@ -79,16 +76,43 @@ angular.module('app').service('todoStorage', function ($q) {
         category.subToDo.splice(category.subToDo.length-1-subToDoIndex, 1);
         this.sync();
     }
+    this.removeCompleted = function(index){
+        var extraInfo = _this.persistentInformation.completedStuff;
+        extraInfo.splice(index,1);
+        this.sync();
+    }
+
+    this.markToDoAsComplete = function(Categoryindex, subToDoIndex){
+
+        var size = _this.data.length-1; 
+        var categoryX = _this.data[size-Categoryindex];
+        var current = categoryX.subToDo[categoryX.subToDo.length-1-subToDoIndex];
+        var completedObject = {
+            category: categoryX.content,
+            name: current.name,
+            date: "Temporary Date", // TODO change to current.date once not null
+            time: "Temporary Time", // TODO change to current.time once not null
+            notes: "Temporary Notes", // TODO change to current.notes once not null
+            completedAt: new Date(), // each new date gets set to creation time
+        }
+        this.persistentInformation.completedStuff.push(completedObject);
+        this.sync();
+        NotifyingService.notify(this.persistentInformation); // used to notify completed controller of any changes
+    }
 
     this.updateColor = function(color){
 
         var information = {
-            topColor: color,    
-
+            topColor: color,
+            completedStuff: this.persistentInformation.completedStuff, // keep data the same    
         }
-
         this.persistentInformation = information;
         this.sync()
+    }
+
+    this.markAsComplete = function(completeInformation){
+        this.persistentInformation.completedStuff.push(completeInformation);
+        this.sync();
     }
 
     this.changeSubToDoName = function(Categoryindex, subToDoIndex, name){
@@ -146,4 +170,18 @@ angular.module('app').service('todoStorage', function ($q) {
         this.sync();
     }
 
+});
+
+// Used to notify the complete controller when something in the main controller has been marked as complete 
+angular.module('app').factory('NotifyingService', function($rootScope) {
+    return {
+        subscribe: function(scope, callback) {
+            var handler = $rootScope.$on('notifying-service-event', callback);
+            scope.$on('$destroy', handler);
+        },
+
+        notify: function(importantInfo) {
+            $rootScope.$emit('notifying-service-event', importantInfo);
+        }
+    };
 });
