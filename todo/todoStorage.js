@@ -6,7 +6,6 @@ angular.module('app').service('todoStorage', function ($q) {
 
     this.findAll = function(callback) {
         chrome.storage.sync.get('todo', function(keys) {
-            console.log(keys);
             if (keys.todo != null) {
                 _this.data = keys.todo;
                 for (var i=0; i<_this.data.length; i++) {
@@ -48,7 +47,6 @@ angular.module('app').service('todoStorage', function ($q) {
             createdAt: new Date(),
             subToDo: new Array(0), // array to keep track of the subToDos
         };
-        console.log("New category at index: " + id);
         this.data.push(todo); // adds new category to the end of the array
         this.persistentInformation = "this is working!>!>!";
         this.sync();
@@ -64,7 +62,6 @@ angular.module('app').service('todoStorage', function ($q) {
     this.changeCategoryColor = function(index, hexValue){
         var todo = _this.data[index];
         todo.color = hexValue;
-        console.log("(Storage) Category Index " + index + " color changed to: " + todo.color);
         this.sync();
     }
 
@@ -74,16 +71,16 @@ angular.module('app').service('todoStorage', function ($q) {
         this.sync();
     }
 
-    this.removeSubToDo = function(Categoryindex, subToDoIndex){
+    this.removeSubToDo = function(categoryIndex, subToDoIndex){
         var size = _this.data.length-1; 
-        var category = _this.data[size-Categoryindex]; // we have to go backwards essentially since on the DOM they are displayed backwards (newest first)
+        var category = _this.data[size-categoryIndex]; // we have to go backwards essentially since on the DOM they are displayed backwards (newest first)
         category.subToDo.splice(category.subToDo.length-1-subToDoIndex, 1);
         this.sync();
     }
 
-    this.changeSubToDoName = function(Categoryindex, subToDoIndex, name){
+    this.changeSubToDoName = function(categoryIndex, subToDoIndex, name){
         var size = _this.data.length-1; 
-        var category = _this.data[size-Categoryindex];
+        var category = _this.data[size-categoryIndex];
         var size2 = category.subToDo.length-1;
 
         var newData = {
@@ -92,15 +89,58 @@ angular.module('app').service('todoStorage', function ($q) {
             time: category.subToDo[size2 - subToDoIndex].time,
             notes: category.subToDo[size2 - subToDoIndex].notes,
         }
-        console.log("Passed in name: " + name + ", Stored name : " + newData.name);
         category.subToDo[size2 - subToDoIndex] = newData;
-        console.log("Updated name: " + category.subToDo[size2 - subToDoIndex].name);
         this.sync();
     }
 
-    this.modifySubToDo = function(Categoryindex, subToDoIndex, name, date, time, notes){
+    this.changeSubToDoNotes = function(categoryIndex, subToDoIndex, notes){
         var size = _this.data.length-1; 
-        var category = _this.data[size-Categoryindex];
+        var category = _this.data[size-categoryIndex];
+        var size2 = category.subToDo.length-1;
+
+        var newData = {
+            name: category.subToDo[size2 - subToDoIndex].name,
+            date: category.subToDo[size2 - subToDoIndex].date,
+            time: category.subToDo[size2 - subToDoIndex].time,
+            notes: notes,
+        }
+        category.subToDo[size2 - subToDoIndex] = newData;
+        this.sync();
+    }
+
+    this.changeSubToDoDate = function(categoryIndex, subToDoIndex, date){
+        var size = _this.data.length-1; 
+        var category = _this.data[size-categoryIndex];
+        var size2 = category.subToDo.length-1;
+
+        var newData = {
+            name: category.subToDo[size2 - subToDoIndex].name,
+            date: date,
+            time: category.subToDo[size2 - subToDoIndex].time,
+            notes: category.subToDo[size2 - subToDoIndex].notes,
+        } 
+        category.subToDo[size2 - subToDoIndex] = newData;
+        this.sync();
+    }
+
+    this.changeSubToDoTime = function(categoryIndex, subToDoIndex, time){
+        var size = _this.data.length-1; 
+        var category = _this.data[size-categoryIndex];
+        var size2 = category.subToDo.length-1;
+
+        var newData = {
+            name: category.subToDo[size2 - subToDoIndex].name,
+            date: category.subToDo[size2 - subToDoIndex].date,
+            time: time,
+            notes: category.subToDo[size2 - subToDoIndex].notes,
+        }
+        category.subToDo[size2 - subToDoIndex] = newData;
+        this.sync();
+    }
+
+    this.modifySubToDo = function(categoryIndex, subToDoIndex, name, date, time, notes){
+        var size = _this.data.length-1; 
+        var category = _this.data[size-categoryIndex];
         var size2 = category.subToDo.length-1;
 
         var newData = {
@@ -108,8 +148,7 @@ angular.module('app').service('todoStorage', function ($q) {
             date: date,
             time: time,
             notes: notes,
-        }  
-        console.log(newData.time);   
+        }    
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
     }
@@ -119,7 +158,6 @@ angular.module('app').service('todoStorage', function ($q) {
         if(category == undefined){
             category = _this.data[index-1]; 
         }
-
 
         var newData = {
             name: name,

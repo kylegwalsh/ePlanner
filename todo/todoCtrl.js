@@ -27,7 +27,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             var htmlCategory = $scope.addCategory(item.content, value, item.color) // Loop through each of the categories 
             var arrayLength = item.subToDo.length;
             for(var j=0; j < item.subToDo.length; j++){
-                $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,$scope.formatDate(new Date(item.subToDo[j].date)),item.subToDo[j].time, item.subToDo[j].notes, false);          
+                $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,item.subToDo[j].date,item.subToDo[j].time, item.subToDo[j].notes, false);          
             }
         })
     });
@@ -177,7 +177,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                          title.style.backgroundColor = "#" + colorPicker.value;
                          color = colorPicker.value;
                          todoStorage.changeCategoryColor(index,colorPicker.value);
-                         console.log("(ColorPicker) Category Index " + index + " color changed to: " + colorPicker.value);
                     });
 
                     var deleteCategory = document.createElement('div');
@@ -245,11 +244,11 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         addnew.innerHTML = "<i class='fa fa-plus'></i> &nbsp; &nbsp; Add New Assignment";
 
         $(addnew).bind( "click", function() {
-            // call funciton to save the new information
+            // call function to save the new information
             $scope.saveSubSectionForTodo(index, $(this), "", "", "", "");
 
             // call function to display the information
-            $scope.displaySubSectionForTodo( $(this), "", "", "", "", false);
+            $scope.displaySubSectionForTodo( $(this), "", "", "", "", true);
         });
 
         divider.appendChild(addnewbar);
@@ -262,7 +261,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
            todoStorage.addSubToDo(index,nameData,dateData,timeData, notesData)
     }
 
-    $scope.displaySubSectionForTodo = function(addSection, nameData, dateData, timeData, notesData, boolean){
+    $scope.displaySubSectionForTodo = function(addSection, nameData, dateData, timeData, notesData, newToDoBool){
 
         var divider = document.createElement('div');
         divider.className = "Divider";
@@ -280,33 +279,101 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             name.type = "text";
             name.className = "SubName row";
             name.value = nameData;
-            var notes  = document.createElement('div'); // The notes will go here
-            notes.className = "Notes";
-            notes.innerHTML = notesData;
+            var notes  = document.createElement('textarea'); // The notes will go here
+            notes.className = "Notes row";
+            notes.value = notesData;
             var dateandtime = document.createElement('div');  // The date and time go here
             dateandtime.className = "SubDateTime row";
-            dateandtime.innerHTML = dateData + "&nbsp; &nbsp;" + timeData;
+            var date = document.createElement('input');
+            date.type = 'date';
+            date.value = dateData;
+            date.className = "date";
+            var time = document.createElement('input');
+            time.type = 'time';
+            time.value = timeData;
+            time.className = "time";
             var Options  = document.createElement('div'); // The Options will go here
             Options.className = "todoOptionsButton col-xs-1 vcenter";
             Options.innerHTML = "<i class='fa fa-ellipsis-h'></i>";
 
             // Save changes to todo name
             $(name).blur(function() {
-                // TODO ADD FUNCTION TO SAVE INDIVIDUAL FIELDS
                 var child = divider;
                 var parent = $(divider).parent();
-                var subToDoindex = $(parent).children(".Divider").index(child);
+                var subToDoIndex = $(parent).children(".Divider").index(child);
                 // subToDoindex contains the value of what we currently want to delete
-                console.log("SubToDoIndex: " + subToDoindex);
 
                 var categoryChild = $(divider).parent().parent().parent();
                 var categoryParent = $(divider).parent().parent().parent().parent();
                 var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
                 // categoryIndex contains the value of the entire Category that the subToDo is being deleted in
-                console.log("categoryIndex: " + categoryIndex);
 
                 // categoryIndex contains the value of the entire Category that the subToDo is being updated in
-                todoStorage.changeSubToDoName(categoryIndex, subToDoindex, name.value);
+                todoStorage.changeSubToDoName(categoryIndex, subToDoIndex, name.value);
+            });
+
+            // Save changes to todo notes
+            $(notes).blur(function() {
+                var child = divider;
+                var parent = $(divider).parent();
+                var subToDoIndex = $(parent).children(".Divider").index(child);
+                // subToDoindex contains the value of what we currently want to delete
+
+                var categoryChild = $(divider).parent().parent().parent();
+                var categoryParent = $(divider).parent().parent().parent().parent();
+                var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+                // categoryIndex contains the value of the entire Category that the subToDo is being deleted in
+
+                // categoryIndex contains the value of the entire Category that the subToDo is being updated in
+                todoStorage.changeSubToDoNotes(categoryIndex, subToDoIndex, notes.value);
+
+                // don't show notes if we don't have one
+                if(notes.value == ""){
+                    notes.style.display = "none";
+                }
+            });
+
+            // Save changes to todo date
+            $(date).blur(function() {
+                var child = divider;
+                var parent = $(divider).parent();
+                var subToDoIndex = $(parent).children(".Divider").index(child);
+                // subToDoindex contains the value of what we currently want to delete
+
+                var categoryChild = $(divider).parent().parent().parent();
+                var categoryParent = $(divider).parent().parent().parent().parent();
+                var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+                // categoryIndex contains the value of the entire Category that the subToDo is being deleted in
+
+                // categoryIndex contains the value of the entire Category that the subToDo is being updated in
+                todoStorage.changeSubToDoDate(categoryIndex, subToDoIndex, date.value); 
+
+                // don't allow time field without a date field
+                if(date.value == ""){
+                    todoStorage.changeSubToDoTime(categoryIndex, subToDoIndex, "");
+                    dateandtime.style.display = "none";
+                }
+            });
+
+            // Save changes to todo date
+            $(time).blur(function() {
+                var child = divider;
+                var parent = $(divider).parent();
+                var subToDoIndex = $(parent).children(".Divider").index(child);
+                // subToDoindex contains the value of what we currently want to delete
+
+                var categoryChild = $(divider).parent().parent().parent();
+                var categoryParent = $(divider).parent().parent().parent().parent();
+                var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+                // categoryIndex contains the value of the entire Category that the subToDo is being deleted in
+
+                // categoryIndex contains the value of the entire Category that the subToDo is being updated in
+                todoStorage.changeSubToDoTime(categoryIndex, subToDoIndex, time.value);
+
+                // don't show time field if we don't have one
+                if(time.value == ""){
+                    time.style.display = "none";
+                }
             });
 
             // If user presses enter, remove focus
@@ -315,6 +382,55 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                    name.blur();
                 }
             });
+
+            // If user presses enter, remove focus
+            $(notes).bind('keydown', function(event) {
+                if(event.keyCode == 13){
+                   notes.blur();
+                }
+            });
+
+            // If user presses enter, remove focus
+            $(date).bind('keydown', function(event) {
+                if(event.keyCode == 13){
+                   date.blur();
+                }
+            });
+
+            // If user presses enter, remove focus
+            $(time).bind('keydown', function(event) {
+                if(event.keyCode == 13){
+                   time.blur();
+                }
+            });
+
+                    // $(oldButton).bind("click", function(){   // Button that handles updating the TODO
+                    //     var userInput = $(this).parent().children(".OptionsText").val(); // get the input that is in the textBox
+                    //     $(this).parent().parent().children().children().children(".SubName").html(userInput); // update the data
+
+                    //     var userInputNotes = $(this).parent().children(".NoteInput").val(); // get the input that is in the textBox
+                    //     $(this).parent().parent().children().children().children(".Notes").html(userInputNotes); // update the data
+                    //     var datePickerValue = $(this).parent().children(".DatePicker").val();
+                    //     var addNote = $(this).parent().children(".Text").val();
+                    //     var date  = new Date(datePickerValue);
+     
+
+                    //     var timeInput = $(this).parent().children(".TimePicker").val(); // get the time input value
+                    //     var test = $scope.formatTime(timeInput);      
+                       
+                    //     var child = $(this).parent().parent();
+                    //     var parent = $(this).parent().parent().parent();
+                    //     var subToDoindex = $(parent).children(".Divider").index(child);
+                    //     // subToDoindex contains the value of what we currently want to edit
+
+                    //     var categoryChild = $(this).parent().parent().parent().parent().parent();
+                    //     var categoryParent = $(this).parent().parent().parent().parent().parent().parent();
+                    //     var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+                    //     // Category of the subToDo that we want to edit
+
+                    //     todoStorage.modifySubToDo(categoryIndex, subToDoindex, userInput, datePickerValue, timeInput, userInputNotes); // Update in memory
+                    //     $(this).parent().parent().children().children().children(".SubDateTime").html($scope.formatDate(date)    + " " + timeInput); // Update in HTML                  
+                    // });
 
             // Bring up options menu when option button clicked
             $(Options).bind( "click",  function(event) {
@@ -347,22 +463,19 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                     editButton.innerHTML = "Edit";
                     // TODO modify CSS and class stuff here 
 
-                    var addNote = document.createElement("textarea"); // button that brings up notes text field
+                    var addNote = document.createElement("div"); // button that brings up notes text field
                     addNote.className = "menu-item";
                     addNote.innerHTML = "Add Notes";
                     // TODO modify CSS and class stuff here
 
-                    var datePicker = document.createElement("input"); // date picker
-                    datePicker.type = "date";
-                    datePicker.className = "DatePicker"; 
+                    var dateButton = document.createElement("div"); // date picker
+                    dateButton.className = "menu-item"; 
+                    dateButton.innerHTML = "Change Date";
                     // TODO modify CSS and class stuff here
 
-                    var timePicker = document.createElement("input"); // Time picker
-                    timePicker.type = "time";
-                    timePicker.className = "TimePicker";
-
-                    var oldButton = document.createElement("button");
-                    oldButton.innerHTML = "Old Update Button";
+                    var timeButton = document.createElement("div"); // edit time
+                    timeButton.className = "menu-item";
+                    timeButton.innerHTML = "Change Time";
 
                     // Edit todo name
                     $(editButton).bind("click", function(){
@@ -372,34 +485,41 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                         name.select();
                     });
 
-                    // $(oldButton).bind("click", function(){   // Button that handles updating the TODO
-                    //     var userInput = $(this).parent().children(".OptionsText").val(); // get the input that is in the textBox
-                    //     $(this).parent().parent().children().children().children(".SubName").html(userInput); // update the data
+                    // Edit todo notes
+                    $(addNote).bind("click", function(){
+                        todoOverlay.innerHTML = ""; // clear contents of overlay
+                        todoOverlay.style.display = "none";  // close overlay
+                        // If there was no date, we need to show the date section
+                        if(notes.value == ""){
+                            notes.style.display = "inline-block";
+                        }                               
+                        notes.focus();
+                        notes.select();
+                    });
 
-                    //     var userInputNotes = $(this).parent().children(".NoteInput").val(); // get the input that is in the textBox
-                    //     $(this).parent().parent().children().children().children(".Notes").html(userInputNotes); // update the data
-                    //     var datePickerValue = $(this).parent().children(".DatePicker").val();
-                    //     var addNote = $(this).parent().children(".Text").val();
-                    //     var date  = new Date(datePickerValue);
-     
 
-                    //     var timeInput = $(this).parent().children(".TimePicker").val(); // get the time input value
-                    //     var test = $scope.formatTime(timeInput);      
-                       
-                    //     var child = $(this).parent().parent();
-                    //     var parent = $(this).parent().parent().parent();
-                    //     var subToDoindex = $(parent).children(".Divider").index(child);
-                    //     // subToDoindex contains the value of what we currently want to edit
+                    // Edit todo date
+                    $(dateButton).bind("click", function(){
+                        todoOverlay.innerHTML = ""; // clear contents of overlay
+                        todoOverlay.style.display = "none";  // close overlay
+                        // If there was no date, we need to show the date section
+                        if(date.value == ""){
+                            dateandtime.style.display = "inline-block";
+                        }       
+                        date.focus();
+                        date.select();
+                    });
 
-                    //     var categoryChild = $(this).parent().parent().parent().parent().parent();
-                    //     var categoryParent = $(this).parent().parent().parent().parent().parent().parent();
-                    //     var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
-                    //     // Category of the subToDo that we want to edit
-
-                    //     todoStorage.modifySubToDo(categoryIndex, subToDoindex, userInput, datePickerValue, timeInput, userInputNotes); // Update in memory
-                    //     $(this).parent().parent().children().children().children(".SubDateTime").html($scope.formatDate(date)    + " " + timeInput); // Update in HTML                  
-                    // });
-
+                    // Edit todo time
+                    $(timeButton).bind("click", function(){
+                        todoOverlay.innerHTML = ""; // clear contents of overlay
+                        todoOverlay.style.display = "none";  // close overlay
+                        if((date.value != "") && (time.value == "")){
+                            time.style.display = "inline-block";
+                        }         
+                        time.focus();
+                        time.select();
+                    });
 
                     var deleteTodo = document.createElement('div');  // Delete button for the Todo that is at the bottom
                     deleteTodo.className = "menu-item";
@@ -424,8 +544,13 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
                     
                     todoOverlay.appendChild(editButton);
                     todoOverlay.appendChild(addNote);
-                    todoOverlay.appendChild(datePicker);
-                    todoOverlay.appendChild(timePicker);
+                    todoOverlay.appendChild(dateButton);
+
+                    // if there's no date, don't display time option
+                    if(date.value != ""){
+                        todoOverlay.appendChild(timeButton);
+                    }
+
                     todoOverlay.appendChild(deleteTodo);    
                 }
             });        
@@ -435,23 +560,41 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         center.appendChild(name);
         center.appendChild(notes);
         center.appendChild(dateandtime);
+        dateandtime.appendChild(date);
+        dateandtime.appendChild(time);
         sub.appendChild(Options); // append select, name, date, Options to TO-DO item, 
         divider.appendChild(sub);
         addSection.parent().prepend(divider);// append the whole thing to join up wit the title that was preivously added
+
+        // If there's no date, don't display
+        if(date.value == ""){
+            dateandtime.style.display = "none";
+        }
+        // If there's no time, don't display
+        if(time.value == ""){
+            time.style.display = "none";
+        }
+        // If there's no time, don't display
+        if(notes.value == ""){
+            notes.style.display = "none";
+        }
+
+        if(newToDoBool){
+            name.focus();
+        }
     }
 
     $scope.formatTime = function(date){
         // Time isn't working for some reason, idk 
-
     }
 
-    // function used to format date month/day/year
-    $scope.formatDate = function(date){
-        var day = date.getDate() +1; // ?!?!? i have no idea why but I have to add 1 for some reason 
-        var month = date.getMonth() +1;  // ?!?!? i have no idea why but I have to add 1 for some reason 
-        var year =  date.getFullYear();  // ?!?!? year is fine for some reason 
-        return month + "/" + day + "/" + year;
-    }
+    // // function used to format date month/day/year
+    // $scope.formatDate = function(date){
+    //     var day = date.getDate() + 1; // ?!?!? i have no idea why but I have to add 1 for some reason 
+    //     var month = date.getMonth() + 1;  // ?!?!? i have no idea why but I have to add 1 for some reason 
+    //     var year =  date.getFullYear();  // ?!?!? year is fine for some reason 
+    //     return month + "/" + day + "/" + year;
+    // }
 
 });
 
@@ -541,6 +684,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
 
                     var datePicker = document.createElement("input"); // date picker
                     datePicker.type = "date";
+                    datePicker.buttonText = "<i class='fa fa-calendar'></i>";
                     datePicker.className = "DatePicker";
                     // TODO modify CSS and class stuff here
 
@@ -589,7 +733,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     calendarOverlay.appendChild(note);
                     calendarOverlay.appendChild(datePicker);
                     calendarOverlay.appendChild(timePicker);
-                    calendarOverlay.appendChild(deleteTodo);   
+                    calendarOverlay.appendChild(deleteTodo);  
         }
     };
 

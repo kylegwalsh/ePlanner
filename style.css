@@ -189,13 +189,16 @@ footer{
 }
 
 .CategoryName:focus{
-  outline: none;
   font-weight: bold;
   font-style: italic;
 }
 
 .CategoryOptions{
   max-width: 10px;
+}
+
+input[type="checkbox"]:focus{
+    outline:0;
 }
 
 .CategoryOptions:hover{
@@ -277,6 +280,14 @@ footer{
   border-radius: 2px;
 }
 
+.Notes{
+  height: 40px;
+}
+
+.Notes:focus{
+  outline: none;
+}
+
 .menu-item{
   padding: 3px;
   border-top: solid 1px #D7D7D7;
@@ -328,18 +339,46 @@ footer{
 }
 
 .SubName:focus{
-  outline: none;
   font-weight: bold;
   font-style: italic;
+  width: 100%;
 }
 
 .Notes{
-
+  font-size: 16px;
+  color: darkgray;
+  width: 100%;
+  border: none;
+  overflow:hidden;
 }
 
 .SubDateTime{
   font-size: 15px;
+  width: 100%;
   color: gray;
+}
+
+.date, .time{
+  padding: 0;
+  border: none;
+  height: 20px;
+}
+
+.date{
+  width: 125px;
+}
+
+.time{
+  margin-left: 3px;
+  width: 90px;
+}
+
+[type="date"]::-webkit-inner-spin-button, [type="time"]::-webkit-inner-spin-button {
+  display: none;
+}
+
+[type="date"]::-webkit-calendar-picker-indicator {
+  margin-left: 3px;
 }
 
 .todoOptionsButton{
@@ -357,6 +396,10 @@ footer{
   margin-left: 64px;
   padding-top: 10px;
   padding-bottom: 10px;
+}
+
+input:focus{
+  outline: none;
 }
 
 hr{
@@ -423,10 +466,6 @@ input[type=checkbox]:checked:after {
   color: #67b2e4;
 }
 
-input[type="checkbox"]:focus{
-    outline:0;
-}
-
 #HoverOptions{
   width: 400px;
   height: 300px;
@@ -460,8 +499,4 @@ input[type="checkbox"]:focus{
 
 .jscolor:hover{
   cursor: pointer;
-}
-
-.jscolor:focus{
-  outline: none;
 }
