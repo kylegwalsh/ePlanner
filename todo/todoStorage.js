@@ -21,7 +21,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
             _this.persistentInformation = keys.info;
             callback(_this.persistentInformation);
         });
-
     }
 
     this.updateIndexes = function(){
@@ -85,6 +84,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         var todo = _this.data[index];
         todo.content = newName;
         this.sync();
+        alarm.doToggleAlarms();
     }
 
     this.changeCategoryColor = function(index, hexValue){
@@ -94,6 +94,12 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
     }
 
     this.remove = function(index) {
+        var category = _this.data[index];
+        console.log("Inside remove");
+        for (var i=0; i < category.subToDo.length; i++) {
+            console.log("Trying to delete alarms for hash:" + category.subToDo[i].uniqueHash)
+            alarm.cancelAlarms(category.subToDo[i]);
+        }
         this.data.splice(index, 1);
         this.updateIndexes();
         this.sync();
@@ -108,6 +114,10 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
     this.removeSubToDo = function(categoryIndex, subToDoIndex){
         var size = _this.data.length-1; 
         var category = _this.data[size-categoryIndex]; // we have to go backwards essentially since on the DOM they are displayed backwards (newest first)
+        var size2 = category.subToDo.length-1;
+        console.log("Removing subToDo with Hash: " + category.subToDo[size2 - subToDoIndex].uniqueHash);
+        alarm.cancelAlarms(category.subToDo[size2 - subToDoIndex]);
+        
         category.subToDo.splice(category.subToDo.length-1-subToDoIndex, 1);
         this.sync();
     }
@@ -126,6 +136,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         }
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
+        alarm.doToggleAlarms();
     }
 
     this.changeSubToDoNotes = function(categoryIndex, subToDoIndex, notes){
@@ -158,6 +169,8 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         } 
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
+        alarm.cancelAlarms(category.subToDo[size2 - subToDoIndex]);
+        alarm.doToggleAlarms();
     }
 
     this.changeSubToDoTime = function(categoryIndex, subToDoIndex, time){
@@ -174,6 +187,8 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         }
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
+        alarm.cancelAlarms(category.subToDo[size2 - subToDoIndex]);
+        alarm.doToggleAlarms();
     }
 
     this.markToDoAsComplete = function(Categoryindex, subToDoIndex){
@@ -218,6 +233,8 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         }    
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
+        alarm.cancelAlarms(category.subToDo[size2 - subToDoIndex]);
+        alarm.doToggleAlarms();
     }
 
     this.addSubToDo = function(index, name, date, time, notes){
@@ -262,12 +279,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         category.subToDo.push(newData);       
         this.sync();
     }
-
-    this.removeAll = function() {
-        this.data = [];
-        this.sync();
-    }
-
 });
 
 // Used to notify the complete controller when something in the main controller has been marked as complete 

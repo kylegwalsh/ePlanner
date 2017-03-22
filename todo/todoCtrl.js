@@ -20,6 +20,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
 
     $scope.todoStorage.findAll(function(data){
+        $("#ITEMS").innerHTML = "";
         $scope.todoList = data;
         $scope.$apply();
         // after everything is loaded in, we update the colors
@@ -49,11 +50,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
     $scope.remove = function(index) {
         todoStorage.remove(index);
-    }
-
-    $scope.removeAll = function() {
-        todoStorage.removeAll(); // Clear in storage 
-        $( "#ITEMS" ).empty(); // CLEAR DOM 
     }
 
     $scope.toggleCompleted = function() {
@@ -415,23 +411,32 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             // If user presses enter, remove focus
             $(name).bind('keydown', function(event) {
                 if(event.keyCode == 13){
-                   name.blur();
+                    if(newToDoBool){
+                        date.focus();
+                        date.select();
+                    }
+                    else{
+                        name.blur();
+                    }
                 }
             });
 
             // If user presses enter, remove focus
             $(notes).bind('keydown', function(event) {
                 if(event.keyCode == 13){
-                   notes.blur();
+                    notes.blur();
                 }
             });
 
             // If user presses enter, remove focus
             $(date).bind('keydown', function(event) {
                 if(event.keyCode == 13){
-                    if(time.value == ""){
+                    if((time.value == "") && (time.style.display != "none")){
                         time.focus();
                         time.select();
+                    }
+                    else{
+                        date.blur();
                     }
                 }
             });
@@ -499,7 +504,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
 
                     var editButton = document.createElement("div"); // The button to confirm the user click to update everything 
                     editButton.className = "menu-item top-item";
-                    editButton.innerHTML = "Edit";
+                    editButton.innerHTML = "Edit Name";
                     // TODO modify CSS and class stuff here 
 
                     var addNote = document.createElement("div"); // button that brings up notes text field
@@ -607,11 +612,11 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         addSection.parent().prepend(divider);// append the whole thing to join up wit the title that was preivously added
 
         // If there's no date, don't display
-        if(date.value == ""){
+        if(date.value == "" && !newToDoBool){
             dateandtime.style.display = "none";
         }
         // If there's no time, don't display
-        if(time.value == ""){
+        if(time.value == "" && !newToDoBool){
             time.style.display = "none";
         }
         // If there's no time, don't display
@@ -990,5 +995,3 @@ app.controller('settings', function($scope) {
 
 
 });
-
-

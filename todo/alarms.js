@@ -1,32 +1,22 @@
-(function () {
+var alarm = (function () {
   'use strict';
-   var alarmName = 'remindme';
-   function checkAlarm(callback) {
+   return {
 
-     chrome.alarms.getAll(function(alarms) {
-       var hasAlarm = alarms.some(function(a) {
-         return a.name == alarmName;
-       });
-       var newLabel;
-       if (hasAlarm) {
-         newLabel = 'Cancel alarm';
-       } else {
-         newLabel = 'Activate alarm';
-       }
-       document.getElementById('toggleAlarm').innerText = newLabel;
-       if (callback) callback(hasAlarm);
-     })
-   }
-
-   function create1HourAlarm() {
-    console.log("Inside alarm creation");
+   create1HourAlarm: (function () {
     findAll(function(data){
       var todoList = data;
       for(var k = 0; k < todoList.length; k++){
         for(var j = 0; j < todoList[k].subToDo.length; j++){
           var subToDo = todoList[k].subToDo[j];
+          if(subToDo.date == ""){
+            return;
+          }
           var dueDate = new Date(subToDo.date);
-          setTime(dueDate, subToDo.time);
+          var time = subToDo.time;
+          if(time == ""){
+            time = "12:00";
+          }
+          setTime(dueDate, time);
           dueDate.setDate(dueDate.getDate() + 1);
           var nameOfAlarm = subToDo.uniqueHash + "1Hour";
           if(dueDate.getTime() - 3.6e6 > Date.now()){
@@ -35,16 +25,23 @@
         }
       }
     });
-   }
+   }),
 
-   function create1DayAlarm() {
+   create1DayAlarm: (function () {
     findAll(function(data){
       var todoList = data;
       for(var k = 0; k < todoList.length; k++){
         for(var j = 0; j < todoList[k].subToDo.length; j++){
           var subToDo = todoList[k].subToDo[j];
+          if(subToDo.date == ""){
+            return;
+          }
           var dueDate = new Date(subToDo.date);
-          setTime(dueDate, subToDo.time);
+          var time = subToDo.time;
+          if(time == ""){
+            time = "12:00";
+          }
+          setTime(dueDate, time);
           dueDate.setDate(dueDate.getDate() + 1);
           var nameOfAlarm = subToDo.uniqueHash + "1Day";
           if(dueDate.getTime() - 8.64e7 > Date.now()){
@@ -53,16 +50,24 @@
         }
       }
     });
-   }
+   }),
 
-  function create1WeekAlarm() {
+  create1WeekAlarm: (function () {
     findAll(function(data){
+      console.log("Creating alarms");
       var todoList = data;
       for(var k = 0; k < todoList.length; k++){
         for(var j = 0; j < todoList[k].subToDo.length; j++){
           var subToDo = todoList[k].subToDo[j];
+          if(subToDo.date == ""){
+            return;
+          }
           var dueDate = new Date(subToDo.date);
-          setTime(dueDate, subToDo.time);
+          var time = subToDo.time;
+          if(time == ""){
+            time = "12:00";
+          }
+          setTime(dueDate, time);
           dueDate.setDate(dueDate.getDate() + 1);
           var nameOfAlarm = subToDo.uniqueHash + "1Week";
           if(dueDate.getTime() - 6.048e8 > Date.now()){
@@ -71,16 +76,23 @@
         }
       }
     });
-   }
+   }),
 
-   function createOverdueAlarm(){
+   createOverdueAlarm: (function (){
     findAll(function(data){
       var todoList = data;
       for(var k = 0; k < todoList.length; k++){
         for(var j = 0; j < todoList[k].subToDo.length; j++){
           var subToDo = todoList[k].subToDo[j];
+          if(subToDo.date == ""){
+            continue;
+          }
           var dueDate = new Date(subToDo.date);
-          setTime(dueDate, subToDo.time);
+          var time = subToDo.time;
+          if(time == ""){
+            time = "12:00";
+          }
+          setTime(dueDate, time);
           dueDate.setDate(dueDate.getDate() + 1);
           var nameOfAlarm = subToDo.uniqueHash + "Overdue";
           if(dueDate.getTime() > Date.now()){
@@ -89,38 +101,28 @@
         }
       }
     });
-   }
+   }),
 
-   function cancelAlarm() {
-     chrome.alarms.clear(alarmName);
-   }
-   function doToggleAlarm() {
-     checkAlarm( function(hasAlarm) {
-       if (hasAlarm) {
-         cancelAlarm();
-       } else {
-         create1HourAlarm();
-         create1DayAlarm();
-         create1WeekAlarm();
-         createOverdueAlarm();
-       }
-       checkAlarm();
-     });
-   }
-  $('#toggleAlarm').bind('click', doToggleAlarm);
+   cancelAlarms: (function(subToDo) {
+     chrome.alarms.clear(subToDo.uniqueHash + "1Hour");
+     chrome.alarms.clear(subToDo.uniqueHash + "1Day");
+     chrome.alarms.clear(subToDo.uniqueHash + "1Week");
+     chrome.alarms.clear(subToDo.uniqueHash + "Overdue");
+     console.log("Alarm canceled for subToDo Hash: " + subToDo.uniqueHash);
+   }),
 
-  // NEED TO GET FUNCTIONS WORKING (either via blur or by calling from storage)
-  $('.CategoryName').bind('blur', doToggleAlarm);
-  $('.SubName').bind('blur', doToggleAlarm);
-  $('.date').bind('blur', doToggleAlarm);
-  $('.time').bind('blur', doToggleAlarm);
+   doToggleAlarms: (function () {
+       alarm.create1HourAlarm();
+       alarm.create1DayAlarm();
+       alarm.create1WeekAlarm();
+       alarm.createOverdueAlarm();
+   })
 
-  checkAlarm();
+  };
 })();
 
 findAll = function(callback) {
     chrome.storage.sync.get('todo', function(keys) {
-        //console.log(keys);
         if (keys.todo != null) {
             data = keys.todo;
             for (var i=0; i<data.length; i++) {

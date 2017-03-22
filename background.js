@@ -1,21 +1,35 @@
 var dbName = 'todo';
 function showNotification(alarm) {
     findAll(function(data){
+      console.log("Inside notification");
       var todoList = data;
-      console.log(alarm.name);
+      var notificationSound = new Audio('notificationSounds/oldSpice.mp3');
+      notificationSound.play();
       todoList.forEach(function(toDo){
         for(var j = 0; j < toDo.subToDo.length; j++){
           if(alarm.name == toDo.subToDo[j].uniqueHash + "1Hour" || alarm.name == toDo.subToDo[j].uniqueHash + "1Day" || alarm.name == toDo.subToDo[j].uniqueHash + "1Week"){
+            console.log(toDo.subToDo[j].name);
             var notificationDate = new Date(toDo.subToDo[j].date);
             setTime(notificationDate, toDo.subToDo[j].time);
-            chrome.notifications.create(alarm.name, {
-              type: 'basic',
-              iconUrl: 'icon.png',
-              title: toDo.content,
-              message: toDo.subToDo[j].name + "\nDue: " + formatDate(notificationDate)
-            }, function(notificationId) {});
+            if(toDo.subToDo[j].time==""){
+              chrome.notifications.create(alarm.name, {
+                type: 'basic',
+                iconUrl: 'icon.png',
+                title: toDo.content,
+                message: toDo.subToDo[j].name + "\nDue: " + formatDateOnly(toDo.subToDo[j].date)
+              }, function(notificationId) {});
+            }
+            else{
+              chrome.notifications.create(alarm.name, {
+                type: 'basic',
+                iconUrl: 'icon.png',
+                title: toDo.content,
+                message: toDo.subToDo[j].name + "\nDue: " + formatDate(notificationDate)
+              }, function(notificationId) {});
+            }
           }
           else if(alarm.name == toDo.subToDo[j].uniqueHash + "Overdue"){
+            console.log(toDo.subToDo[j].name);
             var notificationDate = new Date(toDo.subToDo[j].date);
             setTime(notificationDate, toDo.subToDo[j].time);
             chrome.browserAction.setBadgeText({text: "!"});
@@ -24,7 +38,7 @@ function showNotification(alarm) {
               type: 'basic',
               iconUrl: 'icon.png',
               title: toDo.content,
-              message: toDo.subToDo[j].name + "\nThis assignment is now overdue!"
+              message: toDo.subToDo[j].name + "\nThis assignment is overdue!"
             }, function(notificationId) {});
           }
         }
@@ -73,4 +87,12 @@ function formatDate(date) {
   minutes = minutes < 10 ? '0'+minutes : minutes;
   var strTime = hours + ':' + minutes + ' ' + ampm;
   return date.getMonth()+1 + "/" + date.getDate() + "/" + date.getFullYear() + "  " + strTime;
+}
+
+function formatDateOnly (val){
+    var date = new Date(val);
+    var day = date.getDate() + 1; // ?!?!? i have no idea why but I have to add 1 for some reason 
+    var month = date.getMonth() + 1;  // ?!?!? i have no idea why but I have to add 1 for some reason 
+    var year =  date.getFullYear();  // ?!?!? year is fine for some reason 
+    return month + "/" + day + "/" + year;
 }
