@@ -83,14 +83,27 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
     this.changeCategoryName = function(index, newName){
         var todo = _this.data[index];
+        var old = todo.content;
         todo.content = newName;
         this.sync();
+        var syncData = {
+            functionName: "changeCategoryName",
+            oldCategoryName: old,
+            newCategoryName: newName
+        }
+        NotifyingServiceCalendar.notify(syncData);
     }
 
     this.changeCategoryColor = function(index, hexValue){
         var todo = _this.data[index];
         todo.color = hexValue;
         this.sync();
+        var syncData = {
+            functionName: "changeCategoryColor",
+            categoryName: todo.content,
+            categoryColor: hexValue
+        }
+        NotifyingServiceCalendar.notify(syncData);
     }
 
     this.remove = function(index) {

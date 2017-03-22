@@ -881,23 +881,45 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                 }
             }
         }
-        else if(functionName == "modifySubToDo"){
-                
+        else if(functionName == "changeCategoryName"){
+            for(var j = 0; j < $scope.events.length; j++){
+                if(data.oldCategoryName == $scope.events[j].category){
+                    $scope.events[j].category = data.newCategoryName;
+                    uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                }
+            }       
+        }
+        else if(functionName == "changeCategoryColor"){
+            var tmp = [];
+            var indices = [];
+            indices.push(0);
+            for(var j = 0; j < $scope.events.length; j++){
+                if(data.categoryName == $scope.events[j].category){
+                    tmp.push($scope.events[j]);
+                    indices.push(j);
+                }
+            }
+            for(var j = 0; j < indices.length; j++){
+                $scope.remove(indices[j]);
+                uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+            }
+            for(var j = 1; j < tmp.length + 1; j++){
+                $scope.events.push(tmp[j]);
+            }       
         }
         else if(functionName == "addSubToDo"){
-                var syncData = data.data;
-                var eventDate = new Date(y - 1, m, d);
-                    $scope.events.push({
-                    title: syncData.name,
-                    start: eventDate,
-                    notes: syncData.notes,
-                    hash: syncData.uniqueHash,
-                    backgroundColor: "#" + data.color,
-                    //start: $scope.setTime(eventDate, subToDo.time)
-                    stick: true
-                });
-                console.log($scope.events);
-                uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents'); 
+            var syncData = data.data;
+            var eventDate = new Date(y - 1, m, d);
+                $scope.events.push({
+                title: syncData.name,
+                start: eventDate,
+                notes: syncData.notes,
+                hash: syncData.uniqueHash,
+                backgroundColor: "#" + data.color,
+                stick: true
+            });
+            console.log($scope.events);
+            uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents'); 
         }
     }
 
