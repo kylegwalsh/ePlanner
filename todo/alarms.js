@@ -19,6 +19,7 @@
    }
 
    function create1HourAlarm() {
+    console.log("Inside alarm creation");
     findAll(function(data){
       var todoList = data;
       for(var k = 0; k < todoList.length; k++){
@@ -27,7 +28,7 @@
           var dueDate = new Date(subToDo.date);
           setTime(dueDate, subToDo.time);
           dueDate.setDate(dueDate.getDate() + 1);
-          var nameOfAlarm = todoList[k].content + subToDo.name + "1Hour";
+          var nameOfAlarm = subToDo.uniqueHash + "1Hour";
           if(dueDate.getTime() - 3.6e6 > Date.now()){
             chrome.alarms.create(nameOfAlarm, {when: dueDate.getTime() - 3.6e6});
           }
@@ -45,7 +46,7 @@
           var dueDate = new Date(subToDo.date);
           setTime(dueDate, subToDo.time);
           dueDate.setDate(dueDate.getDate() + 1);
-          var nameOfAlarm = todoList[k].content + subToDo.name + "1Day";
+          var nameOfAlarm = subToDo.uniqueHash + "1Day";
           if(dueDate.getTime() - 8.64e7 > Date.now()){
             chrome.alarms.create(nameOfAlarm, {when: dueDate.getTime() - 8.64e7});
           }
@@ -63,7 +64,7 @@
           var dueDate = new Date(subToDo.date);
           setTime(dueDate, subToDo.time);
           dueDate.setDate(dueDate.getDate() + 1);
-          var nameOfAlarm = todoList[k].content + subToDo.name + "1Week";
+          var nameOfAlarm = subToDo.uniqueHash + "1Week";
           if(dueDate.getTime() - 6.048e8 > Date.now()){
             chrome.alarms.create(nameOfAlarm, {when: dueDate.getTime() - 6.048e8});
           }
@@ -81,7 +82,7 @@
           var dueDate = new Date(subToDo.date);
           setTime(dueDate, subToDo.time);
           dueDate.setDate(dueDate.getDate() + 1);
-          var nameOfAlarm = todoList[k].content + subToDo.name + "Overdue";
+          var nameOfAlarm = subToDo.uniqueHash + "Overdue";
           if(dueDate.getTime() > Date.now()){
             chrome.alarms.create(nameOfAlarm, {when: dueDate.getTime()});
           }
@@ -107,6 +108,13 @@
      });
    }
   $('#toggleAlarm').bind('click', doToggleAlarm);
+
+  // NEED TO GET FUNCTIONS WORKING (either via blur or by calling from storage)
+  $('.CategoryName').bind('blur', doToggleAlarm);
+  $('.SubName').bind('blur', doToggleAlarm);
+  $('.date').bind('blur', doToggleAlarm);
+  $('.time').bind('blur', doToggleAlarm);
+
   checkAlarm();
 })();
 

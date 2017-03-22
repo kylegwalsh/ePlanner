@@ -623,23 +623,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
             name.focus();
         }
     }
-
-    $scope.formatTime = function(date){
-        // Time isn't working for some reason, idk 
-    }
-
-    // function used to format date month/day/year
-    $scope.formatDate = function(date){
-        var day = date.getDate() + 1; // ?!?!? i have no idea why but I have to add 1 for some reason 
-        var month = date.getMonth() + 1;  // ?!?!? i have no idea why but I have to add 1 for some reason 
-        var year =  date.getFullYear();  // ?!?!? year is fine for some reason 
-        return month + "/" + day + "/" + year;
-    }
-
 });
-
-
-
 
 
 
@@ -706,8 +690,8 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
 
                  completedCategory.innerHTML = $scope.extraInformation.completedStuff[i].category;
                  completedName.innerHTML = $scope.extraInformation.completedStuff[i].name;
-                 completedDate.innerHTML = formatDate($scope.extraInformation.completedStuff[i].date);
-                 completedTime.innerHTML = formatTime($scope.extraInformation.completedStuff[i].time);
+                 completedDate.innerHTML = $scope.formatDate($scope.extraInformation.completedStuff[i].date);
+                 completedTime.innerHTML = $scope.formatTime($scope.extraInformation.completedStuff[i].time);
                  completedNotes.innerHTML = $scope.extraInformation.completedStuff[i].notes;
                  deleteOption.innerHTML = "<i class='fa fa-remove'></i>";
 
@@ -746,6 +730,34 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
            }             
         }
     }
+
+    // function used to format date month/day/year
+    $scope.formatDate = function(val){
+        if(val==""){
+            return date;
+        }
+        var date = new Date(val);
+        var day = date.getDate() + 1; // ?!?!? i have no idea why but I have to add 1 for some reason 
+        var month = date.getMonth() + 1;  // ?!?!? i have no idea why but I have to add 1 for some reason 
+        var year =  date.getFullYear();  // ?!?!? year is fine for some reason 
+        return month + "/" + day + "/" + year;
+    }
+
+    $scope.formatTime = function(time){
+        if(time == ""){
+            return time;
+        }
+        var arr = time.split(":");
+        var hours = arr[0];
+        var minutes = arr[1];
+        var ampm = hours >= 12 ? 'pm' : 'am';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        var strTime = hours + ':' + minutes + ' ' + ampm;
+        return strTime;
+    }
+
+
 });
 
 app.controller('setting', function($scope, todoStorage) {
@@ -793,19 +805,10 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
             }
         })
     });
-    // $scope.events = [
-    //   {title: 'All Day Event',start: new Date(y, m, 1)},
-    //   {title: 'Long Event',start: new Date(y, m, d - 5),end: new Date(y, m, d - 2)},
-    //   {id: 999,title: 'Repeating Event',start: new Date(y, m, d - 3, 16, 0),allDay: false},
-    //   {id: 999,title: 'Repeating Event',start: new Date(y, m, d + 4, 16, 0),allDay: false},
-    //   {title: 'Birthday Party',start: new Date(y, m, d + 1, 19, 0),end: new Date(y, m, d + 1, 22, 30),allDay: false},
-    //   {title: 'Click for Google',start: new Date(y, m, 28),end: new Date(y, m, 29),url: 'http://google.com/'}
-    // ];
 
     /* alert on eventClick */
     $scope.alertOnEventClick = function( date, jsEvent, view){
                 var calendarOverlay = document.getElementById("CalendarOverlay");
-                var calendarOverlay = document.getElementById("fade");
 
                 // Closes options if they're open
                 if(calendarOverlay.style.display == "inline-block"){

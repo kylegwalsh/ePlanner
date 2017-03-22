@@ -11,8 +11,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
                 for (var i=0; i<_this.data.length; i++) {
                     _this.data[i]['id'] = i + 1;
                 }
-                console.log("FINDALL:")
-                console.log(_this.data);
                 callback(_this.data);
             }
         });
@@ -21,8 +19,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
     this.findAll2 = function(callback){   
         chrome.storage.sync.get('info', function(keys){    
             _this.persistentInformation = keys.info;
-            console.log("FINDALL2:")
-            console.log(_this.persistentInformation);
             callback(_this.persistentInformation);
         });
 
@@ -46,6 +42,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
 
         var information = {
             topColor: color,
+            currentHash: this.persistentInformation.currentHash,
             completedStuff: temp,    
         }
         this.persistentInformation = information;
@@ -60,6 +57,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
     this.removeAllCompleted = function(){
         var information = {
             topColor: this.persistentInformation.topColor,
+            currentHash: this.persistentInformation.currentHash,
             completedStuff: new Array(),    
         }
         this.persistentInformation = information;
@@ -68,7 +66,8 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
     }
 
     this.add = function () {
-        var id = this.data.length;
+        var id = this.data.length;      
+
         var todo = {
             id: id,
             content: "",
@@ -76,10 +75,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
             color: "F5B041", // default color
             createdAt: new Date(),
             subToDo: new Array(0), // array to keep track of the subToDos
-            uniqueHash: _this.persistentInformation.currentHash,
         };
-        console.log(_this.persistentInformation.currentHash);
-        _this.persistentInformation.currentHash++;
         this.data.push(todo); // adds new category to the end of the array
         this.sync();
         return id;
@@ -126,6 +122,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
             date: category.subToDo[size2 - subToDoIndex].date,
             time: category.subToDo[size2 - subToDoIndex].time,
             notes: category.subToDo[size2 - subToDoIndex].notes,
+            uniqueHash: category.subToDo[size2 - subToDoIndex].uniqueHash
         }
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
@@ -141,6 +138,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
             date: category.subToDo[size2 - subToDoIndex].date,
             time: category.subToDo[size2 - subToDoIndex].time,
             notes: notes,
+            uniqueHash: category.subToDo[size2 - subToDoIndex].uniqueHash
         }
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
@@ -156,6 +154,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
             date: date,
             time: category.subToDo[size2 - subToDoIndex].time,
             notes: category.subToDo[size2 - subToDoIndex].notes,
+            uniqueHash: category.subToDo[size2 - subToDoIndex].uniqueHash
         } 
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
@@ -171,6 +170,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
             date: category.subToDo[size2 - subToDoIndex].date,
             time: time,
             notes: category.subToDo[size2 - subToDoIndex].notes,
+            uniqueHash: category.subToDo[size2 - subToDoIndex].uniqueHash
         }
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
@@ -214,12 +214,38 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
             date: date,
             time: time,
             notes: notes,
+            uniqueHash: category.subToDo[size2 - subToDoIndex].uniqueHash
         }    
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
     }
 
     this.addSubToDo = function(index, name, date, time, notes){
+        // Assigns unique hash to todo
+        var nextHash;
+        // Set current hash to one if it hasn't been intialized
+        if(this.persistentInformation.currentHash == null){
+            nextHash = 1;
+        }
+        // Otherwise, increment it
+        else{
+            var temp;
+            nextHash = this.persistentInformation.currentHash + 1;
+            if(this.persistentInformation.completedStuff != null){
+                temp = this.persistentInformation.completedStuff;
+            } else {
+                temp = new Array();
+            }
+        }
+
+        var information = {
+            topColor: this.persistentInformation.topColor,
+            currentHash: nextHash,
+            completedStuff: temp,    
+        } 
+        this.persistentInformation = information;
+
+        // Creates todo
         var category =  _this.data[index];
         if(category == undefined){
             category = _this.data[index-1]; 
@@ -230,7 +256,9 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
             date: date,
             time: time,
             notes: notes,
-        }        
+            uniqueHash: nextHash,
+        }
+        console.log(nextHash);
         category.subToDo.push(newData);       
         this.sync();
     }

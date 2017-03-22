@@ -511,8 +511,14 @@ input[type=checkbox]:checked:after {
   cursor: pointer;
 }
 
-.CompleteCategory{
+#topCompletedRow{
+  border-bottom: 1px solid lightgray;
+}
 
+.CompleteCategory{
+  font-size: 20px;
+  font-weight: bold;
+  font-style: italic;
 }
 
 .CompleteName{
@@ -531,7 +537,7 @@ input[type=checkbox]:checked:after {
 
 .CompleteTime{
   display: inline-block;
-  margin-left: 10px;
+  margin-left: 16px;
 }
 
 .CompleteNotes{

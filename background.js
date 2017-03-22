@@ -2,9 +2,10 @@ var dbName = 'todo';
 function showNotification(alarm) {
     findAll(function(data){
       var todoList = data;
+      console.log(alarm.name);
       todoList.forEach(function(toDo){
         for(var j = 0; j < toDo.subToDo.length; j++){
-          if(alarm.name == toDo.content + toDo.subToDo[j].name + "1Hour" || alarm.name == toDo.content + toDo.subToDo[j].name + "1Day" || alarm.name == toDo.content + toDo.subToDo[j].name + "1Week"){
+          if(alarm.name == toDo.subToDo[j].uniqueHash + "1Hour" || alarm.name == toDo.subToDo[j].uniqueHash + "1Day" || alarm.name == toDo.subToDo[j].uniqueHash + "1Week"){
             var notificationDate = new Date(toDo.subToDo[j].date);
             setTime(notificationDate, toDo.subToDo[j].time);
             chrome.notifications.create(alarm.name, {
@@ -14,7 +15,7 @@ function showNotification(alarm) {
               message: toDo.subToDo[j].name + "\nDue: " + formatDate(notificationDate)
             }, function(notificationId) {});
           }
-          else if(alarm.name == toDo.content + toDo.subToDo[j].name + "Overdue"){
+          else if(alarm.name == toDo.subToDo[j].uniqueHash + "Overdue"){
             var notificationDate = new Date(toDo.subToDo[j].date);
             setTime(notificationDate, toDo.subToDo[j].time);
             chrome.browserAction.setBadgeText({text: "!"});
