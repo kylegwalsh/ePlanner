@@ -778,11 +778,17 @@ app.controller('setting', function($scope, todoStorage) {
 });
 
 // controller for the calendar section area
-app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorage) {
+app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorage, NotifyingServiceCalendar) {
+
     $scope.todoStorage = todoStorage;
+    var calendarRendered = false;
 
     $scope.$watch('todoStorage.data', function() {
         $scope.todoList = $scope.todoStorage.data;
+    });
+
+    $("#CalendarTab").bind('click', function(){
+        calendarRendered = true;
     });
 
     var newDate = new Date();
@@ -797,9 +803,12 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     $scope.todoStorage.findAll(function(data){
         $scope.todoList = data;
         $scope.$apply();
+        if($scope.todoList.length == 0){
+            $scope.remove(0);
+        }
         angular.forEach($scope.todoList, function(item){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
             for(var j=0; j < item.subToDo.length; j++){
-                $scope.addEvent(item.subToDo[j], item.color);
+                $scope.addEvent(item.subToDo[j], item.color, item.content);
                 if($scope.count == 0){
                     $scope.remove(0);
                 }
@@ -810,6 +819,127 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
             }
         })
     });
+    console.log($scope.events);
+
+    NotifyingServiceCalendar.subscribe($scope, function somethingChanged(event, data) {
+        $scope.syncCalendar(data); 
+    });
+
+    $scope.syncCalendar = function(data){
+        // If we haven't opened the calendar, we shouldn't rerender
+        if(!calendarRendered){
+            return;
+        }
+        // If we've already opened the calendar
+        else{
+            var functionName = data.functionName;
+            if(functionName == "remove"){
+                var indices = [];
+                indices.push(0);
+                for(var j = 0; j < $scope.events.length; j++){
+                    if(data.category == $scope.events[j].category){
+                        indices.push(j);
+                        console.log($scope.events[j].category);
+                    }
+                }
+                for(var j = 1; j < indices.length + 1; j++){
+                    $scope.remove(indices[j]);
+                    uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                }
+            }
+            else if(functionName == "removeSubToDo"){
+                var syncData = data.data;
+                for(var j = 0; j < $scope.events.length; j++){
+                    if(syncData.uniqueHash == $scope.events[j].hash){
+                        $scope.remove(j);
+                        uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    }
+                }
+            }
+            else if(functionName == "changeSubToDoName"){
+                var syncData = data.data;
+                for(var j = 0; j < $scope.events.length; j++){
+                    if(syncData.uniqueHash == $scope.events[j].hash){
+                        $scope.events[j].title = syncData.name;
+                        uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    }
+                }
+            }
+            else if(functionName == "changeSubToDoNotes"){
+                var syncData = data.data;
+                for(var j = 0; j < $scope.events.length; j++){
+                    if(syncData.uniqueHash == $scope.events[j].hash){
+                        $scope.events[j].notes = syncData.notes;
+                        uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    }
+                }
+            }
+            else if(functionName == "changeSubToDoDate"){
+                var syncData = data.data;
+                for(var j = 0; j < $scope.events.length; j++){
+                    if(syncData.uniqueHash == $scope.events[j].hash){
+                        var eventDate = new Date(syncData.date);
+                        eventDate.setDate(eventDate.getDate() + 1);
+                        $scope.setTime(eventDate, syncData.time);
+                        $scope.events[j].start = eventDate;
+                        uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    }
+                }
+            }
+            else if(functionName == "changeSubToDoTime"){
+                var syncData = data.data;
+                for(var j = 0; j < $scope.events.length; j++){
+                    if(syncData.uniqueHash == $scope.events[j].hash){
+                        var eventDate = new Date(syncData.date);
+                        eventDate.setDate(eventDate.getDate() + 1);
+                        $scope.setTime(eventDate, syncData.time);
+                        $scope.events[j].start = eventDate;
+                        uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    }
+                }
+            }
+            else if(functionName == "changeCategoryName"){
+                for(var j = 0; j < $scope.events.length; j++){
+                    if(data.oldCategoryName == $scope.events[j].category){
+                        $scope.events[j].category = data.newCategoryName;
+                        uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    }
+                }       
+            }
+            else if(functionName == "changeCategoryColor"){
+                var tmp = [];
+                var indices = [];
+                indices.push(0);
+                for(var j = 0; j < $scope.events.length; j++){
+                    if(data.categoryName == $scope.events[j].category){
+                        tmp.push($scope.events[j]);
+                        indices.push(j);
+                    }
+                }
+                for(var j = 0; j < indices.length; j++){
+                    $scope.remove(indices[j]);
+                    uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                }
+                for(var j = 1; j < tmp.length + 1; j++){
+                    $scope.events.push(tmp[j]);
+                }       
+            }
+            else if(functionName == "addSubToDo"){
+                var syncData = data.data;
+                var eventDate = new Date(y - 1, m, d);
+                    $scope.events.push({
+                    title: syncData.name,
+                    start: eventDate,
+                    notes: syncData.notes,
+                    hash: syncData.uniqueHash,
+                    backgroundColor: "#" + data.color,
+                    stick: true
+                });
+                console.log($scope.events);
+                uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents'); 
+            }
+        }
+    }
 
     /* alert on eventClick */
     $scope.alertOnEventClick = function( date, jsEvent, view){
@@ -918,7 +1048,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
       }
     };
     /* add custom event*/
-    $scope.addEvent = function(subToDo, color) {
+    $scope.addEvent = function(subToDo, color, category) {
       var eventDate = new Date(subToDo.date);
       eventDate.setDate(eventDate.getDate() + 1);
       $scope.setTime(eventDate, subToDo.time);
@@ -926,6 +1056,8 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
         title: subToDo.name,
         start: eventDate,
         notes: subToDo.notes,
+        hash: subToDo.uniqueHash,
+        category: category,
         backgroundColor: "#" + color,
         //start: $scope.setTime(eventDate, subToDo.time)
         stick: true
@@ -959,13 +1091,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
         date.setSeconds("00");
         return date;
     }
-
-    $scope.renderCalendar = function (calendarId) {
-        $timeout(function () {
-            calendarTag = $('#' + calendarId);
-            calendarTag.fullCalendar('render');
-        }, 0);
-    };
     /* config object */
     $scope.uiConfig = {
       calendar:{
@@ -985,7 +1110,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
       }
     };
     /* event sources array*/
-    console.log($scope.events);
     $scope.eventSources = [$scope.events];
 });
 
