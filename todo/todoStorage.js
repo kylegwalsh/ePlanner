@@ -1,4 +1,4 @@
-angular.module('app').service('todoStorage', function ($q, NotifyingService) {
+angular.module('app').service('todoStorage', function ($q, NotifyingService, NotifyingServiceCalendar) {
 
     var _this = this;
     this.data = [];
@@ -94,9 +94,17 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
     }
 
     this.remove = function(index) {
+        var category = this.data[index].content;
+        console.log("TODOSTORAGE______________________________")
+        console.log(category);
         this.data.splice(index, 1);
         this.updateIndexes();
         this.sync();
+        var syncData = {
+            functionName: "remove",
+            category: category
+        }
+        NotifyingServiceCalendar.notify(syncData);
     }
 
     this.removeCompleted = function(index){
@@ -108,8 +116,14 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
     this.removeSubToDo = function(categoryIndex, subToDoIndex){
         var size = _this.data.length-1; 
         var category = _this.data[size-categoryIndex]; // we have to go backwards essentially since on the DOM they are displayed backwards (newest first)
+        var removeData = category.subToDo[category.subToDo.length-1-subToDoIndex];
         category.subToDo.splice(category.subToDo.length-1-subToDoIndex, 1);
         this.sync();
+        var syncData = {
+            functionName: "removeSubToDo",
+            data: removeData
+        }
+        NotifyingServiceCalendar.notify(syncData);
     }
 
     this.changeSubToDoName = function(categoryIndex, subToDoIndex, name){
@@ -126,6 +140,11 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         }
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
+        var syncData = {
+            functionName: "changeSubToDoName",
+            data: newData
+        }
+        NotifyingServiceCalendar.notify(syncData);
     }
 
     this.changeSubToDoNotes = function(categoryIndex, subToDoIndex, notes){
@@ -142,6 +161,11 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         }
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
+        var syncData = {
+            functionName: "changeSubToDoNotes",
+            data: newData
+        }
+        NotifyingServiceCalendar.notify(syncData);
     }
 
     this.changeSubToDoDate = function(categoryIndex, subToDoIndex, date){
@@ -158,6 +182,11 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         } 
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
+        var syncData = {
+            functionName: "changeSubToDoDate",
+            data: newData
+        }
+        NotifyingServiceCalendar.notify(syncData);
     }
 
     this.changeSubToDoTime = function(categoryIndex, subToDoIndex, time){
@@ -174,6 +203,11 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         }
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
+        var syncData = {
+            functionName: "changeSubToDoTime",
+            data: newData
+        }
+        NotifyingServiceCalendar.notify(syncData);
     }
 
     this.markToDoAsComplete = function(Categoryindex, subToDoIndex){
@@ -218,6 +252,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         }    
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
+        NotifyingServiceCalendar.notify(this.data);
     }
 
     this.addSubToDo = function(index, name, date, time, notes){
@@ -261,6 +296,12 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService) {
         console.log(nextHash);
         category.subToDo.push(newData);       
         this.sync();
+        var syncData = {
+            functionName: "addSubToDo",
+            data: newData,
+            color: category.color
+        }
+        NotifyingServiceCalendar.notify(syncData);
     }
 
     this.removeAll = function() {
@@ -280,6 +321,20 @@ angular.module('app').factory('NotifyingService', function($rootScope) {
 
         notify: function(importantInfo) {
             $rootScope.$emit('notifying-service-event', importantInfo);
+        }
+    };
+});
+
+
+angular.module('app').factory('NotifyingServiceCalendar', function($rootScope) {
+    return {
+        subscribe: function(scope, callback) {
+            var handler = $rootScope.$on('notifying-service-calendar-event', callback);
+            scope.$on('$destroy', handler);
+        },
+
+        notify: function(importantInfo) {
+            $rootScope.$emit('notifying-service-calendar-event', importantInfo);
         }
     };
 });
