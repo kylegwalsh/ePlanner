@@ -64,7 +64,8 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             topColor: this.persistentInformation.topColor,
             reminders: temp,
             currentHash: this.persistentInformation.currentHash,
-            completedStuff: new Array(),    
+            completedStuff: new Array(), 
+            notificationSound: this.persistentInformation.notificationSound,
         }
         this.persistentInformation = information;
         NotifyingService.notify(this.persistentInformation);
@@ -273,6 +274,19 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
     }
 
+    this.changeNotificationSound = function(selected){
+
+        var information = {
+            topColor: this.persistentInformation.topColor,
+            reminders: this.persistentInformation.reminders,
+            currentHash: this.persistentInformation.currentHash,
+            completedStuff: new Array(), 
+            notificationSound: selected,
+        }
+        this.persistentInformation = information;
+        this.sync();
+    }
+
     this.modifySubToDo = function(categoryIndex, subToDoIndex, name, date, time, notes){
         var size = _this.data.length-1; 
         var category = _this.data[size-categoryIndex];
@@ -308,7 +322,8 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             topColor: this.persistentInformation.topColor,
             reminders: info,
             currentHash: this.persistentInformation.currentHash,
-            completedStuff: this.persistentInformation.completedStuff,   
+            completedStuff: this.persistentInformation.completedStuff,  
+            notificationSound: this.persistentInformation.notificationSound,
         } 
         this.persistentInformation = information;
         this.sync();
@@ -406,8 +421,8 @@ angular.module('app').factory('NotifyingColorService2', function($rootScope) {
             scope.$on('$destroy', handler);
         },
 
-        notify: function(importantInfo, evenMore) {
-            $rootScope.$emit('notifying-service-color-event2', importantInfo, evenMore);
+        notify: function(importantInfo, evenMore, evenMore2) {
+            $rootScope.$emit('notifying-service-color-event2', importantInfo, evenMore, evenMore2);
         }
     };
 });

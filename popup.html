@@ -109,6 +109,16 @@
             <input type="checkbox" ng-model="enableReminders" ng-change="updateSetting()">
             <label>Enable Reminders</label>
         </div>
+        <div>
+            <label>Notification Sound</label>
+              <select ng-model="dataSelect" ng-change = "doSomething()">
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <option value="option3">Option 3</option>
+                    <option value="option4">Option 4</option>
+                    <option value="option5">Option 5</option>
+              </select>
+        </div>
       </div>
     </div>
   </body>

@@ -22,8 +22,8 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
         $("#ITEMS").innerHTML = "";
         $scope.todoList = data;
         $scope.$apply();
-        console.log($scope.extraInformation.reminders);
-        NotifyingColorService2.notify($scope.extraInformation.topColor,$scope.extraInformation.reminders);
+        console.log($scope.extraInformation);
+        NotifyingColorService2.notify($scope.extraInformation.topColor,$scope.extraInformation.reminders, $scope.extraInformation.notificationSound);
 
         angular.forEach($scope.todoList, function(item, value){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
             var htmlCategory = $scope.addCategory(item.content, value, item.color) // Loop through each of the categories 
@@ -770,6 +770,11 @@ app.controller('setting', function($scope, todoStorage, NotifyingColorService, N
     $scope.themeID = 0;
 
     $scope.enableReminders;
+    $scope.dataSelect;
+
+    $scope.doSomething = function(){
+        todoStorage.changeNotificationSound($scope.dataSelect);
+    }
 
     $scope.$watch('todoStorage.persistentInformation', function(){
         $scope.extraInformation = todoStorage.persistentInformation;
@@ -786,9 +791,10 @@ app.controller('setting', function($scope, todoStorage, NotifyingColorService, N
         } 
     });
 
-    NotifyingColorService2.subscribe($scope, function somethingChanged(event, info, setting) {
+    NotifyingColorService2.subscribe($scope, function somethingChanged(event, info, setting, notificationSound) {
         $scope.themeID = info;
         $scope.enableReminders = setting;
+        $scope.dataSelect = notificationSound;
         if ($scope.themeID == 0){
             $scope.update();
         } else if($scope.themeID == 1){
@@ -841,7 +847,7 @@ app.controller('setting', function($scope, todoStorage, NotifyingColorService, N
         $scope.updateColors();
     }
     $scope.update4 = function(){ // theme #5
-        $scope.colorCode = "bbde0d";
+        $scope.colorCode = "D4D438";
         $scope.tabCode = "bfd93d";
         $scope.themeID = 4;
         $scope.updateColors();
