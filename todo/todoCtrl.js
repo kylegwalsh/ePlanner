@@ -381,6 +381,25 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                     time.value = "";
                     dateandtime.style.display = "none";
                 }
+                console.log(new Date(date.value + " " + time.value));
+                console.log(Date.now());
+                // Check if overdue
+                if(time.value == ""){
+                    if(new Date(date.value + " 00:00") < Date.now()){
+                        name.style.color = "red";
+                    }
+                    else{
+                        name.style.color = "black";
+                    }
+                }
+                else{
+                    if(new Date(date.value + " " + time.value) < Date.now()){
+                        name.style.color = "red";
+                    }
+                    else{
+                        name.style.color = "black";
+                    }
+                }
             });
 
             // Save changes to todo date
@@ -401,6 +420,13 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                 // don't show time field if we don't have one
                 if(time.value == ""){
                     time.style.display = "none";
+                }
+                // Check overdue
+                if(new Date(date.value + " " + time.value) < Date.now()){
+                    name.style.color = "red";
+                }
+                else{
+                    name.style.color = "black";
                 }
             });
 
@@ -443,6 +469,24 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                    time.blur();
                 }
             });
+
+            // Check if overdue
+            if(time.value == ""){
+                if(new Date(date.value + " 00:00") < Date.now()){
+                    name.style.color = "red";
+                }
+                else{
+                    name.style.color = "black";
+                }
+            }
+            else{
+                if(new Date(date.value + " " + time.value) < Date.now()){
+                    name.style.color = "red";
+                }
+                else{
+                    name.style.color = "black";
+                }
+            }
 
                     // $(oldButton).bind("click", function(){   // Button that handles updating the TODO
                     //     var userInput = $(this).parent().children(".OptionsText").val(); // get the input that is in the textBox
@@ -773,12 +817,33 @@ app.controller('setting', function($scope, todoStorage, NotifyingColorService, N
     $scope.dataSelect;
 
     $scope.doSomething = function(){
-        todoStorage.changeNotificationSound($scope.dataSelect);
+        var notificationSound;
+        if($scope.dataSelect == "oldSpice.mp3"){
+            todoStorage.changeNotificationSound('oldSpice.mp3');
+            notificationSound = new Audio('notificationSounds/oldSpice.mp3');
+            notificationSound.play();
+        }
+        if($scope.dataSelect == "chime.mp3"){
+            todoStorage.changeNotificationSound('chime.mp3');
+            notificationSound = new Audio('notificationSounds/chime.mp3');
+            notificationSound.play();
+        }
+        if($scope.dataSelect == "bliss.mp3"){
+            todoStorage.changeNotificationSound('bliss.mp3');
+            notificationSound = new Audio('notificationSounds/bliss.mp3');
+            notificationSound.play();
+        }
+        if($scope.dataSelect == "notify.mp3"){
+            todoStorage.changeNotificationSound('notify.mp3');
+            notificationSound = new Audio('notificationSounds/notify.mp3');
+            notificationSound.play();
+        }
     }
 
     $scope.$watch('todoStorage.persistentInformation', function(){
         $scope.extraInformation = todoStorage.persistentInformation;
         $scope.themeID = $scope.extraInformation.topColor;
+        $scope.dataSelect = todoStorage.persistentInformation.notificationSound;
         if ($scope.themeID == "0"){
             $scope.update();
         }
@@ -822,33 +887,33 @@ app.controller('setting', function($scope, todoStorage, NotifyingColorService, N
         todoStorage.updateColor($scope.themeID);
     }
 
-    $scope.update = function(){  // theme # 1
-        $scope.colorCode = "3db3d4";
-        $scope.tabCode = "6abdd4";
+    $scope.update = function(){  // theme #1 - blue
+        $scope.colorCode = "0a97f5";
+        $scope.tabCode = "6cc1f9";
         $scope.themeID = 0;
         $scope.updateColors();
     }
-    $scope.update1 = function(){ // theme #2
-        $scope.colorCode = "13bf91";
-        $scope.tabCode = "7edec4";
+    $scope.update1 = function(){ // theme #2 - gold
+        $scope.colorCode = "ffd700";
+        $scope.tabCode = "ffe866";
         $scope.themeID = 1;
         $scope.updateColors();
     }
-    $scope.update2 = function(){ // theme #3
+    $scope.update2 = function(){ // theme #3 - red
         $scope.colorCode = "d6391a";
-        $scope.tabCode = "d4563d"; 
+        $scope.tabCode = "eb7760"; 
         $scope.themeID = 2;
         $scope.updateColors();
     }
-    $scope.update3 = function(){ // theme #4
-        $scope.colorCode = "30c935";
-        $scope.tabCode = "60d664";
+    $scope.update3 = function(){ // theme #4 - green
+        $scope.colorCode = "2db931";
+        $scope.tabCode = "6fdc73";
         $scope.themeID = 3;
         $scope.updateColors();
     }
-    $scope.update4 = function(){ // theme #5
-        $scope.colorCode = "D4D438";
-        $scope.tabCode = "bfd93d";
+    $scope.update4 = function(){ // theme #5 - pink
+        $scope.colorCode = "ff5bff";
+        $scope.tabCode = "ff99ff";
         $scope.themeID = 4;
         $scope.updateColors();
     }

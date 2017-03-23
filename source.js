@@ -1,4 +1,6 @@
 $(document).ready(function(){
+    chrome.browserAction.setBadgeText({text: ""});
+
     $('.tab').on('click', function(){
         $('.tab.active').removeClass('active');
         $(this).addClass('active');
@@ -8,7 +10,7 @@ $(document).ready(function(){
         $('.filterMenu').hide();
     });
 
-    $('.filterMenu').on('click', function(e){
+    $('.categoryMenu').on('click', function(e){
         e.stopPropagation();
     });
 
@@ -35,6 +37,7 @@ app.controller('TabController', function($scope, todoStorage, NotifyingColorServ
             $("#ToDoView").hide();
             $("#CompletedView").hide();
             $('#CalendarView').show();
+            $('.fc-today-button').trigger('click');
           setTimeout(function(){ 
               $('.col-xs-4.tab.noselect').css("background-color", "#" + "FFFFFF");
               $('.col-xs-4.tab.noselect.active').css("background-color", "#" + $scope.colorInfo);

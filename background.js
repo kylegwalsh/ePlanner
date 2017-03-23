@@ -3,8 +3,10 @@ function showNotification(alarm) {
     findAll(function(data){
       console.log("Inside notification");
       var todoList = data;
-      var notificationSound = new Audio('notificationSounds/oldSpice.mp3');
-      notificationSound.play();
+      findAll2(function(persistentInformation){
+        var notificationSound = new Audio('notificationSounds/' + persistentInformation.notificationSound);
+        notificationSound.play();
+      });
       todoList.forEach(function(toDo){
         for(var j = 0; j < toDo.subToDo.length; j++){
           if(alarm.name == toDo.subToDo[j].uniqueHash + "1Hour" || alarm.name == toDo.subToDo[j].uniqueHash + "1Day" || alarm.name == toDo.subToDo[j].uniqueHash + "1Week"){
@@ -48,7 +50,6 @@ function showNotification(alarm) {
 
 findAll = function(callback) {
     chrome.storage.sync.get('todo', function(keys) {
-        //console.log(keys);
         if (keys.todo != null) {
             data = keys.todo;
             for (var i=0; i<data.length; i++) {
@@ -59,6 +60,12 @@ findAll = function(callback) {
     });
 }
 
+findAll2 = function(callback){   
+    chrome.storage.sync.get('info', function(keys){    
+        persistentInformation = keys.info;
+        callback(persistentInformation);
+    });
+}
 
 chrome.alarms.onAlarm.addListener(function( alarm ) {
   console.log(alarm);
