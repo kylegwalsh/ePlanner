@@ -33,10 +33,9 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
         })
     });
 
-
     $scope.add = function() {
         var index = todoStorage.add();
-        var categoryHTML = $scope.addCategory("",index, "F5B041"); // when a new item is added, we add a corresponding HTML for it
+        var categoryHTML = $scope.addCategory("",index, $scope.colorInfo); // when a new item is added, we add a corresponding HTML for it
         $scope.newContent = '';
     }
 
@@ -94,18 +93,18 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
         addMe.className = "Category";
             var top = document.createElement('div'); // Create Title div that houses To-Do category and button for in/out sliding
             top.className = "CategoryBar row";
-            top.style.backgroundColor = "#" + $scope.colorInfo; // updates the color in the Category
+            top.style.backgroundColor = "#" + color; // updates the color in the Category
             var title  = document.createElement('input'); // title
             title.type = "text"; 
             title.className = "CategoryName col-xs-9 col-xs-offset-1";
             title.value = data;
-            title.style.backgroundColor = "#" + $scope.colorInfo;
+            title.style.backgroundColor = "#" + color;
             var buttonB4  = document.createElement('div'); // settings for the category
             buttonB4.innerHTML = "<i class='fa fa-lg fa-ellipsis-h'></i>";
             buttonB4.className = "CategoryOptions col-xs-1";
 
             $(title).blur(function() {
-                title.style.backgroundColor = "#" + $scope.colorInfo;
+                title.style.backgroundColor = "#" + color;
                 todoStorage.changeCategoryName(index, title.value);
             });
 
