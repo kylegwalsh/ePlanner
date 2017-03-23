@@ -45,6 +45,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             completedStuff: temp,    
         }
         this.persistentInformation = information;
+        console.log(this.persistentInformation);
         this.sync();
     }
 
@@ -347,6 +348,32 @@ angular.module('app').factory('NotifyingService', function($rootScope) {
 
         notify: function(importantInfo) {
             $rootScope.$emit('notifying-service-event', importantInfo);
+        }
+    };
+});
+
+angular.module('app').factory('NotifyingColorService', function($rootScope) {
+    return {
+        subscribe: function(scope, callback) {
+            var handler = $rootScope.$on('notifying-service-color-event', callback);
+            scope.$on('$destroy', handler);
+        },
+
+        notify: function(importantInfo) {
+            $rootScope.$emit('notifying-service-color-event', importantInfo);
+        }
+    };
+});
+
+angular.module('app').factory('NotifyingColorService2', function($rootScope) {
+    return {
+        subscribe: function(scope, callback) {
+            var handler = $rootScope.$on('notifying-service-color-event2', callback);
+            scope.$on('$destroy', handler);
+        },
+
+        notify: function(importantInfo) {
+            $rootScope.$emit('notifying-service-color-event2', importantInfo);
         }
     };
 });

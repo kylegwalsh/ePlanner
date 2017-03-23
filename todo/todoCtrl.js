@@ -1,7 +1,7 @@
 'use strict';
 var app = angular.module('app', ['ui.calendar']);
 
-app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
+app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingColorService2, NotifyingColorService ) {
 
     $scope.todoStorage = todoStorage;
 
@@ -13,9 +13,8 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         $scope.extraInformation = $scope.todoStorage.persistentInformation;
     });
 
+    $scope.todoStorage.findAll2(function(data){
 
-    $scope.todoStorage.findAll2(function(moreData){
-            // just gets the information
     });
 
 
@@ -23,8 +22,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         $("#ITEMS").innerHTML = "";
         $scope.todoList = data;
         $scope.$apply();
-        // after everything is loaded in, we update the colors
-        $scope.updateBackgroundColors($scope.extraInformation.topColor, $scope.extraInformation.topColor);
+        NotifyingColorService2.notify($scope.extraInformation.topColor);
 
         angular.forEach($scope.todoList, function(item, value){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
             var htmlCategory = $scope.addCategory(item.content, value, item.color) // Loop through each of the categories 
@@ -35,12 +33,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         })
     });
 
-    $scope.updateBackgroundColors = function(topColor, tabColor){
-        $('#topBar').css("background-color", "#" +topColor); // update colors
-        $('#topBar2').css("background-color", "#" +topColor); // update colors 
-        $('footer').css("background-color", "#" +topColor); // update colors
-        $('.newCourse').css("background-color", "#" +topColor); // update colors  
-    }
 
     $scope.add = function() {
         var index = todoStorage.add();
@@ -55,6 +47,10 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
     $scope.toggleCompleted = function() {
         todoStorage.sync();
     }
+
+    NotifyingColorService.subscribe($scope, function somethingChanged(event, info) {
+        $scope.colorInfo = info;
+    }); 
 
     $scope.addCategory = function(data, index, color){ // data is the category that gets set          
         /*  Heirarchy for TO-DO Item
@@ -98,18 +94,18 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage) {
         addMe.className = "Category";
             var top = document.createElement('div'); // Create Title div that houses To-Do category and button for in/out sliding
             top.className = "CategoryBar row";
-            top.style.backgroundColor = "#" + color; // updates the color in the Category
+            top.style.backgroundColor = "#" + $scope.colorInfo; // updates the color in the Category
             var title  = document.createElement('input'); // title
             title.type = "text"; 
             title.className = "CategoryName col-xs-9 col-xs-offset-1";
             title.value = data;
-            title.style.backgroundColor = "#" + color;
+            title.style.backgroundColor = "#" + $scope.colorInfo;
             var buttonB4  = document.createElement('div'); // settings for the category
             buttonB4.innerHTML = "<i class='fa fa-lg fa-ellipsis-h'></i>";
             buttonB4.className = "CategoryOptions col-xs-1";
 
             $(title).blur(function() {
-                title.style.backgroundColor = "#" + color;
+                title.style.backgroundColor = "#" + $scope.colorInfo;
                 todoStorage.changeCategoryName(index, title.value);
             });
 
@@ -765,16 +761,87 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
 
 });
 
-app.controller('setting', function($scope, todoStorage) {
+app.controller('setting', function($scope, todoStorage, NotifyingColorService, NotifyingColorService2 ){
     $scope.colorCode = document.getElementById("topBar").style.backgroundColor; // deafult color;
 
-    $scope.update = function(){
+
+    $scope.colorCode = "A5FAC0";
+    $scope.tabCode = "A5FAC0";
+    $scope.themeID = 0;
+
+    $scope.$watch('todoStorage.persistentInformation', function(){
+        $scope.extraInformation = todoStorage.persistentInformation;
+        $scope.themeID = $scope.extraInformation.topColor;
+        if ($scope.themeID == "0"){
+            $scope.update();
+        }
+        else if($scope.themeID == "1"){
+            $scope.update1();
+        } else if ($scope.themeID == "2"){
+            $scope.update2();
+        } else {
+            $scope.update3();
+        } 
+    });
+
+    NotifyingColorService2.subscribe($scope, function somethingChanged(event, info) {
+        $scope.themeID = info;
+        console.log($scope.themeID);
+        if ($scope.themeID == 0){
+            $scope.update();
+        } else if($scope.themeID == 1){
+            $scope.update1();
+        } else if ($scope.themeID == 2){
+            $scope.update2();
+        } else if($scope.themeID == 3){
+            $scope.update3();
+        }
+        else {
+            $scope.update4  ();
+        } 
+    }); 
+
+    $scope.updateColors = function(){
+        $('.col-xs-4.tab.noselect.active').css("background-color", "#" + $scope.tabCode);
         $('#topBar').css("background-color", "#" + $scope.colorCode); // update colors
         $('#topBar2').css("background-color", "#" + $scope.colorCode); // update colors
         $('footer').css("background-color", "#" + $scope.colorCode); // update colors 
-        $('.newCourse').css("background-color", "#" + $scope.colorCode); // update colors 
-        todoStorage.updateColor($scope.colorCode);
+        $('.newCourse').css("background-color", "#" + $scope.colorCode); // update colors    
+        NotifyingColorService.notify($scope.tabCode);
+        todoStorage.updateColor($scope.themeID);
     }
+
+    $scope.update = function(){  // theme # 1
+        $scope.colorCode = "3db3d4";
+        $scope.tabCode = "6abdd4";
+        $scope.themeID = 0;
+        $scope.updateColors();
+    }
+    $scope.update1 = function(){ // theme #2
+        $scope.colorCode = "13bf91";
+        $scope.tabCode = "7edec4";
+        $scope.themeID = 1;
+        $scope.updateColors();
+    }
+    $scope.update2 = function(){ // theme #3
+        $scope.colorCode = "d6391a";
+        $scope.tabCode = "d4563d"; 
+        $scope.themeID = 2;
+        $scope.updateColors();
+    }
+    $scope.update3 = function(){ // theme #4
+        $scope.colorCode = "30c935";
+        $scope.tabCode = "60d664";
+        $scope.themeID = 3;
+        $scope.updateColors();
+    }
+    $scope.update4 = function(){ // theme #5
+        $scope.colorCode = "bbde0d";
+        $scope.tabCode = "bfd93d";
+        $scope.themeID = 4;
+        $scope.updateColors();
+    }
+
 });
 
 // controller for the calendar section area

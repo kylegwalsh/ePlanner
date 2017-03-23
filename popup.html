@@ -27,7 +27,7 @@
           </div>
       </div>
       <!-- Tabs -->
-      <div class="row tabs">
+      <div class="row tabs" ng-controller="TabController">
         <div class="col-xs-4 tab active noselect" id="ToDoTab">To-do</div>
         <div class="col-xs-4 tab noselect" id="CompletedTab">Completed</div>
         <div class="col-xs-4 tab noselect" id="CalendarTab">Calendar</div>
@@ -99,8 +99,11 @@
       </div>
       <!-- Main area for settings -->
       <div class="main container" ng-controller="setting">
-        Color: <input class="jscolor" ng-model="colorCode" value="3498DB">
-        <button ng-click="update()">Click to Update </button>
+        <button ng-click="update()">Theme1</button>
+        <button ng-click="update1()">Theme2</button>
+        <button ng-click="update2()">Theme3</button>
+        <button ng-click="update3()">Theme4</button>
+        <button ng-click="update4()">Theme5</button>
       </div>
     </div>
   </body>

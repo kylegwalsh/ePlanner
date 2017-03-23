@@ -17,7 +17,6 @@ body {
   font-size: 30px;
   height: 8%;
   width: 100%;
-  background-color: #3498db;
   color: white;
   padding: 0;
   margin: 0;
@@ -28,7 +27,6 @@ body {
   font-size: 30px;
   height: 8%;
   width: 100%;
-  background-color: #3498db;
   color: white;
   padding: 0;
   margin: 0;
@@ -86,7 +84,7 @@ body {
 }
 
 .tab:active, .active{
-  background-color: #93c8ec;
+  
 }
 
 .noselect {
@@ -112,7 +110,6 @@ body {
 }
 
 .newCourse.btn{
-  background-color: #3498db;
   float: right;
   color: white;
   border-bottom-left-radius: 0;

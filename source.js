@@ -18,41 +18,74 @@ $(document).ready(function(){
     });
 });
 
-function loadToDo() {
-  if(!$('#ToDoTab').hasClass('active')){
-    $("#ToDoView").show();
-    $("#CompletedView").hide();
-    $('#CalendarView').hide();
-  }
-}
-function loadCompleted() {
-  if(!$('#CompletedTab').hasClass('active')){
-    $("#ToDoView").hide();
-    $("#CompletedView").show();
-    $('#CalendarView').hide();
-  }
-}
-function loadCalendar() {
-  if(!$('CalendarTab').hasClass('active')){
-    $("#ToDoView").hide();
-    $("#CompletedView").hide();
-    $('#CalendarView').show();
-    $('.fc-today-button').trigger('click');
-  }
-}
-function loadSettings(){
-  $("#MainPage").hide();
-  $("#SettingsPage").show();
-}
-function returntoMain(){
-  $("#MainPage").show();
-  $("#SettingsPage").hide();
-}
+'use strict';
+app.controller('TabController', function($scope, todoStorage, NotifyingColorService) {
 
-document.addEventListener('DOMContentLoaded', function () {
-  document.querySelector('#ToDoTab').addEventListener('click', loadToDo);
-  document.querySelector('#CompletedTab').addEventListener('click', loadCompleted);
-  document.querySelector('#CalendarTab').addEventListener('click', loadCalendar);
-  document.querySelector('#settingsButton').addEventListener('click', loadSettings);
-  document.querySelector('#return').addEventListener('click',returntoMain);
+    $scope.loadSettings = function(){
+        $("#MainPage").hide();
+        $("#SettingsPage").show();
+    }
+    $scope.returntoMain = function(){
+        $("#MainPage").show();
+        $("#SettingsPage").hide();
+    }
+    $scope.loadCalendar = function(){
+          if(!$('CalendarTab').hasClass('active')){
+            $('.col-xs-4.tab.noselect').css("background-color", "#" +$scope.colorInfo);
+            $("#ToDoView").hide();
+            $("#CompletedView").hide();
+            $('#CalendarView').show();
+          setTimeout(function(){ 
+              $('.col-xs-4.tab.noselect').css("background-color", "#" + "FFFFFF");
+              $('.col-xs-4.tab.noselect.active').css("background-color", "#" + $scope.colorInfo);
+           }, 10);
+          }     
+    }
+    $scope.loadCompleted = function(){
+        if(!$('#CompletedTab').hasClass('active')){
+            $("#ToDoView").hide();
+            $("#CompletedView").show();
+            $('#CalendarView').hide();
+          setTimeout(function(){ 
+              $('.col-xs-4.tab.noselect').css("background-color", "#" + "FFFFFF");
+              $('.col-xs-4.tab.noselect.active').css("background-color", "#" + $scope.colorInfo);
+           }, 10);
+          }
+    }
+    $scope.loadToDo = function(){
+          if(!$('#ToDoTab').hasClass('active')){
+          $("#ToDoView").show();
+          $("#CompletedView").hide();
+          $('#CalendarView').hide();
+          setTimeout(function(){ 
+              $('.col-xs-4.tab.noselect').css("background-color", "#" + "FFFFFF");
+              $('.col-xs-4.tab.noselect.active').css("background-color", "#" + $scope.colorInfo);
+           }, 10);
+        }
+    }
+
+    $scope.setUpOnce = function(){
+      $( "#ToDoTab" ).on( "click", function() {
+        $scope.loadToDo();
+      });
+      $( "#CompletedTab" ).on( "click", function() {
+        $scope.loadCompleted();
+      });
+      $( "#CalendarTab" ).on( "click", function() {
+        $scope.loadCalendar();
+      });
+      $( "#settingsButton" ).on( "click", function() {
+        $scope.loadSettings();
+      });
+      $( "#return" ).on( "click", function() {
+        $scope.returntoMain();
+      });
+    }
+ 
+    NotifyingColorService.subscribe($scope, function somethingChanged(event, info) {
+        $scope.colorInfo = info;
+    }); 
+
+    $scope.setUpOnce();
+
 });
