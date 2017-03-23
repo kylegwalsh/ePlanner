@@ -127,7 +127,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         for (var i=0; i < category.subToDo.length; i++) {
             alarm.cancelAlarms(category.subToDo[i]);
         }
-
         var category = this.data[index].content;
         this.data.splice(index, 1);
         this.updateIndexes();
@@ -145,16 +144,31 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         this.sync();
     }
 
-
+    this.restoreData = function(completedData){
+        _this.data = this.backUpToDo[0];
+        _this.persistentInformation.completedStuff = completedData;
+        this.sync();
+    }
 
     this.backUp = function(catIndex, subIndex){
-        alert("this is working" + catIndex +  " : " +subIndex);
-        
-        var saveMe = {
 
+        var size = _this.data.length-1; 
+        var category = _this.data[size-catIndex];
+        var size2 = category.subToDo.length-1;
+        var toDoData = category.subToDo[category.subToDo.length-1-subIndex];
+
+        var saveMe = { // hard copy object 
+            name: angular.copy(toDoData.name),
+            date:  angular.copy(toDoData.date),
+            time:  angular.copy(toDoData.time),
+            notes:  angular.copy(toDoData.notes),
+            uniqueHash: angular.copy(toDoData.uniqueHash),
+            catIndex: catIndex,
+            subIndex: subIndex,
         }
+        var COPY = angular.copy(_this.data);
 
-        this.backUpToDo.push(saveMe);
+        this.backUpToDo.push(COPY);
      }
 
     this.removeSubToDo = function(categoryIndex, subToDoIndex){
@@ -448,8 +462,8 @@ angular.module('app').factory('NotifyUndo', function($rootScope) {
             var handler = $rootScope.$on('notifying-service-undo', callback);
             scope.$on('$destroy', handler);
         },
-        notify: function() {
-            $rootScope.$emit('notifying-service-undo');
+        notify: function(data) {
+            $rootScope.$emit('notifying-service-undo', data);
         }
     };
 });

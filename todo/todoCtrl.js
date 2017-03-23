@@ -24,17 +24,23 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
         $("#ITEMS").innerHTML = "";
         $scope.todoList = data;
         $scope.$apply();
-        console.log($scope.extraInformation);
         NotifyingColorService2.notify($scope.extraInformation.topColor,$scope.extraInformation.reminders, $scope.extraInformation.notificationSound);
+        $scope.updateEverything();
+    });
 
+    $scope.updateEverything= function(){
+        $scope.todoList = $scope.todoStorage.data;
+        console.log("RESTORING");
+        console.log($scope.todoList);
         angular.forEach($scope.todoList, function(item, value){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
             var htmlCategory = $scope.addCategory(item.content, value, item.color) // Loop through each of the categories 
             var arrayLength = item.subToDo.length;
             for(var j=0; j < item.subToDo.length; j++){
+                console.log("this RUNS");
                 $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,item.subToDo[j].date,item.subToDo[j].time, item.subToDo[j].notes, false);
             }
         })
-    });
+    }
 
     $scope.add = function() {
         var index = todoStorage.add($scope.colorInfo);
@@ -280,11 +286,10 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
     );
 
     $scope.undo = function(){
-        console.log("button clicked");
-        console.log($scope.backUp);
-        todoStorage.restoreCompleted($scope.backUp);
-        $scope.checkBoxCount = 0; // reset
-        NotifyUndo.notify();    
+        $("#ITEMS").empty(); // clear HTML
+        todoStorage.restoreData($scope.backUp); // Load backup data that was saved 
+        $scope.updateEverything(); // update entire HTML
+        NotifyUndo.notify($scope.backUp); 
     }
 
     $scope.displaySubSectionForTodo = function(addSection, nameData, dateData, timeData, notesData, newToDoBool){
@@ -303,13 +308,11 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                 
                 console.log($scope.checkBoxCount);
                 if($scope.checkBoxCount == 0){
-                    console.log($scope.extraInformation);
                     var temp = new Array();
                     for(var i=0; i<$scope.extraInformation.completedStuff.length; i++){
                         temp.push($scope.extraInformation.completedStuff[i]);
                     }
                     $scope.backUp = temp;
-                    console.log($scope.backUp);
                 }
                 $scope.checkBoxCount++;
                 $scope.$digest();
@@ -692,7 +695,8 @@ app.controller('completed', function($scope, todoStorage, NotifyingService, Noti
         $scope.displayAllCompleted(); // refresh page   
     });
 
-    NotifyUndo.subscribe($scope, function doWork(){
+    NotifyUndo.subscribe($scope, function doWork(event, data){
+        $scope.extraInformation.completedStuff = data;
         $scope.displayAllCompleted();
     })
 
