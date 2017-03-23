@@ -41,8 +41,11 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
         var information = {
             topColor: color,
+            reminders: this.persistentInformation.reminders,
             currentHash: this.persistentInformation.currentHash,
-            completedStuff: temp,    
+            completedStuff: temp,
+            notificationSound: this.persistentInformation.notificationSound,
+            catHash: this.persistentInformation.catHash             
         }
         this.persistentInformation = information;
         console.log(this.persistentInformation);
@@ -66,6 +69,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             currentHash: this.persistentInformation.currentHash,
             completedStuff: new Array(), 
             notificationSound: this.persistentInformation.notificationSound,
+            catHash: this.persistentInformation.catHash
         }
         this.persistentInformation = information;
         NotifyingService.notify(this.persistentInformation);
@@ -75,6 +79,45 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
     this.add = function (colorCode) {
         var id = this.data.length;      
+        
+        var nextHash;
+        var remindersTemp;
+        var colorTemp;
+        var completedTemp;
+        var notificationTemp;
+        var catHashTemp;
+
+        if(this.persistentInformation == null){
+            nextHash = 1;
+            remindersTemp = true;
+            colorTemp = 3;
+            completedTemp = new Array();
+            notificationTemp = "oldSpice.mp3";
+            catHashTemp = 1;
+        }
+        else{
+            remindersTemp = this.persistentInformation.reminders;
+            colorTemp = this.persistentInformation.topColor;
+            completedTemp = this.persistentInformation.completedStuff;
+            notificationTemp = this.persistentInformation.notificationSound;
+            if(this.persistentInformation.catHash == null){
+                catHashTemp = 1;
+            }
+            // Otherwise, increment it
+            else{
+                catHashTemp = this.persistentInformation.catHash + 1;
+            }
+        }
+
+        var information = {
+            topColor: colorTemp,
+            reminders: remindersTemp,
+            currentHash: nextHash,
+            completedStuff: completedTemp,
+            notificationSound: notificationTemp,
+            catHash: catHashTemp
+        } 
+        this.persistentInformation = information;
 
         var todo = {
             id: id,
@@ -83,6 +126,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             color: colorCode, // default color
             createdAt: new Date(),
             subToDo: new Array(0), // array to keep track of the subToDos
+            catHash: catHashTemp
         };
         this.data.push(todo); // adds new category to the end of the array
         this.sync();
@@ -98,8 +142,8 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
         var syncData = {
             functionName: "changeCategoryName",
-            oldCategoryName: old,
-            newCategoryName: newName
+            catHash: todo.catHash,
+            categoryName: newName
         }
         NotifyingServiceCalendar.notify(syncData);
     }
@@ -110,7 +154,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         this.sync();
         var syncData = {
             functionName: "changeCategoryColor",
-            categoryName: todo.content,
+            catHash: todo.catHash,
             categoryColor: hexValue
         }
         NotifyingServiceCalendar.notify(syncData);
@@ -280,8 +324,9 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             topColor: this.persistentInformation.topColor,
             reminders: this.persistentInformation.reminders,
             currentHash: this.persistentInformation.currentHash,
-            completedStuff: new Array(), 
+            completedStuff: this.persistentInformation.completedStuff, 
             notificationSound: selected,
+            catHash: this.persistentInformation.catHash
         }
         this.persistentInformation = information;
         this.sync();
@@ -324,6 +369,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             currentHash: this.persistentInformation.currentHash,
             completedStuff: this.persistentInformation.completedStuff,  
             notificationSound: this.persistentInformation.notificationSound,
+            catHash: this.persistentInformation.catHash
         } 
         this.persistentInformation = information;
         this.sync();
@@ -334,31 +380,44 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     this.addSubToDo = function(index, name, date, time, notes){
         // Assigns unique hash to todo
         var nextHash;
+        var remindersTemp;
+        var colorTemp;
+        var completedTemp;
+        var notificationTemp;
+        var catHashTemp;
         // Set current hash to one if it hasn't been intialized
-        if(this.persistentInformation.currentHash == null){
+
+        console.log(this.persistentInformation);
+        if(this.persistentInformation == null){
             nextHash = 1;
+            remindersTemp = true;
+            colorTemp = 3;
+            completedTemp = new Array();
+            notificationTemp = "oldSpice.mp3";
+            catHashTemp = 1;
         }
-        // Otherwise, increment it
         else{
-            var temp;
-            nextHash = this.persistentInformation.currentHash + 1;
-            if(this.persistentInformation.completedStuff != null){
-                temp = this.persistentInformation.completedStuff;
-            } else {
-                temp = new Array();
+            remindersTemp = this.persistentInformation.reminders;
+            colorTemp = this.persistentInformation.topColor;
+            completedTemp = this.persistentInformation.completedStuff;
+            notificationTemp = this.persistentInformation.notificationSound;
+            catHashTemp = this.persistentInformation.catHash;
+            if(this.persistentInformation.currentHash == null){
+                nextHash = 1;
+            }
+            // Otherwise, increment it
+            else{
+                nextHash = this.persistentInformation.currentHash + 1;
             }
         }
 
-        var temp = this.persistentInformation.reminders;
-        if(temp == null){
-            temp = true;
-        }
-
         var information = {
-            topColor: this.persistentInformation.topColor,
-            reminders: temp,
+            topColor: colorTemp,
+            reminders: remindersTemp,
             currentHash: nextHash,
-            completedStuff: this.persistentInformation.completedStuff,    
+            completedStuff: completedTemp,
+            notificationSound: notificationTemp,
+            catHash: catHashTemp
         } 
         this.persistentInformation = information;
 
@@ -375,13 +434,14 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             notes: notes,
             uniqueHash: nextHash,
         }
-        console.log(nextHash);
         category.subToDo.push(newData);       
         this.sync();
         var syncData = {
             functionName: "addSubToDo",
             data: newData,
-            color: category.color
+            color: category.color,
+            categoryName: category.content,
+            catHash: category.catHash
         }
         NotifyingServiceCalendar.notify(syncData);
     }
