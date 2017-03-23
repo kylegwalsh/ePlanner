@@ -1,9 +1,11 @@
 'use strict';
 var app = angular.module('app', ['ui.calendar']);
 
-app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingColorService2, NotifyingColorService ) {
+app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingColorService2, NotifyingColorService, NotifyUndo ) {
 
     $scope.todoStorage = todoStorage;
+    $scope.checkBoxCount = 0;
+    $scope.backUp;
 
     $scope.$watch('todoStorage.data', function() {
         $scope.todoList = $scope.todoStorage.data;
@@ -261,6 +263,30 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
            todoStorage.addSubToDo(index,nameData,dateData,timeData, notesData)
     }
 
+    $scope.$watch(
+
+        function( scope ) {
+            // Return the "result" of the watch expression.
+            return( scope.checkBoxCount);
+        },
+        function( newValue, oldValue ) {
+                 if(newValue == 0){
+                    setTimeout(function(){  
+                        $("#UndoCompleteOverlay").css("display", "none");
+                    }, 10000);
+            }
+        }
+
+    );
+
+    $scope.undo = function(){
+        console.log("button clicked");
+        console.log($scope.backUp);
+        todoStorage.restoreCompleted($scope.backUp);
+        $scope.checkBoxCount = 0; // reset
+        NotifyUndo.notify();    
+    }
+
     $scope.displaySubSectionForTodo = function(addSection, nameData, dateData, timeData, notesData, newToDoBool){
 
         var divider = document.createElement('div');
@@ -268,15 +294,25 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
         var sub  = document.createElement('div'); // Create Div that houses the information for a single row To-DO
         sub.className = "SubToDo row";
 
-
-            // TODO CSS stuff here, TODO gets structured here
             var select  = document.createElement('input'); // This is where the draggable thing will be
             select.className = "Checkbox col-xs-offset-1 col-xs-1 vcenter";
             select.style.width = "10px";
             select.style.marginLeft = "55px";
             select.type = 'checkbox';
             $(select).change(function(event) {   // event for when it is checked 
-
+                
+                console.log($scope.checkBoxCount);
+                if($scope.checkBoxCount == 0){
+                    console.log($scope.extraInformation);
+                    var temp = new Array();
+                    for(var i=0; i<$scope.extraInformation.completedStuff.length; i++){
+                        temp.push($scope.extraInformation.completedStuff[i]);
+                    }
+                    $scope.backUp = temp;
+                    console.log($scope.backUp);
+                }
+                $scope.checkBoxCount++;
+                $scope.$digest();
                 var child = divider;
                 var parent = $(divider).parent();
                 var subToDoindex = $(parent).children(".Divider").index(child);
@@ -285,21 +321,24 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                 var categoryParent = $(divider).parent().parent().parent().parent();
                 var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
 
-                setTimeout(function(){
-                    $(divider).slideUp("slow");
-                    todoStorage.markToDoAsComplete(categoryIndex, subToDoindex);
-                    todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory
-                }, 500);
-                setTimeout(function(){
-                    if(select.checked){ // set to true                
-                        divider.remove(); // Clear from html
-                    } else { // set to false
 
-                    }
-                }, 1000);
+                $("#UndoCompleteOverlay").css("display", "inline-block"); // make undo button visible
+                setTimeout(function(){
+                    $(divider).slideUp("slow"); // slide away the ToDo
+                    todoStorage.markToDoAsComplete(categoryIndex, subToDoindex); // adds to persistentStorage 
+                    todoStorage.backUp(categoryIndex, subToDoindex); // save the current ToDo
+                    todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory   
+                    divider.remove(); // Clear from html     
+                }, 100);
+
+                setTimeout(function(){
+                    $scope.checkBoxCount--;
+                    if($scope.checkBoxCount == 0){
+                        $("#UndoCompleteOverlay").css("display", "inline-block"); // make undo button visible
+                    }     
+                }, 3000);
                 
             })
-
             var center = document.createElement('div');  // Top center row (for styling)
             center.className = "col-xs-9 vcenter";
             var name  = document.createElement('input'); // The name will go here
@@ -631,7 +670,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 // Temporary these are here, was running into errors putting these into separate files
 
 // controller for the completed section area
-app.controller('completed', function($scope, todoStorage, NotifyingService) {
+app.controller('completed', function($scope, todoStorage, NotifyingService, NotifyUndo) {
 
     $scope.todoStorage = todoStorage;
 
@@ -652,6 +691,10 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
         $scope.extraInformation = info;
         $scope.displayAllCompleted(); // refresh page   
     });
+
+    NotifyUndo.subscribe($scope, function doWork(){
+        $scope.displayAllCompleted();
+    })
 
     $scope.removeAll = function(){
         todoStorage.removeAllCompleted();

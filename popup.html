@@ -37,6 +37,9 @@
         <!-- To do View -->
         <div id="ToDoView" ng-controller="todoCtrl">
           <div class="row">
+              <div id="UndoCompleteOverlay">
+                  <button ng-click="undo()">Undo Complete</button>
+              </div>
               <div class="col-md-12">
                 <div class="newCourse btn" ng-click="add()">
                     Add New Course

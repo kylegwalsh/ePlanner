@@ -3,6 +3,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     var _this = this;
     this.data = [];
     this.persistentInformation = [];
+    this.backUpToDo = [];
 
     this.findAll = function(callback) {
         chrome.storage.sync.get('todo', function(keys) {
@@ -71,7 +72,12 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         NotifyingService.notify(this.persistentInformation);
         this.sync();
     }
-
+    this.restoreCompleted = function(backUpData){
+        console.log("restoring");
+        console.log(backUpData);
+        this.persistentInformation.completedStuff = backUpData;
+        this.sync();
+    }
 
     this.add = function (colorCode) {
         var id = this.data.length;      
@@ -138,6 +144,18 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         extraInfo.splice(index,1);
         this.sync();
     }
+
+
+
+    this.backUp = function(catIndex, subIndex){
+        alert("this is working" + catIndex +  " : " +subIndex);
+        
+        var saveMe = {
+
+        }
+
+        this.backUpToDo.push(saveMe);
+     }
 
     this.removeSubToDo = function(categoryIndex, subToDoIndex){
         var size = _this.data.length-1; 
@@ -247,7 +265,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     }
 
     this.markToDoAsComplete = function(Categoryindex, subToDoIndex){
-
         var size = _this.data.length-1; 
         var categoryX = _this.data[size-Categoryindex];
         var current = categoryX.subToDo[categoryX.subToDo.length-1-subToDoIndex];
@@ -327,8 +344,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         } 
         this.persistentInformation = information;
         this.sync();
-        console.log("AFTER");
-        console.log(this.persistentInformation);
     }
 
     this.addSubToDo = function(index, name, date, time, notes){
@@ -423,6 +438,18 @@ angular.module('app').factory('NotifyingColorService2', function($rootScope) {
 
         notify: function(importantInfo, evenMore, evenMore2) {
             $rootScope.$emit('notifying-service-color-event2', importantInfo, evenMore, evenMore2);
+        }
+    };
+});
+
+angular.module('app').factory('NotifyUndo', function($rootScope) {
+    return {
+        subscribe: function(scope, callback) {
+            var handler = $rootScope.$on('notifying-service-undo', callback);
+            scope.$on('$destroy', handler);
+        },
+        notify: function() {
+            $rootScope.$emit('notifying-service-undo');
         }
     };
 });
