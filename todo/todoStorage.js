@@ -1,4 +1,4 @@
-angular.module('app').service('todoStorage', function ($q, NotifyingService, NotifyingServiceCalendar) {
+angular.module('app').service('todoStorage', function ($q, NotifyingService, NotifyingServiceCalendar ) {
 
     var _this = this;
     this.data = [];
@@ -55,8 +55,14 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     }
 
     this.removeAllCompleted = function(){
+        var temp = this.persistentInformation.reminders;
+        if(temp == null){
+            temp = true;
+        }
+
         var information = {
             topColor: this.persistentInformation.topColor,
+            reminders: temp,
             currentHash: this.persistentInformation.currentHash,
             completedStuff: new Array(),    
         }
@@ -65,14 +71,15 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         this.sync();
     }
 
-    this.add = function () {
+
+    this.add = function (colorCode) {
         var id = this.data.length;      
 
         var todo = {
             id: id,
             content: "",
             completed: false,
-            color: "F5B041", // default color
+            color: colorCode, // default color
             createdAt: new Date(),
             subToDo: new Array(0), // array to keep track of the subToDos
         };
@@ -115,8 +122,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         }
 
         var category = this.data[index].content;
-        console.log("TODOSTORAGE______________________________");
-        console.log(category);
         this.data.splice(index, 1);
         this.updateIndexes();
         this.sync();
@@ -288,6 +293,29 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         NotifyingServiceCalendar.notify(this.data);
     }
 
+    this.changeReminderSetting = function(){
+        // toggle so we dont' need any input
+        var info = this.persistentInformation.reminders;
+        if(info == undefined){
+            info = true;
+        } else if(info == true){
+            info = false;
+        } else {
+            info = true;
+        }
+        console.log(info);
+        var information = {
+            topColor: this.persistentInformation.topColor,
+            reminders: info,
+            currentHash: this.persistentInformation.currentHash,
+            completedStuff: this.persistentInformation.completedStuff,   
+        } 
+        this.persistentInformation = information;
+        this.sync();
+        console.log("AFTER");
+        console.log(this.persistentInformation);
+    }
+
     this.addSubToDo = function(index, name, date, time, notes){
         // Assigns unique hash to todo
         var nextHash;
@@ -306,10 +334,16 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             }
         }
 
+        var temp = this.persistentInformation.reminders;
+        if(temp == null){
+            temp = true;
+        }
+
         var information = {
             topColor: this.persistentInformation.topColor,
+            reminders: temp,
             currentHash: nextHash,
-            completedStuff: temp,    
+            completedStuff: this.persistentInformation.completedStuff,    
         } 
         this.persistentInformation = information;
 
@@ -372,8 +406,8 @@ angular.module('app').factory('NotifyingColorService2', function($rootScope) {
             scope.$on('$destroy', handler);
         },
 
-        notify: function(importantInfo) {
-            $rootScope.$emit('notifying-service-color-event2', importantInfo);
+        notify: function(importantInfo, evenMore) {
+            $rootScope.$emit('notifying-service-color-event2', importantInfo, evenMore);
         }
     };
 });

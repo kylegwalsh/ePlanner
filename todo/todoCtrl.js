@@ -22,7 +22,8 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
         $("#ITEMS").innerHTML = "";
         $scope.todoList = data;
         $scope.$apply();
-        NotifyingColorService2.notify($scope.extraInformation.topColor);
+        console.log($scope.extraInformation.reminders);
+        NotifyingColorService2.notify($scope.extraInformation.topColor,$scope.extraInformation.reminders);
 
         angular.forEach($scope.todoList, function(item, value){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
             var htmlCategory = $scope.addCategory(item.content, value, item.color) // Loop through each of the categories 
@@ -34,7 +35,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
     });
 
     $scope.add = function() {
-        var index = todoStorage.add();
+        var index = todoStorage.add($scope.colorInfo);
         var categoryHTML = $scope.addCategory("",index, $scope.colorInfo); // when a new item is added, we add a corresponding HTML for it
         $scope.newContent = '';
     }
@@ -768,6 +769,8 @@ app.controller('setting', function($scope, todoStorage, NotifyingColorService, N
     $scope.tabCode = "A5FAC0";
     $scope.themeID = 0;
 
+    $scope.enableReminders;
+
     $scope.$watch('todoStorage.persistentInformation', function(){
         $scope.extraInformation = todoStorage.persistentInformation;
         $scope.themeID = $scope.extraInformation.topColor;
@@ -783,9 +786,9 @@ app.controller('setting', function($scope, todoStorage, NotifyingColorService, N
         } 
     });
 
-    NotifyingColorService2.subscribe($scope, function somethingChanged(event, info) {
+    NotifyingColorService2.subscribe($scope, function somethingChanged(event, info, setting) {
         $scope.themeID = info;
-        console.log($scope.themeID);
+        $scope.enableReminders = setting;
         if ($scope.themeID == 0){
             $scope.update();
         } else if($scope.themeID == 1){
@@ -799,6 +802,9 @@ app.controller('setting', function($scope, todoStorage, NotifyingColorService, N
             $scope.update4  ();
         } 
     }); 
+    $scope.updateSetting = function(){
+        todoStorage.changeReminderSetting();
+    }
 
     $scope.updateColors = function(){
         $('.col-xs-4.tab.noselect.active').css("background-color", "#" + $scope.tabCode);
