@@ -35,6 +35,7 @@ app.controller('TabController', function($scope, todoStorage, NotifyingColorServ
             $("#ToDoView").hide();
             $("#CompletedView").hide();
             $('#CalendarView').show();
+            $('.fc-today-button').trigger('click');
           setTimeout(function(){ 
               $('.col-xs-4.tab.noselect').css("background-color", "#" + "FFFFFF");
               $('.col-xs-4.tab.noselect.active').css("background-color", "#" + $scope.colorInfo);
