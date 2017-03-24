@@ -1153,26 +1153,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                 }
             }         
         }
-        else if(functionName == "addSubToDo"){
-            var syncData = data.data;
-            var eventDate = new Date(y - 1, m, d);
-                $scope.events.push({
-                title: syncData.name,
-                start: eventDate,
-                notes: syncData.notes,
-                hash: syncData.uniqueHash,
-                category: syncData.categoryName,
-                backgroundColor: "#" + data.color,
-                stick: true
-            });
-            if(calendarRendered){
-                    uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
-
-                }
-                for(var j = 1; j < tmp.length + 1; j++){
-                    $scope.events.push(tmp[j]);
-                }       
-            }
             else if(functionName == "addSubToDo"){
                 var syncData = data.data;
                 var eventDate = new Date(y - 1, m, d);
@@ -1187,7 +1167,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                 uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents'); 
             }
         }
-    }
+
 
     /* alert on eventClick */
     $scope.alertOnEventClick = function( date, jsEvent, view){
