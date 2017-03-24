@@ -3,18 +3,18 @@
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-findAll2(function(persistentInformation){
-	if(persistentInformation.UID != null){
-		ga('create', 'UA-96121250-1', {'userId': persistentInformation.UID});  // Replace with your property ID.
-	}
+chrome.storage.sync.get('info', function(keys){    
+    persistentInformation = keys.info;
+    console.log(persistentInformation.UID);
+	ga('create', 'UA-96121250-1', {'userId': persistentInformation.UID});  // Replace with your property ID.
+	ga('set', 'checkProtocolTask', null);
+	ga('require', 'displayfeatures');
+	ga('send', 'pageview', '/popup.html');
 });
-ga('set', 'checkProtocolTask', null);
-ga('require', 'displayfeatures');
-ga('send', 'pageview', '/popup.html');
 
-findAll2 = function(callback){   
-    chrome.storage.sync.get('info', function(keys){    
-        persistentInformation = keys.info;
-        callback(persistentInformation);
-    });
-}
+// findAll2 = function(callback){   
+//     chrome.storage.sync.get('info', function(keys){    
+//         persistentInformation = keys.info;
+//         callback(persistentInformation);
+//     });
+// }
