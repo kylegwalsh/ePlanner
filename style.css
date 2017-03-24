@@ -255,6 +255,19 @@ input[type="checkbox"]:focus{
   border-radius: 2px;
 }
 
+#UndoCompleteOverlay{
+  display: none;
+  float: left;
+  margin-left:40px;
+  background-color: white;
+  padding: 0;
+  z-index: 2;
+  color: #333;
+  border-radius: 2px;
+}
+
+
+
 #CategoryOptionsOverlay:before {
   border-bottom: 10px solid white;
   border-left: 10px solid transparent;
