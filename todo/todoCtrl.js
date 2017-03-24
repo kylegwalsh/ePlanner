@@ -30,13 +30,10 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 
     $scope.updateEverything= function(){
         $scope.todoList = $scope.todoStorage.data;
-        console.log("RESTORING");
-        console.log($scope.todoList);
         angular.forEach($scope.todoList, function(item, value){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
             var htmlCategory = $scope.addCategory(item.content, value, item.color) // Loop through each of the categories 
             var arrayLength = item.subToDo.length;
             for(var j=0; j < item.subToDo.length; j++){
-                console.log("this RUNS");
                 $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,item.subToDo[j].date,item.subToDo[j].time, item.subToDo[j].notes, false);
             }
         })
@@ -282,15 +279,34 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                     }, 10000);
             }
         }
-
     );
 
     $scope.undo = function(){
         $("#ITEMS").empty(); // clear HTML
-        todoStorage.restoreData($scope.backUp); // Load backup data that was saved 
+        todoStorage.restoreData(); // Load backup data that was saved 
         $scope.updateEverything(); // update entire HTML
-        NotifyUndo.notify($scope.backUp); 
+        todoStorage.clearSavedInfo();
+         $("#UndoCompleteOverlay").css("display", "none"); // make undo button not visible 
+         for(var i =0; i<$scope.timeouts.length; i++){
+            var temp = $scope.timeouts[i];
+            clearTimeout(temp);
+         }
+         $scope.checkBoxCount = 0;
+         $scope.timeouts = new Array();
+
     }
+    $scope.ignore = function(){
+        $("#UndoCompleteOverlay").css("display", "none"); // make undo button not visible
+         todoStorage.clearSavedInfo(); // clear saved stuff so can't be restored 
+        for(var i =0; i<$scope.timeouts.length; i++){
+            var temp = $scope.timeouts[i];
+            clearTimeout(temp);
+         }
+         $scope.checkBoxCount = 0;
+         $scope.timeouts = new Array();
+    }
+
+    $scope.timeouts;
 
     $scope.displaySubSectionForTodo = function(addSection, nameData, dateData, timeData, notesData, newToDoBool){
 
@@ -298,48 +314,47 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
         divider.className = "Divider";
         var sub  = document.createElement('div'); // Create Div that houses the information for a single row To-DO
         sub.className = "SubToDo row";
-
             var select  = document.createElement('input'); // This is where the draggable thing will be
             select.className = "Checkbox col-xs-offset-1 col-xs-1 vcenter";
             select.style.width = "10px";
             select.style.marginLeft = "55px";
             select.type = 'checkbox';
+
             $(select).change(function(event) {   // event for when it is checked 
-                
-                console.log($scope.checkBoxCount);
-                if($scope.checkBoxCount == 0){
-                    var temp = new Array();
-                    for(var i=0; i<$scope.extraInformation.completedStuff.length; i++){
-                        temp.push($scope.extraInformation.completedStuff[i]);
-                    }
-                    $scope.backUp = temp;
-                }
-                $scope.checkBoxCount++;
-                $scope.$digest();
-                var child = divider;
-                var parent = $(divider).parent();
-                var subToDoindex = $(parent).children(".Divider").index(child);
-
-                var categoryChild = $(divider).parent().parent().parent();
-                var categoryParent = $(divider).parent().parent().parent().parent();
-                var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
-
-
-                $("#UndoCompleteOverlay").css("display", "inline-block"); // make undo button visible
-                setTimeout(function(){
-                    $(divider).slideUp("slow"); // slide away the ToDo
-                    todoStorage.markToDoAsComplete(categoryIndex, subToDoindex); // adds to persistentStorage 
-                    todoStorage.backUp(categoryIndex, subToDoindex); // save the current ToDo
-                    todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory   
-                    divider.remove(); // Clear from html     
-                }, 100);
-
-                setTimeout(function(){
-                    $scope.checkBoxCount--;
-                    if($scope.checkBoxCount == 0){
+                if(select.checked){
                         $("#UndoCompleteOverlay").css("display", "inline-block"); // make undo button visible
-                    }     
-                }, 3000);
+
+                        if($scope.checkBoxCount == 0){
+                            todoStorage.backupCompleteData(); // save all current completed stuff
+                            todoStorage.backUp(categoryIndex, subToDoindex); // clone all current TODOs
+                            $scope.timeouts = new Array();
+                        }
+                        $scope.checkBoxCount++;
+                        $scope.$digest();
+                        var child = divider;
+                        var parent = $(divider).parent();
+                        var subToDoindex = $(parent).children(".Divider").index(child);
+
+                        var categoryChild = $(divider).parent().parent().parent();
+                        var categoryParent = $(divider).parent().parent().parent().parent();
+                        var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+                        
+                        todoStorage.markToDoAsComplete(categoryIndex, subToDoindex); // adds to persistentStorage 
+                        todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory 
+                        divider.remove(); // Clear from html   
+
+                        var timeoutFunction = setTimeout(function(){
+                            $scope.checkBoxCount--;
+                            if($scope.checkBoxCount == 0){
+                                $("#UndoCompleteOverlay").css("display", "none"); // make undo button visible
+                            }    
+                        }, 6000);
+                              $scope.timeouts.push(timeoutFunction);
+                      
+                } else {
+
+                }
+
                 
             })
             var center = document.createElement('div');  // Top center row (for styling)
@@ -944,7 +959,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
             }
         })
     });
-    console.log($scope.events);
 
     NotifyingServiceCalendar.subscribe($scope, function somethingChanged(event, data) {
         $scope.syncCalendar(data); 
@@ -964,7 +978,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                 for(var j = 0; j < $scope.events.length; j++){
                     if(data.category == $scope.events[j].category){
                         indices.push(j);
-                        console.log($scope.events[j].category);
                     }
                 }
                 for(var j = 1; j < indices.length + 1; j++){
@@ -1060,7 +1073,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     backgroundColor: "#" + data.color,
                     stick: true
                 });
-                console.log($scope.events);
                 uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents'); 
             }
         }

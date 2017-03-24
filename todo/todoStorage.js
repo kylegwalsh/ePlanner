@@ -1,9 +1,10 @@
-angular.module('app').service('todoStorage', function ($q, NotifyingService, NotifyingServiceCalendar ) {
+angular.module('app').service('todoStorage', function ($q, NotifyingService, NotifyingServiceCalendar, NotifyUndo ) {
 
     var _this = this;
     this.data = [];
     this.persistentInformation = [];
     this.backUpToDo = [];
+    this.extraBackupInfo;
 
     this.findAll = function(callback) {
         chrome.storage.sync.get('todo', function(keys) {
@@ -60,7 +61,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         if(temp == null){
             temp = true;
         }
-
         var information = {
             topColor: this.persistentInformation.topColor,
             reminders: temp,
@@ -70,11 +70,21 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         }
         this.persistentInformation = information;
         NotifyingService.notify(this.persistentInformation);
+
+        var temp = new Array();
+
+        if(_this.persistentInformation.completedStuff == null){
+
+        } else {
+            for(var i=0; i<_this.persistentInformation.completedStuff.length; i++){
+                 temp.push(angular.copy(_this.persistentInformation.completedStuff[i]));
+            }
+        }
+        this.extraBackupInfo = temp;
+
         this.sync();
     }
     this.restoreCompleted = function(backUpData){
-        console.log("restoring");
-        console.log(backUpData);
         this.persistentInformation.completedStuff = backUpData;
         this.sync();
     }
@@ -144,32 +154,46 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         this.sync();
     }
 
-    this.restoreData = function(completedData){
-        _this.data = this.backUpToDo[0];
-        _this.persistentInformation.completedStuff = completedData;
-        this.sync();
+    this.backupCompleteData = function(){
+        var temp = new Array();
+
+        if(_this.persistentInformation.completedStuff == null){
+
+        } else {
+            for(var i=0; i<_this.persistentInformation.completedStuff.length; i++){
+                 temp.push(angular.copy(_this.persistentInformation.completedStuff[i]));
+            }
+        }
+        this.extraBackupInfo = temp;
     }
 
     this.backUp = function(catIndex, subIndex){
-
-        var size = _this.data.length-1; 
-        var category = _this.data[size-catIndex];
-        var size2 = category.subToDo.length-1;
-        var toDoData = category.subToDo[category.subToDo.length-1-subIndex];
-
-        var saveMe = { // hard copy object 
-            name: angular.copy(toDoData.name),
-            date:  angular.copy(toDoData.date),
-            time:  angular.copy(toDoData.time),
-            notes:  angular.copy(toDoData.notes),
-            uniqueHash: angular.copy(toDoData.uniqueHash),
-            catIndex: catIndex,
-            subIndex: subIndex,
-        }
         var COPY = angular.copy(_this.data);
+        console.log("copy =========================== is:");
+        console.log(COPY);
+        this.backUpToDo = COPY;
 
-        this.backUpToDo.push(COPY);
      }
+    this.clearSavedInfo = function(){
+
+        var temp = new Array();
+            for(var i=0; i<_this.persistentInformation.completedStuff.length; i++){
+                 temp.push(angular.copy(_this.persistentInformation.completedStuff[i]));
+            }
+
+        this.extraBackupInfo = temp;
+        this.backUpToDo = _this.data;
+        this.sync();
+    }
+
+    this.restoreData = function(){
+        _this.data = this.backUpToDo;
+        console.log(_this.data);
+        _this.persistentInformation.completedStuff = this.extraBackupInfo;
+        console.log(_this.persistentInformation.completedStuff);
+        NotifyUndo.notify(this.extraBackupInfo); 
+         this.sync();
+    }
 
     this.removeSubToDo = function(categoryIndex, subToDoIndex){
         var size = _this.data.length-1; 
