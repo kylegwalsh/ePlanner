@@ -1,9 +1,11 @@
 'use strict';
 var app = angular.module('app', ['ui.calendar']);
 
-app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingColorService2, NotifyingColorService ) {
+app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingColorService2, NotifyingColorService, NotifyUndo ) {
 
     $scope.todoStorage = todoStorage;
+    $scope.checkBoxCount = 0;
+    $scope.backUp;
 
     $scope.$watch('todoStorage.data', function() {
         $scope.todoList = $scope.todoStorage.data;
@@ -24,7 +26,11 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
         $scope.todoList = data;
         $scope.$apply();
         NotifyingColorService2.notify($scope.extraInformation.topColor,$scope.extraInformation.reminders, $scope.extraInformation.notificationSound);
+        $scope.updateEverything();
+    });
 
+    $scope.updateEverything= function(){
+        $scope.todoList = $scope.todoStorage.data;
         angular.forEach($scope.todoList, function(item, value){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
             var htmlCategory = $scope.addCategory(item.content, value, item.color) // Loop through each of the categories 
             var arrayLength = item.subToDo.length;
@@ -32,7 +38,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                 $scope.displaySubSectionForTodo( htmlCategory, item.subToDo[j].name,item.subToDo[j].date,item.subToDo[j].time, item.subToDo[j].notes, false);
             }
         })
-    });
+    }
 
     $scope.add = function() {
         var index = todoStorage.add($scope.colorInfo);
@@ -271,45 +277,101 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
            todoStorage.addSubToDo(index,nameData,dateData,timeData, notesData)
     }
 
+    $scope.$watch(
+
+        function( scope ) {
+            // Return the "result" of the watch expression.
+            return( scope.checkBoxCount);
+        },
+        function( newValue, oldValue ) {
+                 if(newValue == 0){
+                    setTimeout(function(){  
+                        $("#UndoCompleteOverlay").css("display", "none");
+                    }, 10000);
+            }
+        }
+    );
+
+    $scope.undo = function(){
+        $("#ITEMS").empty(); // clear HTML
+        todoStorage.restoreData(); // Load backup data that was saved 
+        $scope.updateEverything(); // update entire HTML
+        todoStorage.clearSavedInfo();
+         $("#UndoCompleteOverlay").css("display", "none"); // make undo button not visible 
+         for(var i =0; i<$scope.timeouts.length; i++){
+            var temp = $scope.timeouts[i];
+            clearTimeout(temp);
+         }
+         $scope.checkBoxCount = 0;
+         $scope.timeouts = new Array();
+
+    }
+    $scope.ignore = function(){
+        $("#UndoCompleteOverlay").css("display", "none"); // make undo button not visible
+         todoStorage.clearSavedInfo(); // clear saved stuff so can't be restored 
+        for(var i =0; i<$scope.timeouts.length; i++){
+            var temp = $scope.timeouts[i];
+            clearTimeout(temp);
+         }
+         $scope.checkBoxCount = 0;
+         $scope.timeouts = new Array();
+    }
+
+    $scope.timeouts;
+
     $scope.displaySubSectionForTodo = function(addSection, nameData, dateData, timeData, notesData, newToDoBool){
 
         var divider = document.createElement('div');
         divider.className = "Divider";
         var sub  = document.createElement('div'); // Create Div that houses the information for a single row To-DO
         sub.className = "SubToDo row";
-
-
-            // TODO CSS stuff here, TODO gets structured here
             var select  = document.createElement('input'); // This is where the draggable thing will be
             select.className = "Checkbox col-xs-offset-1 col-xs-1 vcenter";
             select.style.width = "10px";
             select.style.marginLeft = "55px";
             select.type = 'checkbox';
+
             $(select).change(function(event) {   // event for when it is checked 
+                if(select.checked){
+                        $("#UndoCompleteOverlay").css("display", "inline-block"); // make undo button visible
 
-                var child = divider;
-                var parent = $(divider).parent();
-                var subToDoindex = $(parent).children(".Divider").index(child);
+                        if($scope.checkBoxCount == 0){
+                            todoStorage.backupCompleteData(); // save all current completed stuff
+                            todoStorage.backUp(categoryIndex, subToDoindex); // clone all current TODOs
+                            $scope.timeouts = new Array();
+                        }
+                        $scope.checkBoxCount++;
+                        $scope.$digest();
+                        var child = divider;
+                        var parent = $(divider).parent();
+                        var subToDoindex = $(parent).children(".Divider").index(child);
 
-                var categoryChild = $(divider).parent().parent().parent();
-                var categoryParent = $(divider).parent().parent().parent().parent();
-                var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+                        var categoryChild = $(divider).parent().parent().parent();
+                        var categoryParent = $(divider).parent().parent().parent().parent();
+                        var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+                        
+                        todoStorage.markToDoAsComplete(categoryIndex, subToDoindex); // adds to persistentStorage 
+                        todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory 
+                          
 
-                setTimeout(function(){
-                    $(divider).slideUp("slow");
-                    todoStorage.markToDoAsComplete(categoryIndex, subToDoindex);
-                    todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory
-                }, 500);
-                setTimeout(function(){
-                    if(select.checked){ // set to true                
-                        divider.remove(); // Clear from html
-                    } else { // set to false
+                        var animation = setTimeout(function(){
+                            divider.remove(); // Clear from html 
+                        }, 300);
 
-                    }
-                }, 1000);
+                        var timeoutFunction = setTimeout(function(){
+                            $scope.checkBoxCount--;
+                            if($scope.checkBoxCount == 0){
+                                $("#UndoCompleteOverlay").css("display", "none"); // make undo button visible
+                            }    
+                        }, 6000);
+                              $scope.timeouts.push(timeoutFunction);
+                      
+                } else {
+
+                }
+
                 
             })
-
             var center = document.createElement('div');  // Top center row (for styling)
             center.className = "col-xs-9 vcenter";
             var name  = document.createElement('input'); // The name will go here
@@ -694,7 +756,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 // Temporary these are here, was running into errors putting these into separate files
 
 // controller for the completed section area
-app.controller('completed', function($scope, todoStorage, NotifyingService) {
+app.controller('completed', function($scope, todoStorage, NotifyingService, NotifyUndo) {
 
     $scope.todoStorage = todoStorage;
 
@@ -715,6 +777,11 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
         $scope.extraInformation = info;
         $scope.displayAllCompleted(); // refresh page   
     });
+
+    NotifyUndo.subscribe($scope, function doWork(event, data){
+        $scope.extraInformation.completedStuff = data;
+        $scope.displayAllCompleted();
+    })
 
     $scope.removeAll = function(){
         todoStorage.removeAllCompleted();
@@ -953,8 +1020,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     });
 
     $("#CalendarTab").bind('click', function(){
-        calendarRendered = true;
-    });
+        calendarRendered = true;    });
 
     var newDate = new Date();
     var d = newDate.getDate();
@@ -993,6 +1059,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
         // If we haven't opened the calendar, we shouldn't rerender
 
         // If we've already opened the calendar
+
         var functionName = data.functionName;
         if(functionName == "removeSubToDo"){
             var syncData = data.data;
@@ -1001,6 +1068,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     $scope.remove(j);
                     if(calendarRendered){
                         uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+
                     }
                 }
             }
@@ -1089,26 +1157,25 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                 }
             }         
         }
-        else if(functionName == "addSubToDo"){
-            var syncData = data.data;
-            var eventDate = new Date(y - 1, m, d);
-                $scope.events.push({
-                title: syncData.name,
-                start: eventDate,
-                notes: syncData.notes,
-                hash: syncData.uniqueHash,
-                category: syncData.categoryName,
-                backgroundColor: "#" + data.color,
-                stick: true
-            });
-            if(calendarRendered){
-                    uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+            else if(functionName == "addSubToDo"){
+                var syncData = data.data;
+                var eventDate = new Date(y - 1, m, d);
+                    $scope.events.push({
+                    title: syncData.name,
+                    start: eventDate,
+                    notes: syncData.notes,
+                    hash: syncData.uniqueHash,
+                    backgroundColor: "#" + data.color,
+                    stick: true
+                });
+                uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents'); 
             }
         }
-    }
+
 
     /* alert on eventClick */
     $scope.alertOnEventClick = function( date, jsEvent, view){
+                jsEvent.stopPropagation();
                 var calendarOverlay = document.getElementById("CalendarOverlay");
 
                 // Closes options if they're open
@@ -1121,63 +1188,61 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     calendarOverlay.style.display = "inline-block";
 
                     var close = document.createElement("div"); // The button to confirm the user click to update name
-                    close.className = "closeButton row text-right";
-                    close.innerHTML = "<i class='fa fa-lg fa-remove'></i>";
+                    close.className = "text-right";
+                    close.innerHTML = "<i class='closeButton fa fa-lg fa-remove'></i>";
                     
                     $(close).bind('click', function(){
                         calendarOverlay.innerHTML = "";
                         calendarOverlay.style.display = "none";
                     });
 
-                    var name = document.createElement('input'); // Field where new name goes
-                    name.disabled = 'readonly';
-                    name.type = 'text';
-                    name.value = date.title;
+                    var category = document.createElement('div');
+                    category.className = "row calRow calCat";
+                    category.innerHTML = date.category;
 
-                    var note = document.createElement("textarea"); // button that brings up notes text field
-                    note.disabled = 'readonly';
-                    note.value = date.notes;
+                    var name = document.createElement('div'); // Field where new name goes
+                    name.className = "row calRow";
+                    name.innerHTML = date.title;
+
+                    var note = document.createElement("div"); // button that brings up notes text field
+                    note.className = 'row calNotes container';
+                    note.innerHTML = date.notes;
                     // TODO modify CSS and class stuff here
 
-                    var datePicker = document.createElement("input"); // date picker
-                    datePicker.disabled = 'readonly';
-                    datePicker.type = "date";
-                    datePicker.buttonText = "<i class='fa fa-calendar'></i>";
-                    datePicker.className = "DatePicker";
-                    datePicker.value = new Date(date.start);
-                    // TODO modify CSS and class stuff here
-
-                    var timePicker = document.createElement("input"); // Time picker
-                    timePicker.type = "time";
-                    timePicker.className = "TimePicker";
-
-                    var deleteTodo = document.createElement('div');  // Delete button for the Todo that is at the bottom
-                    deleteTodo.className = "";
-                    deleteTodo.innerHTML = "Delete Assignment";
-                    
-                    $(deleteTodo).bind( "click", function() {    // button that handles deleting a TODO
-                        var child = divider;
-                        var parent = $(divider).parent();
-                        var subToDoindex = $(parent).children(".Divider").index(child);
-                        // subToDoindex contains the value of what we currently want to delete
-
-                        var categoryChild = $(divider).parent().parent().parent();
-                        var categoryParent = $(divider).parent().parent().parent().parent();
-                        var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
-                        // categoryIndex contains the value of the entire Category that the subToDo is being deleted in
-
-                        todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory
-                        divider.remove(); // Clear from HTML
-                        calendarOverlay.innerHTML = ""; // clear contents of overlay
-                        calendarOverlay.style.display = "none";  // close overlay
-                    });
+                    var dateandtime = document.createElement('div');
+                    dateandtime.className = "SubDateTime calRow row";
+                    var temp = new Date(date.start);
+                    var date = document.createElement('input');
+                    date.type = 'date';
+                    date.disabled = "readonly";
+                    var year = temp.getFullYear();
+                    var month = temp.getMonth()+1;
+                    if(month < 10){
+                        month = "0"+month;
+                    }
+                    var day = temp.getDate();
+                    date.value = year + "-" + month + "-" + day;
+                    console.log(temp.getFullYear() + "-" + (temp.getMonth()+1) + "-" + temp.getDate());
+                    date.className = "date";
+                    var time = document.createElement('input');
+                    time.type = 'time';
+                    time.disabled = "readonly";
+                    time.value = temp.getHours() + ":" + temp.getMinutes();
+                    time.className = "time";
                     
                     calendarOverlay.appendChild(close);
+                    calendarOverlay.appendChild(category);
                     calendarOverlay.appendChild(name);
-                    calendarOverlay.appendChild(note);
-                    calendarOverlay.appendChild(datePicker);
-                    calendarOverlay.appendChild(timePicker);
-                    calendarOverlay.appendChild(deleteTodo);  
+                    console.log(date.notes);
+                    if(note.innerHTML != ""){
+                        calendarOverlay.appendChild(note);
+                    }
+                    calendarOverlay.appendChild(dateandtime);
+                    dateandtime.appendChild(date);
+                    if(time.value == ""){
+                        time.value = "00:00";
+                    }
+                    dateandtime.appendChild(time);
         }
     };
 
@@ -1250,7 +1315,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     $scope.uiConfig = {
       calendar:{
         height: 463,
-        editable: true,
+        editable: false,
         eventTextColor: "black",
         eventBoarderColor: "black",
         header:{

@@ -1,10 +1,11 @@
-angular.module('app').service('todoStorage', function ($q, NotifyingService, NotifyingServiceCalendar ) {
+angular.module('app').service('todoStorage', function ($q, NotifyingService, NotifyingServiceCalendar, NotifyUndo ) {
 
     var _this = this;
     this.data = [];
     this.persistentInformation = [];
     this.UID;
-
+    this.backUpToDo = [];
+    this.extraBackupInfo;
     // Runs first time app opened
     $(document).ready(function(){
         if(_this.persistentInformation.UID == null){
@@ -31,6 +32,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         $('#UIDPage').hide();        
         $('#MainPage').show();        
     }
+
 
     this.findAll = function(callback) {
         chrome.storage.sync.get('todo', function(keys) {
@@ -89,7 +91,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         if(temp == null){
             temp = true;
         }
-
         var information = {
             topColor: this.persistentInformation.topColor,
             reminders: temp,
@@ -100,6 +101,22 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         }
         this.persistentInformation = information;
         NotifyingService.notify(this.persistentInformation);
+
+        var temp = new Array();
+
+        if(_this.persistentInformation.completedStuff == null){
+
+        } else {
+            for(var i=0; i<_this.persistentInformation.completedStuff.length; i++){
+                 temp.push(angular.copy(_this.persistentInformation.completedStuff[i]));
+            }
+        }
+        this.extraBackupInfo = temp;
+
+        this.sync();
+    }
+    this.restoreCompleted = function(backUpData){
+        this.persistentInformation.completedStuff = backUpData;
         this.sync();
     }
 
@@ -173,6 +190,47 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         var extraInfo = _this.persistentInformation.completedStuff;
         extraInfo.splice(index,1);
         this.sync();
+    }
+
+    this.backupCompleteData = function(){
+        var temp = new Array();
+
+        if(_this.persistentInformation.completedStuff == null){
+
+        } else {
+            for(var i=0; i<_this.persistentInformation.completedStuff.length; i++){
+                 temp.push(angular.copy(_this.persistentInformation.completedStuff[i]));
+            }
+        }
+        this.extraBackupInfo = temp;
+    }
+
+    this.backUp = function(catIndex, subIndex){
+        var COPY = angular.copy(_this.data);
+        console.log("copy =========================== is:");
+        console.log(COPY);
+        this.backUpToDo = COPY;
+
+     }
+    this.clearSavedInfo = function(){
+
+        var temp = new Array();
+            for(var i=0; i<_this.persistentInformation.completedStuff.length; i++){
+                 temp.push(angular.copy(_this.persistentInformation.completedStuff[i]));
+            }
+
+        this.extraBackupInfo = temp;
+        this.backUpToDo = _this.data;
+        this.sync();
+    }
+
+    this.restoreData = function(){
+        _this.data = this.backUpToDo;
+        console.log(_this.data);
+        _this.persistentInformation.completedStuff = this.extraBackupInfo;
+        console.log(_this.persistentInformation.completedStuff);
+        NotifyUndo.notify(this.extraBackupInfo); 
+         this.sync();
     }
 
     this.removeSubToDo = function(categoryIndex, subToDoIndex){
@@ -283,7 +341,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     }
 
     this.markToDoAsComplete = function(Categoryindex, subToDoIndex){
-
         var size = _this.data.length-1; 
         var categoryX = _this.data[size-Categoryindex];
         var current = categoryX.subToDo[categoryX.subToDo.length-1-subToDoIndex];
@@ -454,6 +511,18 @@ angular.module('app').factory('NotifyingColorService2', function($rootScope) {
 
         notify: function(importantInfo, evenMore, evenMore2) {
             $rootScope.$emit('notifying-service-color-event2', importantInfo, evenMore, evenMore2);
+        }
+    };
+});
+
+angular.module('app').factory('NotifyUndo', function($rootScope) {
+    return {
+        subscribe: function(scope, callback) {
+            var handler = $rootScope.$on('notifying-service-undo', callback);
+            scope.$on('$destroy', handler);
+        },
+        notify: function(data) {
+            $rootScope.$emit('notifying-service-undo', data);
         }
     };
 });
