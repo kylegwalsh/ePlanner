@@ -1,20 +1,32 @@
 $(document).ready(function(){
+    chrome.browserAction.setBadgeText({text: ""});
+
     $('.tab').on('click', function(){
         $('.tab.active').removeClass('active');
         $(this).addClass('active');
     });
 
-    $('html').on('click', function() {
-        $('.filterMenu').hide();
+    $('.exitButton').on('click', function(){
+        window.close();
     });
 
-    $('.filterMenu').on('click', function(e){
-        e.stopPropagation();
+    $('#MainPage').on('click', function() {
+        document.getElementById('CategoryOptionsOverlay').innerHTML = "";
+        document.getElementById('CategoryOptionsOverlay').style.display = "none";
+        document.getElementById('TodoOptionsOverlay').innerHTML = "";
+        document.getElementById('TodoOptionsOverlay').style.display = "none";
     });
 
-    $('#filterButton').on('click', function(e){
-        e.stopPropagation();
-        $('.filterMenu').toggle();
+    $('#CategoryOptionsOverlay').on('click', function(e){
+      e.stopPropagation();
+    });
+
+    $('#CategoryOptionsOverlay').on('click', function(e){
+      e.stopPropagation();
+    });
+
+    $('.jscolor').on('click', function(e){
+      e.stopPropagation();
     });
 });
 

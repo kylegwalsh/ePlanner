@@ -13,17 +13,13 @@
       <div class="container no-padding" id="topBar">
           <div class="row" id="header">
             <!-- Filter button -->
-            <div class="pull-left"><i id="filterButton" class='fa fa-lg fa-filter'></i></div>
-            <!-- Pop up filter menu -->
-            <div class="container filterMenu">
-              Filter Menu
-            </div>
+            <div class="pull-left"><i id="settingsButton" class='fa fa-lg fa-cog'></i></div>
             <!-- Title of App -->
             <div id="appName">
               <strong class="noselect">ePlanner</strong>
             </div>
             <!-- Settings button -->
-            <div class="pull-right"><i id="settingsButton" class='fa fa-lg fa-cog'></i></div>
+            <div class="pull-right"><i class='fa fa-lg fa-remove exitButton'></i></div>
           </div>
       </div>
       <!-- Tabs -->
@@ -88,36 +84,77 @@
 
     <!-- Settings Page that can be swapped with Main Page -->
     <div id="SettingsPage">
-      <!-- New top bar for settings -->
+      <!-- Top header bar for settings -->
       <div class="container no-padding" id="topBar2">
           <div class="row" id="header">
-            <div id="settingsName">
+            <!-- Return button -->
+            <div class="pull-left"><i id="return" class='fa fa-lg fa-arrow-left'></i></div>
+            <!-- Title of App -->
+            <div id="appName">
               <strong class="noselect">ePlanner Settings</strong>
             </div>
-            <a class="pull-right" id="return"><i class="fa fa-lg fa-remove"></i></a>
+            <!-- Exit button -->
+            <div class="pull-right"><i class='fa fa-lg fa-remove exitButton'></i></div>
           </div>
       </div>
+
       <!-- Main area for settings -->
       <div class="main container" ng-controller="setting">
-        <button ng-click="update()">Theme1</button>
-        <button ng-click="update1()">Theme2</button>
-        <button ng-click="update2()">Theme3</button>
-        <button ng-click="update3()">Theme4</button>
-        <button ng-click="update4()">Theme5</button>
+        <div class="container">
+          <div class="row"><h2 class="settingsTitle">Themes</h2></div>
+          <div class="row">
+            <button ng-click="update()" class="theme" style="background-color:#0a97f5;">Theme1</button>
+            <button ng-click="update1()" class="theme" style="background-color:#ffd700;">Theme2</button>
+            <button ng-click="update2()" class="theme" style="background-color:#d6391a;">Theme3</button>
+            <button ng-click="update3()" class="theme" style="background-color:#2db931;">Theme4</button>
+            <button ng-click="update4()" class="theme" style="background-color:#ff5bff;">Theme5</button>
+          </div>
 
-        <div>
-            <input type="checkbox" ng-model="enableReminders" ng-change="updateSetting()">
-            <label>Enable Reminders</label>
+          <div class="row"><h2 class="settingsTitle">Reminders</h2></div>
+          <div class="row">
+              <input type="checkbox" ng-model="enableReminders" ng-change="updateSetting()" style="float:left; margin-right: 10px;">
+              <p>Enable Reminders</p>
+          </div>
+          <div class="row">
+            <div class="reminderMsg">If reminders are enabled, then you will recieve desktop push notifications:<br>
+              <ul type="disc">
+                <li>A week before the assignment deadline</li>
+                <li>A day before the assignment deadline</li>
+                <li>An hour before the assignment deadline</li>
+                <li>At the assignment deadline</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="row"><h2 class="settingsTitle">Notification Sounds</h2></div>
+          <div class="row">
+            <select ng-model="dataSelect" ng-change = "doSomething()" style="float:left; margin-right: 10px;">
+                  <option value="oldSpice.mp3">Old Spice</option>
+                  <option value="chime.mp3">Chime</option>
+                  <option value="bliss.mp3">Bliss</option>
+                  <option value="notify.mp3">Notify</option>
+            </select>
+            <p>Select Notification Sound</p>
+          </div>
         </div>
-        <div>
-            <label>Notification Sound</label>
-              <select ng-model="dataSelect" ng-change = "doSomething()">
-                    <option value="option1">Option 1</option>
-                    <option value="option2">Option 2</option>
-                    <option value="option3">Option 3</option>
-                    <option value="option4">Option 4</option>
-                    <option value="option5">Option 5</option>
-              </select>
+      </div>
+    </div>
+
+    <!-- Page to enter UID -->
+    <div id="UIDPage">
+      <div class="container no-padding" id="topBar">
+          <div class="row text-center" id="header">
+            <!-- Title of App -->
+            <div id="appName">
+              <strong class="noselect">ePlanner</strong>
+            </div>
+          </div>
+      </div>
+      <div class="container text-center">
+        <h2>Please enter the user ID you were assigned for this study</h2>
+        <div class="row" style="margin-top: 40px;">
+            <input id="UIDForm" type="text" name="uid" placeholder="Enter user ID">
+            <input id="UIDSubmit" type="submit" value="Submit">
         </div>
       </div>
     </div>

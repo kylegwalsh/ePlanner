@@ -11,6 +11,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 
     $scope.$watch('todoStorage.persistentInformation', function(){
         $scope.extraInformation = $scope.todoStorage.persistentInformation;
+        console.log($scope.extraInformation);
     });
 
     $scope.todoStorage.findAll2(function(data){
@@ -22,7 +23,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
         $("#ITEMS").innerHTML = "";
         $scope.todoList = data;
         $scope.$apply();
-        console.log($scope.extraInformation);
         NotifyingColorService2.notify($scope.extraInformation.topColor,$scope.extraInformation.reminders, $scope.extraInformation.notificationSound);
 
         angular.forEach($scope.todoList, function(item, value){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
@@ -118,6 +118,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 
             // CATEGORY OVERLAY
             $(buttonB4).bind( "click",{ category: addMe},  function(event) {
+                event.stopPropagation();
                 var categoryOverlay = document.getElementById("CategoryOptionsOverlay");
                 var todoOverlay = document.getElementById("TodoOptionsOverlay");
 
@@ -165,6 +166,10 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                     colorPicker.disabled = 'readonly';
                     colorPicker.value = color; // default color
 
+                    $(colorPicker).bind('click', function(){
+                        event.stopPropagation();
+                    });
+
                     $(colorPicker).ready(function() {
                       jscolor.installByClassName("jscolor"); // don't change this
                     });
@@ -172,7 +177,12 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                     var colorButton  = document.createElement('div'); // toggle on/off button
                     colorButton.innerHTML = "Change Color";
 
+                    $(colorButton).bind('click', function(){
+                        event.stopPropagation();
+                    });
+
                     $(colorOption).bind('click', function(){
+                         event.stopPropagation();
                          top.style.backgroundColor = "#" + colorPicker.value; // updates the color in the Category
                          title.style.backgroundColor = "#" + colorPicker.value;
                          color = colorPicker.value;
@@ -381,6 +391,23 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                     time.value = "";
                     dateandtime.style.display = "none";
                 }
+                // Check if overdue
+                if((time.value == "") && (time.style.display == "none")){
+                    if(new Date(date.value + " 00:00") < Date.now()){
+                        name.style.color = "red";
+                    }
+                    else{
+                        name.style.color = "black";
+                    }
+                }
+                else if(time.value != ""){
+                    if(new Date(date.value + " " + time.value) < Date.now()){
+                        name.style.color = "red";
+                    }
+                    else{
+                        name.style.color = "black";
+                    }
+                }
             });
 
             // Save changes to todo date
@@ -401,6 +428,23 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                 // don't show time field if we don't have one
                 if(time.value == ""){
                     time.style.display = "none";
+                }
+                // Check if overdue
+                if(time.value == ""){
+                    if(new Date(date.value + " 00:00") < Date.now()){
+                        name.style.color = "red";
+                    }
+                    else{
+                        name.style.color = "black";
+                    }
+                }
+                else{
+                    if(new Date(date.value + " " + time.value) < Date.now()){
+                        name.style.color = "red";
+                    }
+                    else{
+                        name.style.color = "black";
+                    }
                 }
             });
 
@@ -444,6 +488,24 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                 }
             });
 
+            // Check if overdue
+            if(time.value == ""){
+                if(new Date(date.value + " 00:00") < Date.now()){
+                    name.style.color = "red";
+                }
+                else{
+                    name.style.color = "black";
+                }
+            }
+            else{
+                if(new Date(date.value + " " + time.value) < Date.now()){
+                    name.style.color = "red";
+                }
+                else{
+                    name.style.color = "black";
+                }
+            }
+
                     // $(oldButton).bind("click", function(){   // Button that handles updating the TODO
                     //     var userInput = $(this).parent().children(".OptionsText").val(); // get the input that is in the textBox
                     //     $(this).parent().parent().children().children().children(".SubName").html(userInput); // update the data
@@ -474,6 +536,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 
             // Bring up options menu when option button clicked
             $(Options).bind( "click",  function(event) {
+                event.stopPropagation();
                 var todoOverlay = document.getElementById("TodoOptionsOverlay");
                 var categoryOverlay = document.getElementById("CategoryOptionsOverlay");
 
@@ -605,7 +668,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
         dateandtime.appendChild(time);
         sub.appendChild(Options); // append select, name, date, Options to TO-DO item, 
         divider.appendChild(sub);
-        addSection.parent().prepend(divider);// append the whole thing to join up wit the title that was preivously added
+        addSection.parent().prepend(divider); // append the whole thing to join up wit the title that was preivously added
 
         // If there's no date, don't display
         if(date.value == "" && !newToDoBool){
@@ -762,23 +825,44 @@ app.controller('completed', function($scope, todoStorage, NotifyingService) {
 });
 
 app.controller('setting', function($scope, todoStorage, NotifyingColorService, NotifyingColorService2 ){
-    $scope.colorCode = document.getElementById("topBar").style.backgroundColor; // deafult color;
+    $scope.colorCode = document.getElementById("topBar").style.backgroundColor; // default color;
 
-
-    $scope.colorCode = "A5FAC0";
-    $scope.tabCode = "A5FAC0";
+    $scope.colorCode = "0a97f5";
+    $scope.tabCode = "6cc1f9";
     $scope.themeID = 0;
 
     $scope.enableReminders;
     $scope.dataSelect;
 
     $scope.doSomething = function(){
-        todoStorage.changeNotificationSound($scope.dataSelect);
+        alert($scope.themeID);
+        var notificationSound;
+        if($scope.dataSelect == "oldSpice.mp3"){
+            notificationSound = new Audio('notificationSounds/oldSpice.mp3');
+            notificationSound.play();
+            todoStorage.changeNotificationSound('oldSpice.mp3');
+        }
+        if($scope.dataSelect == "chime.mp3"){
+            notificationSound = new Audio('notificationSounds/chime.mp3');
+            notificationSound.play();
+            todoStorage.changeNotificationSound('chime.mp3');
+        }
+        if($scope.dataSelect == "bliss.mp3"){
+            notificationSound = new Audio('notificationSounds/bliss.mp3');
+            notificationSound.play();
+            todoStorage.changeNotificationSound('bliss.mp3');
+        }
+        if($scope.dataSelect == "notify.mp3"){
+            notificationSound = new Audio('notificationSounds/notify.mp3');
+            notificationSound.play();
+            todoStorage.changeNotificationSound('notify.mp3');
+        }
     }
 
     $scope.$watch('todoStorage.persistentInformation', function(){
         $scope.extraInformation = todoStorage.persistentInformation;
         $scope.themeID = $scope.extraInformation.topColor;
+        $scope.dataSelect = todoStorage.persistentInformation.notificationSound;
         if ($scope.themeID == "0"){
             $scope.update();
         }
@@ -792,6 +876,7 @@ app.controller('setting', function($scope, todoStorage, NotifyingColorService, N
     });
 
     NotifyingColorService2.subscribe($scope, function somethingChanged(event, info, setting, notificationSound) {
+        console.log(info);
         $scope.themeID = info;
         $scope.enableReminders = setting;
         $scope.dataSelect = notificationSound;
@@ -805,7 +890,7 @@ app.controller('setting', function($scope, todoStorage, NotifyingColorService, N
             $scope.update3();
         }
         else {
-            $scope.update4  ();
+            $scope.update4();
         } 
     }); 
     $scope.updateSetting = function(){
@@ -822,33 +907,35 @@ app.controller('setting', function($scope, todoStorage, NotifyingColorService, N
         todoStorage.updateColor($scope.themeID);
     }
 
-    $scope.update = function(){  // theme # 1
-        $scope.colorCode = "3db3d4";
-        $scope.tabCode = "6abdd4";
+    $scope.updateColors();
+
+    $scope.update = function(){  // theme #1 - blue
+        $scope.colorCode = "0a97f5";
+        $scope.tabCode = "6cc1f9";
         $scope.themeID = 0;
         $scope.updateColors();
     }
-    $scope.update1 = function(){ // theme #2
-        $scope.colorCode = "13bf91";
-        $scope.tabCode = "7edec4";
+    $scope.update1 = function(){ // theme #2 - gold
+        $scope.colorCode = "ffd700";
+        $scope.tabCode = "ffe866";
         $scope.themeID = 1;
         $scope.updateColors();
     }
-    $scope.update2 = function(){ // theme #3
+    $scope.update2 = function(){ // theme #3 - red
         $scope.colorCode = "d6391a";
-        $scope.tabCode = "d4563d"; 
+        $scope.tabCode = "eb7760"; 
         $scope.themeID = 2;
         $scope.updateColors();
     }
-    $scope.update3 = function(){ // theme #4
-        $scope.colorCode = "30c935";
-        $scope.tabCode = "60d664";
+    $scope.update3 = function(){ // theme #4 - green
+        $scope.colorCode = "2db931";
+        $scope.tabCode = "6fdc73";
         $scope.themeID = 3;
         $scope.updateColors();
     }
-    $scope.update4 = function(){ // theme #5
-        $scope.colorCode = "D4D438";
-        $scope.tabCode = "bfd93d";
+    $scope.update4 = function(){ // theme #5 - pink
+        $scope.colorCode = "ff5bff";
+        $scope.tabCode = "ff99ff";
         $scope.themeID = 4;
         $scope.updateColors();
     }
@@ -884,7 +971,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
         if($scope.todoList.length == 0){
             $scope.remove(0);
         }
-        console.log($scope.todoList);
         angular.forEach($scope.todoList, function(item){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
             for(var j=0; j < item.subToDo.length; j++){
                 $scope.addEvent(item.subToDo[j], item.color, item);
@@ -898,7 +984,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
             }
         })
     });
-    console.log($scope.events);
 
     NotifyingServiceCalendar.subscribe($scope, function somethingChanged(event, data) {
         $scope.syncCalendar(data); 
@@ -909,26 +994,14 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
 
         // If we've already opened the calendar
         var functionName = data.functionName;
-        if(functionName == "remove"){
-            var indices = [];
-            indices.push(0);
-            for(var j = 0; j < $scope.events.length; j++){
-                if(data.catHash == $scope.events[j].catHash){
-                    indices.push(j);
-                    console.log($scope.events[j].catHash);
-                }
-            }
-            for(var j = 1; j < indices.length + 1; j++){
-                $scope.remove(indices[j]);
-                uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
-            }
-        }
-        else if(functionName == "removeSubToDo"){
+        if(functionName == "removeSubToDo"){
             var syncData = data.data;
             for(var j = 0; j < $scope.events.length; j++){
                 if(syncData.uniqueHash == $scope.events[j].hash){
                     $scope.remove(j);
-                    uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    if(calendarRendered){
+                        uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    }
                 }
             }
         }
@@ -937,7 +1010,9 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
             for(var j = 0; j < $scope.events.length; j++){
                 if(syncData.uniqueHash == $scope.events[j].hash){
                     $scope.events[j].title = syncData.name;
-                    uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    if(calendarRendered){
+                        uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    }
                 }
             }
         }
@@ -946,7 +1021,13 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
             for(var j = 0; j < $scope.events.length; j++){
                 if(syncData.uniqueHash == $scope.events[j].hash){
                     $scope.events[j].notes = syncData.notes;
-                    uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    if(calendarRendered){
+                        var tempName = $scope.events[j].title;
+                        $scope.events[j].title = "temp";
+                        uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                        $scope.events[j].title = tempName;
+                        uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    }
                 }
             }
         }
@@ -958,7 +1039,9 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     eventDate.setDate(eventDate.getDate() + 1);
                     $scope.setTime(eventDate, syncData.time);
                     $scope.events[j].start = eventDate;
-                    uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    if(calendarRendered){
+                            uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    }
                 }
             }
         }
@@ -970,19 +1053,41 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     eventDate.setDate(eventDate.getDate() + 1);
                     $scope.setTime(eventDate, syncData.time);
                     $scope.events[j].start = eventDate;
-                    uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    if(calendarRendered){
+                        uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    }
                 }
             }
         }
         else if(functionName == "changeCategoryName"){
+           var syncData = data.data;
             for(var j = 0; j < $scope.events.length; j++){
-                if(data.catHash == $scope.events[j].catHash){
-                    $scope.events[j].category = data.newCategoryName;
-                    uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                if(syncData.uniqueHash == $scope.events[j].hash){
+                    $scope.events[j].category = data.categoryName;
+                    if(calendarRendered){
+                        var tempName = $scope.events[j].title;
+                        $scope.events[j].title = "temp";
+                        uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                        $scope.events[j].title = tempName;
+                        uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    }
                 }
-            }       
+            }      
         }
-        else if(functionName == "changeCategoryColor"){     
+        else if(functionName == "changeCategoryColor"){
+            var syncData = data.data;
+            for(var j = 0; j < $scope.events.length; j++){
+                if(syncData.uniqueHash == $scope.events[j].hash){
+                    $scope.events[j].backgroundColor = "#" + data.categoryColor;
+                    if(calendarRendered){
+                        var tempName = $scope.events[j].title;
+                        $scope.events[j].title = "temp";
+                        uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                        $scope.events[j].title = tempName;
+                        uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+                    }
+                }
+            }         
         }
         else if(functionName == "addSubToDo"){
             var syncData = data.data;
@@ -992,12 +1097,13 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                 start: eventDate,
                 notes: syncData.notes,
                 hash: syncData.uniqueHash,
-                catHash: syncData.catHash,
                 category: syncData.categoryName,
                 backgroundColor: "#" + data.color,
                 stick: true
             });
-            uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+            if(calendarRendered){
+                    uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+            }
         }
     }
 
@@ -1014,23 +1120,27 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                 else{
                     calendarOverlay.style.display = "inline-block";
 
-                    var saveButton = document.createElement("button"); // The button to confirm the user click to update name 
-                    saveButton.innerHTML = "Save Changes";
-                    // TODO modify CSS and class stuff here
-
-                    var discardButton = document.createElement("button"); // The button to confirm the user click to update name 
-                    discardButton.innerHTML = "Discard Changes";
-                    // TODO modify CSS and class stuff here 
+                    var close = document.createElement("div"); // The button to confirm the user click to update name
+                    close.className = "closeButton row text-right";
+                    close.innerHTML = "<i class='fa fa-lg fa-remove'></i>";
+                    
+                    $(close).bind('click', function(){
+                        calendarOverlay.innerHTML = "";
+                        calendarOverlay.style.display = "none";
+                    });
 
                     var name = document.createElement('input'); // Field where new name goes
+                    name.disabled = 'readonly';
                     name.type = 'text';
                     name.value = date.title;
 
                     var note = document.createElement("textarea"); // button that brings up notes text field
+                    note.disabled = 'readonly';
                     note.value = date.notes;
                     // TODO modify CSS and class stuff here
 
                     var datePicker = document.createElement("input"); // date picker
+                    datePicker.disabled = 'readonly';
                     datePicker.type = "date";
                     datePicker.buttonText = "<i class='fa fa-calendar'></i>";
                     datePicker.className = "DatePicker";
@@ -1040,20 +1150,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     var timePicker = document.createElement("input"); // Time picker
                     timePicker.type = "time";
                     timePicker.className = "TimePicker";
-
-                    $(saveButton).bind("click", function(){   // Button that handles updating the TODO
-                        var nameChanges = name.value;
-                        var noteChanges = note.value;
-                        var dateChanges = new Date(datePicker.value);
-                        var timeChanges = $scope.formatTime(timePicker.value);     
-                       
-                        // UPDATE EVENT ON CALENDAR
-
-                        // PUSH CHANGES TO STORAGE
-
-                        todoStorage.modifySubToDo(date.categoryIndex, date.subToDoindex, nameChanges, dateChanges, timeChanges, noteChanges); // Update in memory                 
-                    });
-
 
                     var deleteTodo = document.createElement('div');  // Delete button for the Todo that is at the bottom
                     deleteTodo.className = "";
@@ -1076,8 +1172,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                         calendarOverlay.style.display = "none";  // close overlay
                     });
                     
-                    calendarOverlay.appendChild(saveButton);
-                    calendarOverlay.appendChild(discardButton);
+                    calendarOverlay.appendChild(close);
                     calendarOverlay.appendChild(name);
                     calendarOverlay.appendChild(note);
                     calendarOverlay.appendChild(datePicker);
@@ -1117,7 +1212,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
         start: eventDate,
         notes: subToDo.notes,
         hash: subToDo.uniqueHash,
-        catHash: category.catHash,
         category: category.content,
         backgroundColor: "#" + color,
         //start: $scope.setTime(eventDate, subToDo.time)
