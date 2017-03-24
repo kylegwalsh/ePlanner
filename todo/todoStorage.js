@@ -255,6 +255,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         var size = _this.data.length-1; 
         var category = _this.data[size-categoryIndex];
         var size2 = category.subToDo.length-1;
+        console.log(categoryIndex + " " + subToDoIndex);
 
         var newData = {
             name: name,

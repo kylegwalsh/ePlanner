@@ -1050,6 +1050,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
             for(var j=0; j < item.subToDo.length; j++){
                 $scope.addEvent(item.subToDo[j], item.color, item);
                 if($scope.count == 0){
+                    console.log($scope.events);
                     $scope.remove(0);
                 }
                 $scope.count = $scope.count + 1;         
