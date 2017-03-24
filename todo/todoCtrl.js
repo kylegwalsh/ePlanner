@@ -1168,7 +1168,9 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     backgroundColor: "#" + data.color,
                     stick: true
                 });
-                uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents'); 
+                if(calendarRendered){
+                    uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents'); 
+                }
             }
         }
 

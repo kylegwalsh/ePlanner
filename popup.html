@@ -33,10 +33,18 @@
         <!-- To do View -->
         <div id="ToDoView" ng-controller="todoCtrl">
           <div class="row">
+
               <div id="UndoCompleteOverlay">
-                  <button ng-click="undo()">Undo Complete</button>
-                  <button ng-click="ignore()">Confirm</button>
+                <div class="row">
+                  <div class="col-xs-6 text-center" style="vertical-align: middle;">
+                    <div class="undoButton" ng-click="undo()">Undo</div>
+                  </div>
+                  <div class="col-xs-6 text-center">
+                    <div class="hideButton" ng-click="ignore()">Hide</div>
+                  </div>
+                </div>
               </div>
+
               <div class="col-md-12">
                 <div class="newCourse btn" ng-click="add()">
                     Add New Course

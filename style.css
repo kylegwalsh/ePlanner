@@ -257,16 +257,32 @@ input[type="checkbox"]:focus{
 
 #UndoCompleteOverlay{
   display: none;
-  float: left;
-  margin-left:40px;
-  background-color: white;
+  position: absolute;
+  bottom: 40px;
+  height: 35px;
+  left: 100px;
+  right: 100px;
+  background-color: #666666;
   padding: 0;
   z-index: 2;
-  color: #333;
   border-radius: 2px;
+  opacity: .9;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 4px;
 }
 
+.undoButton{
+  color: red;
+}
 
+.undoButton:hover, .hideButton:hover{
+  cursor: pointer;
+}
+
+.hideButton{
+  color: lightgray;
+}
 
 #CategoryOptionsOverlay:before {
   border-bottom: 10px solid white;
