@@ -3,8 +3,36 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     var _this = this;
     this.data = [];
     this.persistentInformation = [];
+    this.UID;
     this.backUpToDo = [];
     this.extraBackupInfo;
+    // Runs first time app opened
+    $(document).ready(function(){
+        if(_this.persistentInformation.UID == null){
+            $('#MainPage').hide();
+            $('#UIDPage').show();
+        }
+    });
+
+    $('#UIDSubmit').bind('click', function(){
+        _this.updateUID();
+    });
+
+    this.updateUID = function(){
+        var temp = {
+            topColor: 0,
+            reminders: true,
+            currentHash: 1,
+            completedStuff: new Array(),
+            notificationSound: "oldSpice.mp3",
+            UID: document.getElementById("UIDForm").value
+        }
+        this.persistentInformation = temp;
+        this.sync();
+        $('#UIDPage').hide();        
+        $('#MainPage').show();        
+    }
+
 
     this.findAll = function(callback) {
         chrome.storage.sync.get('todo', function(keys) {
@@ -43,11 +71,13 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
         var information = {
             topColor: color,
+            reminders: this.persistentInformation.reminders,
             currentHash: this.persistentInformation.currentHash,
-            completedStuff: temp,    
+            completedStuff: temp,
+            notificationSound: this.persistentInformation.notificationSound,
+            UID: this.persistentInformation.UID            
         }
         this.persistentInformation = information;
-        console.log(this.persistentInformation);
         this.sync();
     }
 
@@ -67,6 +97,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             currentHash: this.persistentInformation.currentHash,
             completedStuff: new Array(), 
             notificationSound: this.persistentInformation.notificationSound,
+            UID: this.persistentInformation.UID 
         }
         this.persistentInformation = information;
         NotifyingService.notify(this.persistentInformation);
@@ -107,45 +138,52 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
     this.changeCategoryName = function(index, newName){
         var todo = _this.data[index];
-        var old = todo.content;
+        var syncData;
+        for (var i=0; i < todo.subToDo.length; i++) {
+            syncData = {
+                functionName: "changeCategoryName",
+                data: todo.subToDo[i],
+                categoryName: newName
+            }
+            NotifyingServiceCalendar.notify(syncData);
+        }
+
         todo.content = newName;
         this.sync();
         alarm.doToggleAlarms();
-
-        var syncData = {
-            functionName: "changeCategoryName",
-            oldCategoryName: old,
-            newCategoryName: newName
-        }
-        NotifyingServiceCalendar.notify(syncData);
     }
 
     this.changeCategoryColor = function(index, hexValue){
         var todo = _this.data[index];
+        var syncData;
+        for (var i=0; i < todo.subToDo.length; i++) {
+            syncData = {
+                functionName: "changeCategoryColor",
+                data: todo.subToDo[i],
+                categoryColor: hexValue
+            }
+            NotifyingServiceCalendar.notify(syncData);
+        }
+
         todo.color = hexValue;
         this.sync();
-        var syncData = {
-            functionName: "changeCategoryColor",
-            categoryName: todo.content,
-            categoryColor: hexValue
-        }
-        NotifyingServiceCalendar.notify(syncData);
     }
 
     this.remove = function(index) {
         var category = _this.data[index];
+        var syncData;
         for (var i=0; i < category.subToDo.length; i++) {
             alarm.cancelAlarms(category.subToDo[i]);
+            syncData = {
+                functionName: "removeSubToDo",
+                data: category.subToDo[i]
+            }
+            NotifyingServiceCalendar.notify(syncData);
         }
-        var category = this.data[index].content;
+
         this.data.splice(index, 1);
         this.updateIndexes();
         this.sync();
-        var syncData = {
-            functionName: "remove",
-            category: category
-        }
-        NotifyingServiceCalendar.notify(syncData);
     }
 
     this.removeCompleted = function(index){
@@ -335,8 +373,9 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             topColor: this.persistentInformation.topColor,
             reminders: this.persistentInformation.reminders,
             currentHash: this.persistentInformation.currentHash,
-            completedStuff: new Array(), 
+            completedStuff: this.persistentInformation.completedStuff, 
             notificationSound: selected,
+            UID: this.persistentInformation.UID,
         }
         this.persistentInformation = information;
         this.sync();
@@ -372,13 +411,13 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         } else {
             info = true;
         }
-        console.log(info);
         var information = {
             topColor: this.persistentInformation.topColor,
             reminders: info,
             currentHash: this.persistentInformation.currentHash,
             completedStuff: this.persistentInformation.completedStuff,  
             notificationSound: this.persistentInformation.notificationSound,
+            UID: this.persistentInformation.UID 
         } 
         this.persistentInformation = information;
         this.sync();
@@ -387,31 +426,27 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     this.addSubToDo = function(index, name, date, time, notes){
         // Assigns unique hash to todo
         var nextHash;
+        var remindersTemp;
+        var colorTemp;
+        var completedTemp;
+        var notificationTemp;
+        var UIDTemp;
         // Set current hash to one if it hasn't been intialized
-        if(this.persistentInformation.currentHash == null){
-            nextHash = 1;
-        }
-        // Otherwise, increment it
-        else{
-            var temp;
-            nextHash = this.persistentInformation.currentHash + 1;
-            if(this.persistentInformation.completedStuff != null){
-                temp = this.persistentInformation.completedStuff;
-            } else {
-                temp = new Array();
-            }
-        }
 
-        var temp = this.persistentInformation.reminders;
-        if(temp == null){
-            temp = true;
-        }
+        remindersTemp = this.persistentInformation.reminders;
+        colorTemp = this.persistentInformation.topColor;
+        completedTemp = this.persistentInformation.completedStuff;
+        notificationTemp = this.persistentInformation.notificationSound;
+        UIDTemp = this.persistentInformation.UID;
+        nextHash = this.persistentInformation.currentHash + 1;
 
         var information = {
-            topColor: this.persistentInformation.topColor,
-            reminders: temp,
+            topColor: colorTemp,
+            reminders: remindersTemp,
             currentHash: nextHash,
-            completedStuff: this.persistentInformation.completedStuff,    
+            completedStuff: completedTemp,
+            notificationSound: notificationTemp,
+            UID: UIDTemp
         } 
         this.persistentInformation = information;
 
@@ -428,13 +463,13 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             notes: notes,
             uniqueHash: nextHash,
         }
-        console.log(nextHash);
-        category.subToDo.push(newData);       
+        category.subToDo.push(newData);      
         this.sync();
         var syncData = {
             functionName: "addSubToDo",
             data: newData,
-            color: category.color
+            color: category.color,
+            categoryName: category.content,
         }
         NotifyingServiceCalendar.notify(syncData);
     }
