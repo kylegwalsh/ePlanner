@@ -54,7 +54,6 @@ var alarm = (function () {
 
   create1WeekAlarm: (function () {
     findAll(function(data){
-      console.log("Creating alarms");
       var todoList = data;
       for(var k = 0; k < todoList.length; k++){
         for(var j = 0; j < todoList[k].subToDo.length; j++){
@@ -108,7 +107,6 @@ var alarm = (function () {
      chrome.alarms.clear(subToDo.uniqueHash + "1Day");
      chrome.alarms.clear(subToDo.uniqueHash + "1Week");
      chrome.alarms.clear(subToDo.uniqueHash + "Overdue");
-     console.log("Alarm canceled for subToDo Hash: " + subToDo.uniqueHash);
    }),
 
    doToggleAlarms: (function () {

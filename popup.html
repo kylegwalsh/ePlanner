@@ -12,12 +12,14 @@
       <!-- Top header bar -->
       <div class="container no-padding" id="topBar">
           <div class="row" id="header">
+            <!-- Filter button -->
+            <div class="pull-left"><i id="settingsButton" class='fa fa-lg fa-cog'></i></div>
             <!-- Title of App -->
-            <div id="appName" class="col-xs-4 col-xs-offset-4">
+            <div id="appName">
               <strong class="noselect">ePlanner</strong>
             </div>
             <!-- Settings button -->
-            <div class="col-xs-offset-2 col-xs-1"><i id="settingsButton" class='fa fa-lg fa-cog'></i></div>
+            <div class="pull-right"><i class='fa fa-lg fa-remove exitButton'></i></div>
           </div>
       </div>
       <!-- Tabs -->
@@ -82,15 +84,20 @@
 
     <!-- Settings Page that can be swapped with Main Page -->
     <div id="SettingsPage">
-      <!-- New top bar for settings -->
+      <!-- Top header bar for settings -->
       <div class="container no-padding" id="topBar2">
           <div class="row" id="header">
-            <div id="settingsName">
+            <!-- Return button -->
+            <div class="pull-left"><i id="return" class='fa fa-lg fa-arrow-left'></i></div>
+            <!-- Title of App -->
+            <div id="appName">
               <strong class="noselect">ePlanner Settings</strong>
             </div>
-            <a class="pull-right" id="return"><i class="fa fa-lg fa-remove"></i></a>
+            <!-- Exit button -->
+            <div class="pull-right"><i class='fa fa-lg fa-remove exitButton'></i></div>
           </div>
       </div>
+
       <!-- Main area for settings -->
       <div class="main container" ng-controller="setting">
         <div class="container">
@@ -109,7 +116,7 @@
               <p>Enable Reminders</p>
           </div>
           <div class="row">
-            <div class="reminderMsg">*If reminders are enabled, then you will recieve desktop push notifications:<br>
+            <div class="reminderMsg">If reminders are enabled, then you will recieve desktop push notifications:<br>
               <ul type="disc">
                 <li>A week before the assignment deadline</li>
                 <li>A day before the assignment deadline</li>
@@ -129,6 +136,25 @@
             </select>
             <p>Select Notification Sound</p>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page to enter UID -->
+    <div id="UIDPage">
+      <div class="container no-padding" id="topBar">
+          <div class="row text-center" id="header">
+            <!-- Title of App -->
+            <div id="appName">
+              <strong class="noselect">ePlanner</strong>
+            </div>
+          </div>
+      </div>
+      <div class="container text-center">
+        <h2>Please enter the user ID you were assigned for this study</h2>
+        <div class="row" style="margin-top: 40px;">
+            <input id="UIDForm" type="text" name="uid" placeholder="Enter user ID">
+            <input id="UIDSubmit" type="submit" value="Submit">
         </div>
       </div>
     </div>

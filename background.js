@@ -1,48 +1,49 @@
 var dbName = 'todo';
 function showNotification(alarm) {
     findAll(function(data){
-      console.log("Inside notification");
       var todoList = data;
+      var remindersEnabled;
       findAll2(function(persistentInformation){
-        var notificationSound = new Audio('notificationSounds/' + persistentInformation.notificationSound);
-        notificationSound.play();
-      });
-      todoList.forEach(function(toDo){
-        for(var j = 0; j < toDo.subToDo.length; j++){
-          if(alarm.name == toDo.subToDo[j].uniqueHash + "1Hour" || alarm.name == toDo.subToDo[j].uniqueHash + "1Day" || alarm.name == toDo.subToDo[j].uniqueHash + "1Week"){
-            console.log(toDo.subToDo[j].name);
-            var notificationDate = new Date(toDo.subToDo[j].date);
-            setTime(notificationDate, toDo.subToDo[j].time);
-            if(toDo.subToDo[j].time==""){
-              chrome.notifications.create(alarm.name, {
-                type: 'basic',
-                iconUrl: 'icon.png',
-                title: toDo.content,
-                message: toDo.subToDo[j].name + "\nDue: " + formatDateOnly(toDo.subToDo[j].date)
-              }, function(notificationId) {});
+        if(persistentInformation.reminders){
+          var notificationSound = new Audio('notificationSounds/' + persistentInformation.notificationSound);
+          notificationSound.play();
+
+          todoList.forEach(function(toDo){
+            for(var j = 0; j < toDo.subToDo.length; j++){
+              if(alarm.name == toDo.subToDo[j].uniqueHash + "1Hour" || alarm.name == toDo.subToDo[j].uniqueHash + "1Day" || alarm.name == toDo.subToDo[j].uniqueHash + "1Week"){
+                var notificationDate = new Date(toDo.subToDo[j].date);
+                setTime(notificationDate, toDo.subToDo[j].time);
+                if(toDo.subToDo[j].time==""){
+                  chrome.notifications.create(alarm.name, {
+                    type: 'basic',
+                    iconUrl: 'icon.png',
+                    title: toDo.content,
+                    message: toDo.subToDo[j].name + "\nDue: " + formatDateOnly(toDo.subToDo[j].date)
+                  }, function(notificationId) {});
+                }
+                else{
+                  chrome.notifications.create(alarm.name, {
+                    type: 'basic',
+                    iconUrl: 'icon.png',
+                    title: toDo.content,
+                    message: toDo.subToDo[j].name + "\nDue: " + formatDate(notificationDate)
+                  }, function(notificationId) {});
+                }
+              }
+              else if(alarm.name == toDo.subToDo[j].uniqueHash + "Overdue"){
+                var notificationDate = new Date(toDo.subToDo[j].date);
+                setTime(notificationDate, toDo.subToDo[j].time);
+                chrome.browserAction.setBadgeText({text: "!"});
+                chrome.browserAction.setBadgeBackgroundColor({color: "#FF0000"});
+                chrome.notifications.create(alarm.name, {
+                  type: 'basic',
+                  iconUrl: 'icon.png',
+                  title: toDo.content,
+                  message: toDo.subToDo[j].name + "\nThis assignment is overdue!"
+                }, function(notificationId) {});
+              }
             }
-            else{
-              chrome.notifications.create(alarm.name, {
-                type: 'basic',
-                iconUrl: 'icon.png',
-                title: toDo.content,
-                message: toDo.subToDo[j].name + "\nDue: " + formatDate(notificationDate)
-              }, function(notificationId) {});
-            }
-          }
-          else if(alarm.name == toDo.subToDo[j].uniqueHash + "Overdue"){
-            console.log(toDo.subToDo[j].name);
-            var notificationDate = new Date(toDo.subToDo[j].date);
-            setTime(notificationDate, toDo.subToDo[j].time);
-            chrome.browserAction.setBadgeText({text: "!"});
-            chrome.browserAction.setBadgeBackgroundColor({color: "#FF0000"});
-            chrome.notifications.create(alarm.name, {
-              type: 'basic',
-              iconUrl: 'icon.png',
-              title: toDo.content,
-              message: toDo.subToDo[j].name + "\nThis assignment is overdue!"
-            }, function(notificationId) {});
-          }
+          });
         }
       });
     });
@@ -68,7 +69,6 @@ findAll2 = function(callback){
 }
 
 chrome.alarms.onAlarm.addListener(function( alarm ) {
-  console.log(alarm);
   showNotification(alarm);
   chrome.alarms.clear(alarm.name);
 });
