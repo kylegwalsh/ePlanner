@@ -48,6 +48,8 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 
     $scope.remove = function(index) {
         todoStorage.remove(index);
+         $("#ITEMS").innerHTML = "";
+          $scope.updateEverything();
     }
 
     $scope.toggleCompleted = function() {
@@ -192,7 +194,10 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                          top.style.backgroundColor = "#" + colorPicker.value; // updates the color in the Category
                          title.style.backgroundColor = "#" + colorPicker.value;
                          color = colorPicker.value;
-                         todoStorage.changeCategoryColor(index,colorPicker.value);
+                         var categoryChild = $(addMe);
+                         var categoryParent = $(addMe).parent();
+                         var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+                         todoStorage.changeCategoryColor(categoryIndex,colorPicker.value);
                     });
 
                     var deleteCategory = document.createElement('div');
@@ -200,9 +205,12 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                     deleteCategory.innerHTML = "Delete Course";
 
                     $(deleteCategory).bind('click', {category: event.data.category }, function(event){
-                        var data = event.data.category;
-                        $(data).empty(); // deletes the entire Category in the HTML
-                        todoStorage.remove(index); // remove Category from memory
+                        var data = event.data.category;   
+                        var categoryChild = $(addMe);
+                        var categoryParent = $(addMe).parent();
+                        var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+                        todoStorage.remove(categoryIndex); // remove Category from memory
+                        addMe.remove(); 
                         categoryOverlay.innerHTML = ""; // clear contents of overlay
                         categoryOverlay.style.display = "none";  // close overlay
                     });
@@ -236,7 +244,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
         top.appendChild(button);
         addMe.appendChild(top);
 
-        var templateToAdd = $scope.addSubSectionTemplate(addMe, index); // append the "add" portion at the bottom
+        var templateToAdd = $scope.addSubSectionTemplate(addMe, addMe); // append the "add" portion at the bottom
         $("#ITEMS").prepend(addMe); // here we actually append the newly created HTML section to the existing DOM
 
         // Focus on title of it doesn't have one
@@ -250,7 +258,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 
 
     // This function adds the blank template that is at the bottom of every category
-    $scope.addSubSectionTemplate = function(Category, index){
+    $scope.addSubSectionTemplate = function(Category, addMe){
         var divider = document.createElement('div');
         divider.className ="EndCategory";
         var addnewbar  = document.createElement('div'); // Create Div that houses the information for a single row To-DO
@@ -261,7 +269,12 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 
         $(addnew).bind( "click", function() {
             // call function to save the new information
-            $scope.saveSubSectionForTodo(index, $(this), "", "", "", "");
+                        var categoryChild = $(addMe);
+                         var categoryParent = $(addMe).parent();
+                         var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+
+
+            $scope.saveSubSectionForTodo(categoryIndex, $(this), "", "", "", "");
 
             // call function to display the information
             $scope.displaySubSectionForTodo( $(this), "", "", "", "", true);
@@ -353,7 +366,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                         todoStorage.markToDoAsComplete(categoryIndex, subToDoindex); // adds to persistentStorage 
                         todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory 
                           
-
                         var animation = setTimeout(function(){
                             divider.remove(); // Clear from html 
                         }, 300);

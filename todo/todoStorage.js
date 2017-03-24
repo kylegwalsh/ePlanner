@@ -55,7 +55,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
     this.updateIndexes = function(){
         for (var i=0; i<_this.data.length; i++) {
-            _this.data[i]['id'] = i + 1;
+            _this.data[i]['id'] = i;
         }
         this.sync();
     }
@@ -122,7 +122,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
     this.add = function (colorCode) {
         var id = this.data.length;      
-
         var todo = {
             id: id,
             content: "",
@@ -170,8 +169,14 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     }
 
     this.remove = function(index) {
-        var category = _this.data[index];
+
+        console.log("B4");
+        console.log(_this.data);
+
+        var category = _this.data[_this.data.length -1 - index];
+        console.log(category);
         var syncData;
+    
         for (var i=0; i < category.subToDo.length; i++) {
             alarm.cancelAlarms(category.subToDo[i]);
             syncData = {
@@ -181,8 +186,10 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             NotifyingServiceCalendar.notify(syncData);
         }
 
-        this.data.splice(index, 1);
-        this.updateIndexes();
+
+        _this.data.splice(_this.data.length -1 - index, 1);
+        console.log("AFTER");
+        console.log(_this.data);
         this.sync();
     }
 
@@ -207,8 +214,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
     this.backUp = function(catIndex, subIndex){
         var COPY = angular.copy(_this.data);
-        console.log("copy =========================== is:");
-        console.log(COPY);
         this.backUpToDo = COPY;
 
      }
