@@ -408,6 +408,11 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 
                 // categoryIndex contains the value of the entire Category that the subToDo is being updated in
                 todoStorage.changeSubToDoName(categoryIndex, subToDoIndex, name.value);
+
+                if(date.value == "" && dateandtime.style.display == "inline-block"){
+                    date.focus();
+                    date.select();
+                }
             });
 
             // Save changes to todo notes
@@ -512,7 +517,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
             // If user presses enter, remove focus
             $(name).bind('keydown', function(event) {
                 if(event.keyCode == 13){
-                    if(newToDoBool){
+                    if(date.value == "" && dateandtime.style.display == "inline-block"){
                         date.focus();
                         date.select();
                     }
@@ -735,6 +740,9 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
         if(date.value == "" && !newToDoBool){
             dateandtime.style.display = "none";
         }
+        else{
+            dateandtime.style.display = "inline-block";
+        }
         // If there's no time, don't display
         if(time.value == "" && !newToDoBool){
             time.style.display = "none";
@@ -743,7 +751,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
         if(notes.value == ""){
             notes.style.display = "none";
         }
-
         if(newToDoBool){
             name.focus();
         }
@@ -1207,7 +1214,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     var note = document.createElement("div"); // button that brings up notes text field
                     note.className = 'row calNotes container';
                     note.innerHTML = date.notes;
-                    // TODO modify CSS and class stuff here
 
                     var dateandtime = document.createElement('div');
                     dateandtime.className = "SubDateTime calRow row";
@@ -1229,7 +1235,18 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     var time = document.createElement('input');
                     time.type = 'time';
                     time.disabled = "readonly";
-                    time.value = temp.getHours() + ":" + temp.getMinutes();
+                    var hours = temp.getHours();
+                    if(moment(date.start).isUTC()){
+                        hours+=5;
+                    }
+                    if(hours < 10){
+                        hours = "0" + hours;
+                    }
+                    var minutes = temp.getMinutes();
+                    if(minutes < 10){
+                        minutes = "0"+ minutes;
+                    }
+                    time.value = hours + ":" + minutes;
                     time.className = "time";
                     
                     calendarOverlay.appendChild(close);

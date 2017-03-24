@@ -195,9 +195,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     this.backupCompleteData = function(){
         var temp = new Array();
 
-        if(_this.persistentInformation.completedStuff == null){
-
-        } else {
+        if(_this.persistentInformation.completedStuff != null){
             for(var i=0; i<_this.persistentInformation.completedStuff.length; i++){
                  temp.push(angular.copy(_this.persistentInformation.completedStuff[i]));
             }
@@ -208,14 +206,13 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     this.backUp = function(catIndex, subIndex){
         var COPY = angular.copy(_this.data);
         this.backUpToDo = COPY;
-
      }
-    this.clearSavedInfo = function(){
 
+    this.clearSavedInfo = function(){
         var temp = new Array();
             for(var i=0; i<_this.persistentInformation.completedStuff.length; i++){
                  temp.push(angular.copy(_this.persistentInformation.completedStuff[i]));
-            }
+        }
 
         this.extraBackupInfo = temp;
         this.backUpToDo = _this.data;
@@ -226,7 +223,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         _this.data = this.backUpToDo;
         _this.persistentInformation.completedStuff = this.extraBackupInfo;
         NotifyUndo.notify(this.extraBackupInfo); 
-         this.sync();
+        this.sync();
     }
 
     this.removeSubToDo = function(categoryIndex, subToDoIndex){
