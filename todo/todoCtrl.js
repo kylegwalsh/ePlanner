@@ -13,7 +13,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 
     $scope.$watch('todoStorage.persistentInformation', function(){
         $scope.extraInformation = $scope.todoStorage.persistentInformation;
-        console.log($scope.extraInformation);
     });
 
     $scope.todoStorage.findAll2(function(data){
@@ -902,7 +901,6 @@ app.controller('setting', function($scope, todoStorage, NotifyingColorService, N
     $scope.dataSelect;
 
     $scope.doSomething = function(){
-        alert($scope.themeID);
         var notificationSound;
         if($scope.dataSelect == "oldSpice.mp3"){
             notificationSound = new Audio('notificationSounds/oldSpice.mp3');
@@ -943,7 +941,6 @@ app.controller('setting', function($scope, todoStorage, NotifyingColorService, N
     });
 
     NotifyingColorService2.subscribe($scope, function somethingChanged(event, info, setting, notificationSound) {
-        console.log(info);
         $scope.themeID = info;
         $scope.enableReminders = setting;
         $scope.dataSelect = notificationSound;
@@ -1165,6 +1162,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     start: eventDate,
                     notes: syncData.notes,
                     hash: syncData.uniqueHash,
+                    category: data.categoryName,
                     backgroundColor: "#" + data.color,
                     stick: true
                 });
@@ -1214,6 +1212,9 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     var dateandtime = document.createElement('div');
                     dateandtime.className = "SubDateTime calRow row";
                     var temp = new Date(date.start);
+                    if(date.start._isUTC == true){
+                        temp.setHours(temp.getHours() + 5);
+                    }
                     var date = document.createElement('input');
                     date.type = 'date';
                     date.disabled = "readonly";
@@ -1224,18 +1225,24 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     }
                     var day = temp.getDate();
                     date.value = year + "-" + month + "-" + day;
-                    console.log(temp.getFullYear() + "-" + (temp.getMonth()+1) + "-" + temp.getDate());
                     date.className = "date";
                     var time = document.createElement('input');
                     time.type = 'time';
                     time.disabled = "readonly";
-                    time.value = temp.getHours() + ":" + temp.getMinutes();
+                    var hours = temp.getHours();
+                    var minutes = temp.getMinutes();
+                    if(hours < 10){
+                        hours = "0"+hours;
+                    }
+                    if(minutes < 10){
+                        minutes = "0"+minutes;
+                    }
+                    time.value =  hours + ":" + minutes;
                     time.className = "time";
                     
                     calendarOverlay.appendChild(close);
                     calendarOverlay.appendChild(category);
                     calendarOverlay.appendChild(name);
-                    console.log(date.notes);
                     if(note.innerHTML != ""){
                         calendarOverlay.appendChild(note);
                     }

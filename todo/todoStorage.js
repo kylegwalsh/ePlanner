@@ -55,7 +55,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
     this.updateIndexes = function(){
         for (var i=0; i<_this.data.length; i++) {
-            _this.data[i]['id'] = i + 1;
+            this.data[i].id = i + 1;
         }
         this.sync();
     }
@@ -121,7 +121,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     }
 
     this.add = function (colorCode) {
-        var id = this.data.length;      
+        var id = this.data.length;    
 
         var todo = {
             id: id,
@@ -182,7 +182,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         }
 
         this.data.splice(index, 1);
-        this.updateIndexes();
+        //this.updateIndexes();
         this.sync();
     }
 
@@ -207,8 +207,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
     this.backUp = function(catIndex, subIndex){
         var COPY = angular.copy(_this.data);
-        console.log("copy =========================== is:");
-        console.log(COPY);
         this.backUpToDo = COPY;
 
      }
@@ -226,9 +224,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
     this.restoreData = function(){
         _this.data = this.backUpToDo;
-        console.log(_this.data);
         _this.persistentInformation.completedStuff = this.extraBackupInfo;
-        console.log(_this.persistentInformation.completedStuff);
         NotifyUndo.notify(this.extraBackupInfo); 
          this.sync();
     }
