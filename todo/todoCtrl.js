@@ -352,7 +352,11 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                         
                         todoStorage.markToDoAsComplete(categoryIndex, subToDoindex); // adds to persistentStorage 
                         todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory 
-                        divider.remove(); // Clear from html   
+                          
+
+                        var animation = setTimeout(function(){
+                            divider.remove(); // Clear from html 
+                        }, 300);
 
                         var timeoutFunction = setTimeout(function(){
                             $scope.checkBoxCount--;
