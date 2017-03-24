@@ -13,7 +13,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 
     $scope.$watch('todoStorage.persistentInformation', function(){
         $scope.extraInformation = $scope.todoStorage.persistentInformation;
-        console.log($scope.extraInformation);
     });
 
     $scope.todoStorage.findAll2(function(data){
@@ -902,7 +901,6 @@ app.controller('setting', function($scope, todoStorage, NotifyingColorService, N
     $scope.dataSelect;
 
     $scope.doSomething = function(){
-        alert($scope.themeID);
         var notificationSound;
         if($scope.dataSelect == "oldSpice.mp3"){
             notificationSound = new Audio('notificationSounds/oldSpice.mp3');
@@ -943,7 +941,6 @@ app.controller('setting', function($scope, todoStorage, NotifyingColorService, N
     });
 
     NotifyingColorService2.subscribe($scope, function somethingChanged(event, info, setting, notificationSound) {
-        console.log(info);
         $scope.themeID = info;
         $scope.enableReminders = setting;
         $scope.dataSelect = notificationSound;
@@ -1161,6 +1158,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                 var syncData = data.data;
                 var eventDate = new Date(y - 1, m, d);
                     $scope.events.push({
+                    category: data.categoryName,
                     title: syncData.name,
                     start: eventDate,
                     notes: syncData.notes,
@@ -1223,8 +1221,10 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                         month = "0"+month;
                     }
                     var day = temp.getDate();
+                    if(day < 10){
+                        day = "0"+day;
+                    }
                     date.value = year + "-" + month + "-" + day;
-                    console.log(temp.getFullYear() + "-" + (temp.getMonth()+1) + "-" + temp.getDate());
                     date.className = "date";
                     var time = document.createElement('input');
                     time.type = 'time';
@@ -1235,7 +1235,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     calendarOverlay.appendChild(close);
                     calendarOverlay.appendChild(category);
                     calendarOverlay.appendChild(name);
-                    console.log(date.notes);
                     if(note.innerHTML != ""){
                         calendarOverlay.appendChild(note);
                     }

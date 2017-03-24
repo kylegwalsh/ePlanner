@@ -8,7 +8,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     this.extraBackupInfo;
     // Runs first time app opened
     $(document).ready(function(){
-        if(_this.persistentInformation.UID == null){
+        if(_this.persistentInformation == null){
             $('#MainPage').hide();
             $('#UIDPage').show();
         }
@@ -207,8 +207,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
     this.backUp = function(catIndex, subIndex){
         var COPY = angular.copy(_this.data);
-        console.log("copy =========================== is:");
-        console.log(COPY);
         this.backUpToDo = COPY;
 
      }
@@ -226,9 +224,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
     this.restoreData = function(){
         _this.data = this.backUpToDo;
-        console.log(_this.data);
         _this.persistentInformation.completedStuff = this.extraBackupInfo;
-        console.log(_this.persistentInformation.completedStuff);
         NotifyUndo.notify(this.extraBackupInfo); 
          this.sync();
     }
