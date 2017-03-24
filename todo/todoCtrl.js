@@ -1109,6 +1109,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
 
     /* alert on eventClick */
     $scope.alertOnEventClick = function( date, jsEvent, view){
+                jsEvent.stopPropagation();
                 var calendarOverlay = document.getElementById("CalendarOverlay");
 
                 // Closes options if they're open
@@ -1121,63 +1122,61 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     calendarOverlay.style.display = "inline-block";
 
                     var close = document.createElement("div"); // The button to confirm the user click to update name
-                    close.className = "closeButton row text-right";
-                    close.innerHTML = "<i class='fa fa-lg fa-remove'></i>";
+                    close.className = "text-right";
+                    close.innerHTML = "<i class='closeButton fa fa-lg fa-remove'></i>";
                     
                     $(close).bind('click', function(){
                         calendarOverlay.innerHTML = "";
                         calendarOverlay.style.display = "none";
                     });
 
-                    var name = document.createElement('input'); // Field where new name goes
-                    name.disabled = 'readonly';
-                    name.type = 'text';
-                    name.value = date.title;
+                    var category = document.createElement('div');
+                    category.className = "row calRow calCat";
+                    category.innerHTML = date.category;
 
-                    var note = document.createElement("textarea"); // button that brings up notes text field
-                    note.disabled = 'readonly';
-                    note.value = date.notes;
+                    var name = document.createElement('div'); // Field where new name goes
+                    name.className = "row calRow";
+                    name.innerHTML = date.title;
+
+                    var note = document.createElement("div"); // button that brings up notes text field
+                    note.className = 'row calNotes container';
+                    note.innerHTML = date.notes;
                     // TODO modify CSS and class stuff here
 
-                    var datePicker = document.createElement("input"); // date picker
-                    datePicker.disabled = 'readonly';
-                    datePicker.type = "date";
-                    datePicker.buttonText = "<i class='fa fa-calendar'></i>";
-                    datePicker.className = "DatePicker";
-                    datePicker.value = new Date(date.start);
-                    // TODO modify CSS and class stuff here
-
-                    var timePicker = document.createElement("input"); // Time picker
-                    timePicker.type = "time";
-                    timePicker.className = "TimePicker";
-
-                    var deleteTodo = document.createElement('div');  // Delete button for the Todo that is at the bottom
-                    deleteTodo.className = "";
-                    deleteTodo.innerHTML = "Delete Assignment";
-                    
-                    $(deleteTodo).bind( "click", function() {    // button that handles deleting a TODO
-                        var child = divider;
-                        var parent = $(divider).parent();
-                        var subToDoindex = $(parent).children(".Divider").index(child);
-                        // subToDoindex contains the value of what we currently want to delete
-
-                        var categoryChild = $(divider).parent().parent().parent();
-                        var categoryParent = $(divider).parent().parent().parent().parent();
-                        var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
-                        // categoryIndex contains the value of the entire Category that the subToDo is being deleted in
-
-                        todoStorage.removeSubToDo(categoryIndex, subToDoindex); // Clear from memory
-                        divider.remove(); // Clear from HTML
-                        calendarOverlay.innerHTML = ""; // clear contents of overlay
-                        calendarOverlay.style.display = "none";  // close overlay
-                    });
+                    var dateandtime = document.createElement('div');
+                    dateandtime.className = "SubDateTime calRow row";
+                    var temp = new Date(date.start);
+                    var date = document.createElement('input');
+                    date.type = 'date';
+                    date.disabled = "readonly";
+                    var year = temp.getFullYear();
+                    var month = temp.getMonth()+1;
+                    if(month < 10){
+                        month = "0"+month;
+                    }
+                    var day = temp.getDate();
+                    date.value = year + "-" + month + "-" + day;
+                    console.log(temp.getFullYear() + "-" + (temp.getMonth()+1) + "-" + temp.getDate());
+                    date.className = "date";
+                    var time = document.createElement('input');
+                    time.type = 'time';
+                    time.disabled = "readonly";
+                    time.value = temp.getHours() + ":" + temp.getMinutes();
+                    time.className = "time";
                     
                     calendarOverlay.appendChild(close);
+                    calendarOverlay.appendChild(category);
                     calendarOverlay.appendChild(name);
-                    calendarOverlay.appendChild(note);
-                    calendarOverlay.appendChild(datePicker);
-                    calendarOverlay.appendChild(timePicker);
-                    calendarOverlay.appendChild(deleteTodo);  
+                    console.log(date.notes);
+                    if(note.innerHTML != ""){
+                        calendarOverlay.appendChild(note);
+                    }
+                    calendarOverlay.appendChild(dateandtime);
+                    dateandtime.appendChild(date);
+                    if(time.value == ""){
+                        time.value = "00:00";
+                    }
+                    dateandtime.appendChild(time);
         }
     };
 
@@ -1250,7 +1249,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     $scope.uiConfig = {
       calendar:{
         height: 463,
-        editable: true,
+        editable: false,
         eventTextColor: "black",
         eventBoarderColor: "black",
         header:{

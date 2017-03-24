@@ -15,13 +15,15 @@ $(document).ready(function(){
         document.getElementById('CategoryOptionsOverlay').style.display = "none";
         document.getElementById('TodoOptionsOverlay').innerHTML = "";
         document.getElementById('TodoOptionsOverlay').style.display = "none";
+        document.getElementById('CalendarOverlay').innerHTML = "";
+        document.getElementById('CalendarOverlay').style.display = "none";
     });
 
     $('#CategoryOptionsOverlay').on('click', function(e){
       e.stopPropagation();
     });
 
-    $('#CategoryOptionsOverlay').on('click', function(e){
+    $('#CalendarOverlay').on('click', function(e){
       e.stopPropagation();
     });
 
