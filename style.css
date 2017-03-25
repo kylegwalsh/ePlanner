@@ -258,22 +258,26 @@ input[type="checkbox"]:focus{
 #UndoCompleteOverlay{
   display: none;
   position: absolute;
-  bottom: 40px;
-  height: 35px;
-  left: 100px;
-  right: 100px;
-  background-color: #666666;
+  bottom: 30px;
+  min-height: 40px;
+  left: 140px;
+  right: 140px;
+  background-color: #404040;
   padding: 0;
   z-index: 2;
   border-radius: 2px;
-  opacity: .9;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
-  border-radius: 4px;
+  border-radius: 8px;
+}
+
+.completedText{
+  color: white;
+  font-weight: bold;
 }
 
 .undoButton{
-  color: red;
+  color: #ea9388;
 }
 
 .undoButton:hover, .hideButton:hover{
@@ -281,7 +285,8 @@ input[type="checkbox"]:focus{
 }
 
 .hideButton{
-  color: lightgray;
+  color: #9a9a9a;
+  font-weight: bold;
 }
 
 #CategoryOptionsOverlay:before {
