@@ -475,7 +475,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             var completedTemp;
             var notificationTemp;
             var UIDTemp;
-            // Set current hash to one if it hasn't been intialized
 
             remindersTemp = this.persistentInformation.reminders;
             colorTemp = this.persistentInformation.topColor;

@@ -469,14 +469,14 @@ input[type="checkbox"]:focus{
 
 .time{
   margin-left: 3px;
-  width: 90px;
+  width: 100px;
 }
 
 .calRow{
   padding: 10px;
 }
 
-[type="date"]::-webkit-inner-spin-button, [type="time"]::-webkit-inner-spin-button {
+[type="date"]::-webkit-inner-spin-button {
   display: none;
 }
 

@@ -987,13 +987,20 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
 
     $scope.todoStorage = todoStorage;
     var calendarRendered = false;
+    var instantiateRemoved = false;
 
     $scope.$watch('todoStorage.data', function() {
         $scope.todoList = $scope.todoStorage.data;
     });
 
     $("#CalendarTab").bind('click', function(){
-        calendarRendered = true;    });
+        calendarRendered = true;    
+        if($scope.events.length > 1 && !instantiateRemoved){
+            $scope.remove(0);
+            instantiateRemoved = true;
+            uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+        }
+    });
 
     var newDate = new Date();
     var d = newDate.getDate();
@@ -1007,19 +1014,10 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     $scope.todoStorage.findAll(function(data){
         $scope.todoList = data;
         $scope.$apply();
-        if($scope.todoList.length == 0){
-            $scope.remove(0);
-        }
         angular.forEach($scope.todoList, function(item){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
             for(var j=0; j < item.subToDo.length; j++){
                 $scope.addEvent(item.subToDo[j], item.color, item);
-                if($scope.count == 0){
-                    $scope.remove(0);
-                }
                 $scope.count = $scope.count + 1;         
-            }
-            if($scope.count == 0 && $scope.events.length == 1){
-                $scope.remove(0);
             }
         })
     });
@@ -1041,7 +1039,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     $scope.remove(j);
                     if(calendarRendered){
                         uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
-
                     }
                 }
             }
@@ -1319,11 +1316,4 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     };
     /* event sources array*/
     $scope.eventSources = [$scope.events];
-});
-
-// controller for hte settings section area
-app.controller('settings', function($scope) {
- 
-
-
 });
