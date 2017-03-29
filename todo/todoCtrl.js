@@ -994,7 +994,8 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     });
 
     $("#CalendarTab").bind('click', function(){
-        calendarRendered = true;    
+        calendarRendered = true;
+
         if($scope.events.length > 1 && !instantiateRemoved){
             $scope.remove(0);
             instantiateRemoved = true;
@@ -1009,7 +1010,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     $scope.count = 0;
 
     $scope.events = [];
-    $scope.events.push({title: 'instantiate',start: new Date(y, m, 1), stick: false});
+    $scope.events.push({title: 'Day One', category: "Start of Month", notes: "", start: new Date(y, m, 1), backgroundColor: "#FFFFFF", stick: false});
 
     $scope.todoStorage.findAll(function(data){
         $scope.todoList = data;
