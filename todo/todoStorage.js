@@ -8,7 +8,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     this.extraBackupInfo;
     // Runs first time app opened
     $(document).ready(function(){
-        if(_this.persistentInformation == null){
+        if(_this.persistentInformation == null || _this.persistentInformation.UID == null){
             $('#MainPage').hide();
             $('#UIDPage').show();
         }
