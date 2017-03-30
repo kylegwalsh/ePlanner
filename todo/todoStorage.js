@@ -169,12 +169,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     }
 
     this.remove = function(index) {
-
-        console.log("B4");
-        console.log(_this.data);
-
         var category = _this.data[_this.data.length -1 - index];
-        console.log(category);
         var syncData;
     
         for (var i=0; i < category.subToDo.length; i++) {
@@ -185,11 +180,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             }
             NotifyingServiceCalendar.notify(syncData);
         }
-
-
         _this.data.splice(_this.data.length -1 - index, 1);
-        console.log("AFTER");
-        console.log(_this.data);
         this.sync();
     }
 
@@ -255,19 +246,17 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         var size = _this.data.length-1; 
         var category = _this.data[size-categoryIndex];
         var size2 = category.subToDo.length-1;
-        console.log(categoryIndex + " " + subToDoIndex);
-
-        var newData = {
+        var  newData = {
             name: name,
             date: category.subToDo[size2 - subToDoIndex].date,
             time: category.subToDo[size2 - subToDoIndex].time,
             notes: category.subToDo[size2 - subToDoIndex].notes,
             uniqueHash: category.subToDo[size2 - subToDoIndex].uniqueHash
+        
         }
         category.subToDo[size2 - subToDoIndex] = newData;
         this.sync();
         alarm.doToggleAlarms();
-
         var syncData = {
             functionName: "changeSubToDoName",
             data: newData
@@ -348,6 +337,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         var size = _this.data.length-1; 
         var categoryX = _this.data[size-Categoryindex];
         var current = categoryX.subToDo[categoryX.subToDo.length-1-subToDoIndex];
+
         if(current.name == "" && current.notes == ""){
             // nothing, don't add
         } else {
@@ -389,7 +379,6 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         var size = _this.data.length-1; 
         var category = _this.data[size-categoryIndex];
         var size2 = category.subToDo.length-1;
-
         var newData = {
             name: name,
             date: date,
@@ -435,6 +424,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         var completedTemp;
         var notificationTemp;
         var UIDTemp;
+
         // Set current hash to one if it hasn't been intialized
 
         remindersTemp = this.persistentInformation.reminders;
@@ -455,10 +445,8 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         this.persistentInformation = information;
 
         // Creates todo
-        var category =  _this.data[index];
-        if(category == ""){
-            category = _this.data[index-1]; 
-        }
+        var size = _this.data.length-1; 
+        var category = _this.data[size-index];
 
         var newData = {
             name: name,

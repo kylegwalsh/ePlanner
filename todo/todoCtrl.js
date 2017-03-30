@@ -272,11 +272,10 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                          var categoryParent = $(addMe).parent();
                          var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
 
-
-            $scope.saveSubSectionForTodo(categoryIndex, $(this), "", "", "", "");
-
-            // call function to display the information
-            $scope.displaySubSectionForTodo( $(this), "", "", "", "", true);
+                $scope.saveSubSectionForTodo(categoryIndex, $(this), "", "", "", "");
+              // call function to display the information
+              $scope.displaySubSectionForTodo( $(this), "", "", "", "", true);
+            
         });
 
         divider.appendChild(addnewbar);
@@ -1050,7 +1049,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
             for(var j=0; j < item.subToDo.length; j++){
                 $scope.addEvent(item.subToDo[j], item.color, item);
                 if($scope.count == 0){
-                    console.log($scope.events);
                     $scope.remove(0);
                 }
                 $scope.count = $scope.count + 1;         
