@@ -494,10 +494,9 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
             this.persistentInformation = information;
 
             // Creates todo
-            var category =  _this.data[index];
-            if(category == ""){
-                category = _this.data[index-1]; 
-            }
+            var size = _this.data.length-1; 
+            var category = _this.data[size-index];
+
 
             var newData = {
                 name: name,
