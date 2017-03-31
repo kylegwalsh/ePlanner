@@ -35,12 +35,15 @@
           <div class="row">
 
               <div id="UndoCompleteOverlay">
+                <div class="row completedText text-center">
+                  Assignment Completed!
+                </div>
                 <div class="row">
-                  <div class="col-xs-6 text-center" style="vertical-align: middle;">
-                    <div class="undoButton" ng-click="undo()">Undo</div>
+                  <div class="col-xs-4 col-xs-offset-2 text-center">
+                    <div class="undoButton" ng-click="undo()">UNDO</div>
                   </div>
-                  <div class="col-xs-6 text-center">
-                    <div class="hideButton" ng-click="ignore()">Hide</div>
+                  <div class="col-xs-4 text-center">
+                    <div class="hideButton" ng-click="ignore()">HIDE</div>
                   </div>
                 </div>
               </div>
@@ -169,6 +172,11 @@
             <input id="UIDSubmit" type="submit" value="Submit">
         </div>
       </div>
+    </div>
+
+    <!-- Box to display error messages -->
+    <div id="ErrorBox">
+      <p><br>Sorry, but an error has occured.<br>Please close and re-open the extension to fix the problem.</p>
     </div>
   </body>
 

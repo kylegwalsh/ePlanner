@@ -8,7 +8,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     this.extraBackupInfo;
     // Runs first time app opened
     $(document).ready(function(){
-        if(_this.persistentInformation == null){
+        if(_this.persistentInformation == null || _this.persistentInformation.UID == null){
             $('#MainPage').hide();
             $('#UIDPage').show();
         }
@@ -30,7 +30,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         this.persistentInformation = temp;
         this.sync();
         $('#UIDPage').hide();        
-        $('#MainPage').show();        
+        $('#MainPage').show();
     }
 
 
@@ -54,31 +54,42 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     }
 
     this.updateIndexes = function(){
-        for (var i=0; i<_this.data.length; i++) {
-            _this.data[i]['id'] = i;
+        try{
+            for (var i=0; i<this.data.length; i++) {
+                _this.data[i]['id'] = i + 1; // TODO just i
+            }
+            this.sync();
         }
-        this.sync();
+        catch(error){
+            var errorBox = document.getElementById("ErrorBox");
+            errorBox.style.display = "inline-block";
+        }
     }
 
     this.updateColor = function(color){
+        try{
+            var temp;
+            if(this.persistentInformation.completedStuff != null){
+                temp = this.persistentInformation.completedStuff;
+            } else {
+                temp = new Array();
+            }
 
-        var temp;
-        if(this.persistentInformation.completedStuff != null){
-            temp = this.persistentInformation.completedStuff;
-        } else {
-            temp = new Array();
+            var information = {
+                topColor: color,
+                reminders: this.persistentInformation.reminders,
+                currentHash: this.persistentInformation.currentHash,
+                completedStuff: temp,
+                notificationSound: this.persistentInformation.notificationSound,
+                UID: this.persistentInformation.UID            
+            }
+            this.persistentInformation = information;
+            this.sync();
         }
-
-        var information = {
-            topColor: color,
-            reminders: this.persistentInformation.reminders,
-            currentHash: this.persistentInformation.currentHash,
-            completedStuff: temp,
-            notificationSound: this.persistentInformation.notificationSound,
-            UID: this.persistentInformation.UID            
+        catch(error){
+            var errorBox = document.getElementById("ErrorBox");
+            errorBox.style.display = "inline-block";
         }
-        this.persistentInformation = information;
-        this.sync();
     }
 
     this.sync = function() {
@@ -115,73 +126,103 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
         this.sync();
     }
+
     this.restoreCompleted = function(backUpData){
         this.persistentInformation.completedStuff = backUpData;
         this.sync();
     }
 
     this.add = function (colorCode) {
-        var id = this.data.length;      
-        var todo = {
-            id: id,
-            content: "",
-            completed: false,
-            color: colorCode, // default color
-            createdAt: new Date(),
-            subToDo: new Array(0), // array to keep track of the subToDos
-        };
-        this.data.push(todo); // adds new category to the end of the array
-        this.sync();
-        return id;
+        try{
+            var id = this.data.length;      
+
+            var todo = {
+                id: id,
+                content: "",
+                completed: false,
+                color: colorCode, // default color
+                createdAt: new Date(),
+                subToDo: new Array(0), // array to keep track of the subToDos
+            };
+            this.data.push(todo); // adds new category to the end of the array
+            this.sync();
+            return id;
+        }
+        catch(error){
+            var errorBox = document.getElementById("ErrorBox");
+            errorBox.style.display = "inline-block";
+        }
     }
 
     this.changeCategoryName = function(index, newName){
-        var todo = _this.data[index];
-        var syncData;
-        for (var i=0; i < todo.subToDo.length; i++) {
-            syncData = {
-                functionName: "changeCategoryName",
-                data: todo.subToDo[i],
-                categoryName: newName
+        try{
+            var todo = _this.data[index];
+            console.log("index is :" +index);
+            var syncData;
+            for (var i=0; i < todo.subToDo.length; i++) {
+                syncData = {
+                    functionName: "changeCategoryName",
+                    data: todo.subToDo[i],
+                    categoryName: newName
+                }
+                NotifyingServiceCalendar.notify(syncData);
             }
-            NotifyingServiceCalendar.notify(syncData);
-        }
 
-        todo.content = newName;
-        this.sync();
-        alarm.doToggleAlarms();
+            todo.content = newName;
+            this.sync();
+            alarm.doToggleAlarms();
+        }
+        catch(error){
+            var errorBox = document.getElementById("ErrorBox");
+            errorBox.style.display = "inline-block";
+        }
     }
 
     this.changeCategoryColor = function(index, hexValue){
-        var todo = _this.data[index];
-        var syncData;
-        for (var i=0; i < todo.subToDo.length; i++) {
-            syncData = {
-                functionName: "changeCategoryColor",
-                data: todo.subToDo[i],
-                categoryColor: hexValue
+        try{
+            var size = _this.data.length-1; 
+            var todo = _this.data[size-index]; 
+            var syncData;
+            for (var i=0; i < todo.subToDo.length; i++) {
+                syncData = {
+                    functionName: "changeCategoryColor",
+                    data: todo.subToDo[i],
+                    categoryColor: hexValue
+                }
+                NotifyingServiceCalendar.notify(syncData);
             }
-            NotifyingServiceCalendar.notify(syncData);
-        }
 
-        todo.color = hexValue;
-        this.sync();
+            todo.color = hexValue;
+            this.sync();
+        }
+        catch(error){
+            var errorBox = document.getElementById("ErrorBox");
+            errorBox.style.display = "inline-block";
+        }
     }
 
     this.remove = function(index) {
-        var category = _this.data[_this.data.length -1 - index];
-        var syncData;
-    
-        for (var i=0; i < category.subToDo.length; i++) {
-            alarm.cancelAlarms(category.subToDo[i]);
-            syncData = {
-                functionName: "removeSubToDo",
-                data: category.subToDo[i]
+
+        try{
+            var category = _this.data[index]; // _this.data.length -1 - index
+            var syncData;
+            for (var i=0; i < category.subToDo.length; i++) {
+                alarm.cancelAlarms(category.subToDo[i]);
+                syncData = {
+                    functionName: "removeSubToDo",
+                    data: category.subToDo[i]
+                }
+                NotifyingServiceCalendar.notify(syncData);
             }
-            NotifyingServiceCalendar.notify(syncData);
+
+            this.data.splice(index, 1); // _this.data.length -1 - index,1
+            this.updateIndexes();
+            this.sync();
         }
-        _this.data.splice(_this.data.length -1 - index, 1);
-        this.sync();
+        catch(error){
+            var errorBox = document.getElementById("ErrorBox");
+            errorBox.style.display = "inline-block";
+        }
     }
 
     this.removeCompleted = function(index){
@@ -193,9 +234,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     this.backupCompleteData = function(){
         var temp = new Array();
 
-        if(_this.persistentInformation.completedStuff == null){
-
-        } else {
+        if(_this.persistentInformation.completedStuff != null){
             for(var i=0; i<_this.persistentInformation.completedStuff.length; i++){
                  temp.push(angular.copy(_this.persistentInformation.completedStuff[i]));
             }
@@ -206,14 +245,13 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     this.backUp = function(catIndex, subIndex){
         var COPY = angular.copy(_this.data);
         this.backUpToDo = COPY;
-
      }
-    this.clearSavedInfo = function(){
 
+    this.clearSavedInfo = function(){
         var temp = new Array();
             for(var i=0; i<_this.persistentInformation.completedStuff.length; i++){
                  temp.push(angular.copy(_this.persistentInformation.completedStuff[i]));
-            }
+        }
 
         this.extraBackupInfo = temp;
         this.backUpToDo = _this.data;
@@ -224,145 +262,180 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
         _this.data = this.backUpToDo;
         _this.persistentInformation.completedStuff = this.extraBackupInfo;
         NotifyUndo.notify(this.extraBackupInfo); 
-         this.sync();
+        this.sync();
     }
 
     this.removeSubToDo = function(categoryIndex, subToDoIndex){
-        var size = _this.data.length-1; 
-        var category = _this.data[size-categoryIndex]; // we have to go backwards essentially since on the DOM they are displayed backwards (newest first)
-        var size2 = category.subToDo.length-1;
-        alarm.cancelAlarms(category.subToDo[size2 - subToDoIndex]);
-        var removeData = category.subToDo[category.subToDo.length-1-subToDoIndex];
-        category.subToDo.splice(category.subToDo.length-1-subToDoIndex, 1);
-        this.sync();
-        var syncData = {
-            functionName: "removeSubToDo",
-            data: removeData
+        try{
+            var size = _this.data.length-1; 
+            var category = _this.data[size-categoryIndex]; // we have to go backwards essentially since on the DOM they are displayed backwards (newest first)
+            var size2 = category.subToDo.length-1;
+            alarm.cancelAlarms(category.subToDo[size2 - subToDoIndex]);
+            var removeData = category.subToDo[category.subToDo.length-1-subToDoIndex];
+            category.subToDo.splice(category.subToDo.length-1-subToDoIndex, 1);
+            this.sync();
+            var syncData = {
+                functionName: "removeSubToDo",
+                data: removeData
+            }
+            NotifyingServiceCalendar.notify(syncData);
         }
-        NotifyingServiceCalendar.notify(syncData);
+        catch(error){
+            var errorBox = document.getElementById("ErrorBox");
+            errorBox.style.display = "inline-block";
+        }
     }
 
     this.changeSubToDoName = function(categoryIndex, subToDoIndex, name){
-        var size = _this.data.length-1; 
-        var category = _this.data[size-categoryIndex];
-        var size2 = category.subToDo.length-1;
-        var  newData = {
-            name: name,
-            date: category.subToDo[size2 - subToDoIndex].date,
-            time: category.subToDo[size2 - subToDoIndex].time,
-            notes: category.subToDo[size2 - subToDoIndex].notes,
-            uniqueHash: category.subToDo[size2 - subToDoIndex].uniqueHash
-        
+
+        try{
+            var size = _this.data.length-1; 
+            var category = _this.data[size-categoryIndex];
+            var size2 = category.subToDo.length-1;
+
+            var newData = {
+                name: name,
+                date: category.subToDo[size2 - subToDoIndex].date,
+                time: category.subToDo[size2 - subToDoIndex].time,
+                notes: category.subToDo[size2 - subToDoIndex].notes,
+                uniqueHash: category.subToDo[size2 - subToDoIndex].uniqueHash
+            }
+            category.subToDo[size2 - subToDoIndex] = newData;
+            this.sync();
+            alarm.doToggleAlarms();
+
+            var syncData = {
+                functionName: "changeSubToDoName",
+                data: newData
+            }
+            NotifyingServiceCalendar.notify(syncData);
         }
-        category.subToDo[size2 - subToDoIndex] = newData;
-        this.sync();
-        alarm.doToggleAlarms();
-        var syncData = {
-            functionName: "changeSubToDoName",
-            data: newData
+        catch(error){
+            var errorBox = document.getElementById("ErrorBox");
+            errorBox.style.display = "inline-block";
         }
-        NotifyingServiceCalendar.notify(syncData);
     }
 
     this.changeSubToDoNotes = function(categoryIndex, subToDoIndex, notes){
-        var size = _this.data.length-1; 
-        var category = _this.data[size-categoryIndex];
-        var size2 = category.subToDo.length-1;
+        try{
+            var size = _this.data.length-1; 
+            var category = _this.data[size-categoryIndex];
+            var size2 = category.subToDo.length-1;
 
-        var newData = {
-            name: category.subToDo[size2 - subToDoIndex].name,
-            date: category.subToDo[size2 - subToDoIndex].date,
-            time: category.subToDo[size2 - subToDoIndex].time,
-            notes: notes,
-            uniqueHash: category.subToDo[size2 - subToDoIndex].uniqueHash
+            var newData = {
+                name: category.subToDo[size2 - subToDoIndex].name,
+                date: category.subToDo[size2 - subToDoIndex].date,
+                time: category.subToDo[size2 - subToDoIndex].time,
+                notes: notes,
+                uniqueHash: category.subToDo[size2 - subToDoIndex].uniqueHash
+            }
+            category.subToDo[size2 - subToDoIndex] = newData;
+            this.sync();
+            var syncData = {
+                functionName: "changeSubToDoNotes",
+                data: newData
+            }
+            NotifyingServiceCalendar.notify(syncData);
         }
-        category.subToDo[size2 - subToDoIndex] = newData;
-        this.sync();
-        var syncData = {
-            functionName: "changeSubToDoNotes",
-            data: newData
+        catch(error){
+            var errorBox = document.getElementById("ErrorBox");
+            errorBox.style.display = "inline-block";
         }
-        NotifyingServiceCalendar.notify(syncData);
     }
 
     this.changeSubToDoDate = function(categoryIndex, subToDoIndex, date){
-        var size = _this.data.length-1; 
-        var category = _this.data[size-categoryIndex];
-        var size2 = category.subToDo.length-1;
+        try{
+            var size = _this.data.length-1; 
+            var category = _this.data[size-categoryIndex];
+            var size2 = category.subToDo.length-1;
 
-        var newData = {
-            name: category.subToDo[size2 - subToDoIndex].name,
-            date: date,
-            time: category.subToDo[size2 - subToDoIndex].time,
-            notes: category.subToDo[size2 - subToDoIndex].notes,
-            uniqueHash: category.subToDo[size2 - subToDoIndex].uniqueHash
-        } 
-        category.subToDo[size2 - subToDoIndex] = newData;
-        this.sync();
-        alarm.cancelAlarms(category.subToDo[size2 - subToDoIndex]);
-        alarm.doToggleAlarms();
+            var newData = {
+                name: category.subToDo[size2 - subToDoIndex].name,
+                date: date,
+                time: category.subToDo[size2 - subToDoIndex].time,
+                notes: category.subToDo[size2 - subToDoIndex].notes,
+                uniqueHash: category.subToDo[size2 - subToDoIndex].uniqueHash
+            } 
+            category.subToDo[size2 - subToDoIndex] = newData;
+            this.sync();
+            alarm.cancelAlarms(category.subToDo[size2 - subToDoIndex]);
+            alarm.doToggleAlarms();
 
-        var syncData = {
-            functionName: "changeSubToDoDate",
-            data: newData
+            var syncData = {
+                functionName: "changeSubToDoDate",
+                data: newData
+            }
+            NotifyingServiceCalendar.notify(syncData);
         }
-        NotifyingServiceCalendar.notify(syncData);
+        catch(error){
+            var errorBox = document.getElementById("ErrorBox");
+            errorBox.style.display = "inline-block";
+        }
     }
 
     this.changeSubToDoTime = function(categoryIndex, subToDoIndex, time){
-        var size = _this.data.length-1; 
-        var category = _this.data[size-categoryIndex];
-        var size2 = category.subToDo.length-1;
+        try{
+            var size = _this.data.length-1; 
+            var category = _this.data[size-categoryIndex];
+            var size2 = category.subToDo.length-1;
 
-        var newData = {
-            name: category.subToDo[size2 - subToDoIndex].name,
-            date: category.subToDo[size2 - subToDoIndex].date,
-            time: time,
-            notes: category.subToDo[size2 - subToDoIndex].notes,
-            uniqueHash: category.subToDo[size2 - subToDoIndex].uniqueHash
-        }
-        category.subToDo[size2 - subToDoIndex] = newData;
-        this.sync();
-        alarm.cancelAlarms(category.subToDo[size2 - subToDoIndex]);
-        alarm.doToggleAlarms();
+            var newData = {
+                name: category.subToDo[size2 - subToDoIndex].name,
+                date: category.subToDo[size2 - subToDoIndex].date,
+                time: time,
+                notes: category.subToDo[size2 - subToDoIndex].notes,
+                uniqueHash: category.subToDo[size2 - subToDoIndex].uniqueHash
+            }
+            category.subToDo[size2 - subToDoIndex] = newData;
+            this.sync();
+            alarm.cancelAlarms(category.subToDo[size2 - subToDoIndex]);
+            alarm.doToggleAlarms();
 
-        var syncData = {
-            functionName: "changeSubToDoTime",
-            data: newData
+            var syncData = {
+                functionName: "changeSubToDoTime",
+                data: newData
+            }
+            NotifyingServiceCalendar.notify(syncData);
         }
-        NotifyingServiceCalendar.notify(syncData);
+        catch(error){
+            var errorBox = document.getElementById("ErrorBox");
+            errorBox.style.display = "inline-block";
+        }
     }
 
     this.markToDoAsComplete = function(Categoryindex, subToDoIndex){
-        var size = _this.data.length-1; 
-        var categoryX = _this.data[size-Categoryindex];
-        var current = categoryX.subToDo[categoryX.subToDo.length-1-subToDoIndex];
-
-        if(current.name == "" && current.notes == ""){
-            // nothing, don't add
-        } else {
-            var completedObject = {
-            category: categoryX.content,
-            name: current.name,
-            date: current.date,
-            time: current.time, 
-            notes: current.notes, 
-            completedAt: new Date(), // each new date gets set to creation time
-            }
-            if(this.persistentInformation.completedStuff != null){
-                this.persistentInformation.completedStuff.push(completedObject);
+        try{
+            var size = _this.data.length-1; 
+            var categoryX = _this.data[size-Categoryindex];
+            var current = categoryX.subToDo[categoryX.subToDo.length-1-subToDoIndex];
+            if(current.name == "" && current.notes == ""){
+                // nothing, don't add
             } else {
-                this.persistentInformation.completedStuff = new Array();
-                this.persistentInformation.completedStuff.push(completedObject);
-            } 
-            this.sync();
-            NotifyingService.notify(this.persistentInformation); // used to notify completed controller of any changes
+                var completedObject = {
+                category: categoryX.content,
+                name: current.name,
+                date: current.date,
+                time: current.time, 
+                notes: current.notes, 
+                completedAt: new Date(), // each new date gets set to creation time
+                }
+                if(this.persistentInformation.completedStuff != null){
+                    this.persistentInformation.completedStuff.push(completedObject);
+                } else {
+                    this.persistentInformation.completedStuff = new Array();
+                    this.persistentInformation.completedStuff.push(completedObject);
+                } 
+                this.sync();
+                NotifyingService.notify(this.persistentInformation); // used to notify completed controller of any changes
+            }
         }
-
+        catch(error){
+            var errorBox = document.getElementById("ErrorBox");
+            errorBox.style.display = "inline-block";
+        }
     }
 
     this.changeNotificationSound = function(selected){
-
         var information = {
             topColor: this.persistentInformation.topColor,
             reminders: this.persistentInformation.reminders,
@@ -417,53 +490,58 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     }
 
     this.addSubToDo = function(index, name, date, time, notes){
-        // Assigns unique hash to todo
-        var nextHash;
-        var remindersTemp;
-        var colorTemp;
-        var completedTemp;
-        var notificationTemp;
-        var UIDTemp;
+        try{
+            // Assigns unique hash to todo
+            var nextHash;
+            var remindersTemp;
+            var colorTemp;
+            var completedTemp;
+            var notificationTemp;
+            var UIDTemp;
 
-        // Set current hash to one if it hasn't been intialized
+            remindersTemp = this.persistentInformation.reminders;
+            colorTemp = this.persistentInformation.topColor;
+            completedTemp = this.persistentInformation.completedStuff;
+            notificationTemp = this.persistentInformation.notificationSound;
+            UIDTemp = this.persistentInformation.UID;
+            nextHash = this.persistentInformation.currentHash + 1;
 
-        remindersTemp = this.persistentInformation.reminders;
-        colorTemp = this.persistentInformation.topColor;
-        completedTemp = this.persistentInformation.completedStuff;
-        notificationTemp = this.persistentInformation.notificationSound;
-        UIDTemp = this.persistentInformation.UID;
-        nextHash = this.persistentInformation.currentHash + 1;
+            var information = {
+                topColor: colorTemp,
+                reminders: remindersTemp,
+                currentHash: nextHash,
+                completedStuff: completedTemp,
+                notificationSound: notificationTemp,
+                UID: UIDTemp
+            } 
+            this.persistentInformation = information;
 
-        var information = {
-            topColor: colorTemp,
-            reminders: remindersTemp,
-            currentHash: nextHash,
-            completedStuff: completedTemp,
-            notificationSound: notificationTemp,
-            UID: UIDTemp
-        } 
-        this.persistentInformation = information;
 
-        // Creates todo
-        var size = _this.data.length-1; 
-        var category = _this.data[size-index];
+            // Creates todo
+            var size = _this.data.length-1; 
+            var category = _this.data[size-index];
 
-        var newData = {
-            name: name,
-            date: date,
-            time: time,
-            notes: notes,
-            uniqueHash: nextHash,
+            var newData = {
+                name: name,
+                date: date,
+                time: time,
+                notes: notes,
+                uniqueHash: nextHash,
+            }
+            category.subToDo.push(newData);      
+            this.sync();
+            var syncData = {
+                functionName: "addSubToDo",
+                data: newData,
+                color: category.color,
+                categoryName: category.content,
+            }
+            NotifyingServiceCalendar.notify(syncData);
         }
-        category.subToDo.push(newData);      
-        this.sync();
-        var syncData = {
-            functionName: "addSubToDo",
-            data: newData,
-            color: category.color,
-            categoryName: category.content,
+        catch(error){
+            var errorBox = document.getElementById("ErrorBox");
+            errorBox.style.display = "inline-block";
         }
-        NotifyingServiceCalendar.notify(syncData);
     }
 });
 

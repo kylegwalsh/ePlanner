@@ -47,8 +47,8 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 
     $scope.remove = function(index) {
         todoStorage.remove(index);
-         $("#ITEMS").innerHTML = "";
-          $scope.updateEverything();
+        $("#ITEMS").innerHTML = "";
+        $scope.updateEverything();
     }
 
     $scope.toggleCompleted = function() {
@@ -268,14 +268,13 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 
         $(addnew).bind( "click", function() {
             // call function to save the new information
-                        var categoryChild = $(addMe);
-                         var categoryParent = $(addMe).parent();
-                         var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+            var categoryChild = $(addMe);
+            var categoryParent = $(addMe).parent();
+            var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
 
-                $scope.saveSubSectionForTodo(categoryIndex, $(this), "", "", "", "");
-              // call function to display the information
-              $scope.displaySubSectionForTodo( $(this), "", "", "", "", true);
-            
+            $scope.saveSubSectionForTodo(categoryIndex, $(this), "", "", "", "");
+            // call function to display the information
+            $scope.displaySubSectionForTodo( $(this), "", "", "", "", true);
         });
 
         divider.appendChild(addnewbar);
@@ -419,6 +418,11 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 
                 // categoryIndex contains the value of the entire Category that the subToDo is being updated in
                 todoStorage.changeSubToDoName(categoryIndex, subToDoIndex, name.value);
+
+                if(date.value == "" && dateandtime.style.display == "inline-block"){
+                    date.focus();
+                    date.select();
+                }
             });
 
             // Save changes to todo notes
@@ -523,7 +527,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
             // If user presses enter, remove focus
             $(name).bind('keydown', function(event) {
                 if(event.keyCode == 13){
-                    if(newToDoBool){
+                    if(date.value == "" && dateandtime.style.display == "inline-block"){
                         date.focus();
                         date.select();
                     }
@@ -578,34 +582,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                 }
             }
 
-                    // $(oldButton).bind("click", function(){   // Button that handles updating the TODO
-                    //     var userInput = $(this).parent().children(".OptionsText").val(); // get the input that is in the textBox
-                    //     $(this).parent().parent().children().children().children(".SubName").html(userInput); // update the data
-
-                    //     var userInputNotes = $(this).parent().children(".NoteInput").val(); // get the input that is in the textBox
-                    //     $(this).parent().parent().children().children().children(".Notes").html(userInputNotes); // update the data
-                    //     var datePickerValue = $(this).parent().children(".DatePicker").val();
-                    //     var addNote = $(this).parent().children(".Text").val();
-                    //     var date  = new Date(datePickerValue);
-     
-
-                    //     var timeInput = $(this).parent().children(".TimePicker").val(); // get the time input value
-                    //     var test = $scope.formatTime(timeInput);      
-                       
-                    //     var child = $(this).parent().parent();
-                    //     var parent = $(this).parent().parent().parent();
-                    //     var subToDoindex = $(parent).children(".Divider").index(child);
-                    //     // subToDoindex contains the value of what we currently want to edit
-
-                    //     var categoryChild = $(this).parent().parent().parent().parent().parent();
-                    //     var categoryParent = $(this).parent().parent().parent().parent().parent().parent();
-                    //     var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
-                    //     // Category of the subToDo that we want to edit
-
-                    //     todoStorage.modifySubToDo(categoryIndex, subToDoindex, userInput, datePickerValue, timeInput, userInputNotes); // Update in memory
-                    //     $(this).parent().parent().children().children().children(".SubDateTime").html($scope.formatDate(date)    + " " + timeInput); // Update in HTML                  
-                    // });
-
             // Bring up options menu when option button clicked
             $(Options).bind( "click",  function(event) {
                 event.stopPropagation();
@@ -636,17 +612,14 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
                     var editButton = document.createElement("div"); // The button to confirm the user click to update everything 
                     editButton.className = "menu-item top-item";
                     editButton.innerHTML = "Edit Name";
-                    // TODO modify CSS and class stuff here 
 
                     var addNote = document.createElement("div"); // button that brings up notes text field
                     addNote.className = "menu-item";
                     addNote.innerHTML = "Add Notes";
-                    // TODO modify CSS and class stuff here
 
                     var dateButton = document.createElement("div"); // date picker
                     dateButton.className = "menu-item"; 
                     dateButton.innerHTML = "Change Date";
-                    // TODO modify CSS and class stuff here
 
                     var timeButton = document.createElement("div"); // edit time
                     timeButton.className = "menu-item";
@@ -746,6 +719,9 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
         if(date.value == "" && !newToDoBool){
             dateandtime.style.display = "none";
         }
+        else{
+            dateandtime.style.display = "inline-block";
+        }
         // If there's no time, don't display
         if(time.value == "" && !newToDoBool){
             time.style.display = "none";
@@ -754,7 +730,6 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
         if(notes.value == ""){
             notes.style.display = "none";
         }
-
         if(newToDoBool){
             name.focus();
         }
@@ -1022,13 +997,21 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
 
     $scope.todoStorage = todoStorage;
     var calendarRendered = false;
+    var instantiateRemoved = false;
 
     $scope.$watch('todoStorage.data', function() {
         $scope.todoList = $scope.todoStorage.data;
     });
 
     $("#CalendarTab").bind('click', function(){
-        calendarRendered = true;    });
+        calendarRendered = true;
+
+        if($scope.events.length > 1 && !instantiateRemoved){
+            $scope.remove(0);
+            instantiateRemoved = true;
+            uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
+        }
+    });
 
     var newDate = new Date();
     var d = newDate.getDate();
@@ -1037,24 +1020,15 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     $scope.count = 0;
 
     $scope.events = [];
-    $scope.events.push({title: 'instantiate',start: new Date(y, m, 1), stick: false});
+    $scope.events.push({title: 'Day One', category: "Start of Month", notes: "", start: new Date(y, m, 1), backgroundColor: "#FFFFFF", stick: false});
 
     $scope.todoStorage.findAll(function(data){
         $scope.todoList = data;
         $scope.$apply();
-        if($scope.todoList.length == 0){
-            $scope.remove(0);
-        }
         angular.forEach($scope.todoList, function(item){ // at the start of loading a page, we itterate over the existing data and create HTML elements for each and add to the DOM
             for(var j=0; j < item.subToDo.length; j++){
                 $scope.addEvent(item.subToDo[j], item.color, item);
-                if($scope.count == 0){
-                    $scope.remove(0);
-                }
                 $scope.count = $scope.count + 1;         
-            }
-            if($scope.count == 0 && $scope.events.length == 1){
-                $scope.remove(0);
             }
         })
     });
@@ -1076,7 +1050,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     $scope.remove(j);
                     if(calendarRendered){
                         uiCalendarConfig.calendars["calendar"].fullCalendar('refetchEvents');
-
                     }
                 }
             }
@@ -1198,7 +1171,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                 else{
                     calendarOverlay.style.display = "inline-block";
 
-                    var close = document.createElement("div"); // The button to confirm the user click to update name
+                    var close = document.createElement("div"); // The button to close overlay
                     close.className = "text-right";
                     close.innerHTML = "<i class='closeButton fa fa-lg fa-remove'></i>";
                     
@@ -1211,21 +1184,26 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     category.className = "row calRow calCat";
                     category.innerHTML = date.category;
 
-                    var name = document.createElement('div'); // Field where new name goes
+                    var name = document.createElement('div'); // displays name
                     name.className = "row calRow";
                     name.innerHTML = date.title;
 
-                    var note = document.createElement("div"); // button that brings up notes text field
+                    var note = document.createElement("div"); // displays notes
                     note.className = 'row calNotes container';
                     note.innerHTML = date.notes;
-                    // TODO modify CSS and class stuff here
 
-                    var dateandtime = document.createElement('div');
+                    var dateandtime = document.createElement('div'); // displays date and time
                     dateandtime.className = "SubDateTime calRow row";
-                    var temp = new Date(date.start);
-                    var date = document.createElement('input');
-                    date.type = 'date';
-                    date.disabled = "readonly";
+                    // accounts for change of date
+                    console.log(date.start);
+                    if(date.start._isUTC){
+                        date.start._d.setHours(date.start._d.getHours() + 4);
+                        date.start._isUTC = false;
+                    }
+                    var temp = new Date(date.start._d);
+                    var myDate = document.createElement('input');
+                    myDate.type = 'date';
+                    myDate.disabled = "readonly";
                     var year = temp.getFullYear();
                     var month = temp.getMonth()+1;
                     if(month < 10){
@@ -1235,12 +1213,20 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                     if(day < 10){
                         day = "0"+day;
                     }
-                    date.value = year + "-" + month + "-" + day;
-                    date.className = "date";
                     var time = document.createElement('input');
                     time.type = 'time';
                     time.disabled = "readonly";
-                    time.value = temp.getHours() + ":" + temp.getMinutes();
+                    var hours = temp.getHours();
+                    if(hours < 10){
+                        hours = "0" + hours;
+                    }
+                    var minutes = temp.getMinutes();
+                    if(minutes < 10){
+                        minutes = "0"+ minutes;
+                    }
+                    myDate.value = year + "-" + month + "-" + day;
+                    myDate.className = "date";
+                    time.value = hours + ":" + minutes;
                     time.className = "time";
                     
                     calendarOverlay.appendChild(close);
@@ -1250,7 +1236,7 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
                         calendarOverlay.appendChild(note);
                     }
                     calendarOverlay.appendChild(dateandtime);
-                    dateandtime.appendChild(date);
+                    dateandtime.appendChild(myDate);
                     if(time.value == ""){
                         time.value = "00:00";
                     }
@@ -1343,11 +1329,4 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     };
     /* event sources array*/
     $scope.eventSources = [$scope.events];
-});
-
-// controller for hte settings section area
-app.controller('settings', function($scope) {
- 
-
-
 });
