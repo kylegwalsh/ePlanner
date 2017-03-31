@@ -111,9 +111,14 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
             buttonB4.innerHTML = "<i class='fa fa-lg fa-ellipsis-h'></i>";
             buttonB4.className = "CategoryOptions col-xs-1";
 
+
+
             $(title).blur(function() {
                 title.style.backgroundColor = "#" + color;
-                todoStorage.changeCategoryName(index, title.value);
+                var categoryChild = $(addMe);
+                var categoryParent = $(addMe).parent();
+                var categoryIndex = $(categoryParent).children(".Category").index(categoryChild);
+                todoStorage.changeCategoryName(categoryIndex, title.value);
             });
 
             // If user presses enter, remove focus
@@ -274,7 +279,7 @@ app.controller('todoCtrl', function ($scope, $compile, todoStorage, NotifyingCol
 
             $scope.saveSubSectionForTodo(categoryIndex, $(this), "", "", "", "");
             // call function to display the information
-            $scope.displaySubSectionForTodo( $(this), "", "", "", "", true);
+            $scope.displaySubSectionForTodo( $(this), "", "", "", "", true);    
         });
 
         divider.appendChild(addnewbar);

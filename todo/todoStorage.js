@@ -156,8 +156,8 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
 
     this.changeCategoryName = function(index, newName){
         try{
-            var todo = _this.data[index];
-            console.log("index is :" +index);
+            var size = _this.data.length; 
+            var todo = _this.data[_this.data.length -index-1]; 
             var syncData;
             for (var i=0; i < todo.subToDo.length; i++) {
                 syncData = {
@@ -204,7 +204,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     this.remove = function(index) {
 
         try{
-            var category = _this.data[index]; // _this.data.length -1 - index
+            var category = _this.data[_this.data.length -index-1]; // _this.data.length -1 - index
             var syncData;
             for (var i=0; i < category.subToDo.length; i++) {
                 alarm.cancelAlarms(category.subToDo[i]);
@@ -214,8 +214,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
                 }
                 NotifyingServiceCalendar.notify(syncData);
             }
-
-            this.data.splice(index, 1); // _this.data.length -1 - index,1
+            this.data.splice(_this.data.length -1 - index,1); // _this.data.length -1 - index,1
             this.updateIndexes();
             this.sync();
         }
