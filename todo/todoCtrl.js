@@ -1043,10 +1043,6 @@ app.controller('calendar', function($scope,$compile,uiCalendarConfig, todoStorag
     });
 
     $scope.syncCalendar = function(data){
-        // If we haven't opened the calendar, we shouldn't rerender
-
-        // If we've already opened the calendar
-
         var functionName = data.functionName;
         if(functionName == "removeSubToDo"){
             var syncData = data.data;

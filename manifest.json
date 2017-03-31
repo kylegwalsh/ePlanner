@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
 
-  "name": "ePlanner Extension",
-  "description": "ePlanner extension for HCI Project",
+  "name": "Student ePlanner",
+  "description": "An electronic planner for students!",
   "version": "1.0",
   
   "content_security_policy": "script-src 'self' https://www.google-analytics.com; object-src 'self'",
