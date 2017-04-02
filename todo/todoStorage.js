@@ -8,7 +8,7 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     this.extraBackupInfo;
     // Runs first time app opened
     $(document).ready(function(){
-        if(_this.persistentInformation == null || _this.persistentInformation.UID == null){
+        if(_this.persistentInformation == null || _this.persistentInformation.UID == null || _this.persistentInformation.UID == ""){
             $('#MainPage').hide();
             $('#UIDPage').show();
         }
@@ -19,18 +19,20 @@ angular.module('app').service('todoStorage', function ($q, NotifyingService, Not
     });
 
     this.updateUID = function(){
-        var temp = {
-            topColor: 0,
-            reminders: true,
-            currentHash: 1,
-            completedStuff: new Array(),
-            notificationSound: "oldSpice.mp3",
-            UID: document.getElementById("UIDForm").value
+        if(document.getElementById("UIDForm").value != ""){
+            var temp = {
+                topColor: 0,
+                reminders: true,
+                currentHash: 1,
+                completedStuff: new Array(),
+                notificationSound: "oldSpice.mp3",
+                UID: document.getElementById("UIDForm").value
+            }
+            this.persistentInformation = temp;
+            this.sync();
+            $('#UIDPage').hide();        
+            $('#MainPage').show();
         }
-        this.persistentInformation = temp;
-        this.sync();
-        $('#UIDPage').hide();        
-        $('#MainPage').show();
     }
 
 
